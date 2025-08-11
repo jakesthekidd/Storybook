@@ -30,8 +30,9 @@ function isResizeObserverError(message: any): boolean {
 if (typeof window !== 'undefined') {
   // Catch errors immediately when they occur
   const originalAddEventListener = window.addEventListener;
-  window.addEventListener = function(type, listener, options) {
+  window.addEventListener = function(type: string, listener: any, options?: any): void {
     if (type === 'error') {
+      const self = this;
       const wrappedListener = function(event: any) {
         if (event.message && isResizeObserverError(event.message)) {
           event.preventDefault();
@@ -39,7 +40,7 @@ if (typeof window !== 'undefined') {
           event.stopImmediatePropagation();
           return false;
         }
-        return typeof listener === 'function' ? listener.call(this, event) : listener.handleEvent(event);
+        return typeof listener === 'function' ? listener.call(self, event) : listener.handleEvent(event);
       };
       return originalAddEventListener.call(this, type, wrappedListener, options);
     }
