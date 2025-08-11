@@ -80,7 +80,11 @@ const config: StorybookConfig = {
         --brand-info: #17a2b8;
       }
 
-      /* Basic CSS to prevent ResizeObserver loops */
+      /* Prevent ResizeObserver loops */
+      * {
+        contain: layout style;
+      }
+
       html, body {
         overflow-x: hidden;
         margin: 0;
