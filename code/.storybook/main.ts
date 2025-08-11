@@ -22,6 +22,7 @@ const config: StorybookConfig = {
     '@storybook/addon-controls',
     '@storybook/addon-viewport',
   ],
+  staticDirs: ['../src/assets'],
   framework: {
     name: '@storybook/angular',
     options: {
