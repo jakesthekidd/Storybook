@@ -1,5 +1,6 @@
 import type { Preview } from '@storybook/angular';
 import './resize-observer-polyfill';
+import './resize-observer-fix.css';
 
 // Comprehensive error suppression for ResizeObserver issues
 const originalConsoleError = console.error;
