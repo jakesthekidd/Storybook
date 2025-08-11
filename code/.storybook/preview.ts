@@ -28,11 +28,7 @@ import { importProvidersFrom } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import './resize-observer-polyfill';
 
-// Import PrimeNG CSS directly
-import 'primeng/resources/themes/lara-light-blue/theme.css';
-import 'primeng/resources/primeng.min.css';
-import 'primeicons/primeicons.css';
-import 'primeflex/primeflex.css';
+// CSS will be loaded via previewHead in main.ts
 
 // Comprehensive error suppression for ResizeObserver issues
 const originalConsoleError = console.error;
