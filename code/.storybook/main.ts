@@ -22,7 +22,12 @@ const config: StorybookConfig = {
     '@storybook/addon-controls',
     '@storybook/addon-viewport',
   ],
-  staticDirs: ['../src/assets'],
+  staticDirs: [
+    '../src/assets',
+    { from: '../node_modules/primeng', to: '/node_modules/primeng' },
+    { from: '../node_modules/primeicons', to: '/node_modules/primeicons' },
+    { from: '../node_modules/primeflex', to: '/node_modules/primeflex' }
+  ],
   framework: {
     name: '@storybook/angular',
     options: {
