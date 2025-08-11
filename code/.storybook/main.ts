@@ -125,27 +125,22 @@ const config: StorybookConfig = {
 
       .sb-show-main,
       .sb-main-padded {
-        contain: layout style paint;
-        will-change: auto;
+        box-sizing: border-box;
       }
 
       .docs-story,
       .sb-story {
-        contain: layout style paint;
-        overflow: hidden;
-        will-change: auto;
+        box-sizing: border-box;
       }
 
       #storybook-root {
-        contain: layout style paint;
         min-height: 100vh;
         box-sizing: border-box;
-        will-change: auto;
       }
 
       .storybook-wrapper {
-        contain: layout style;
-        will-change: auto;
+        box-sizing: border-box;
+        padding: 1rem;
       }
 
       .p-component {
