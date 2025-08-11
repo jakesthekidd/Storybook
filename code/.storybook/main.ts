@@ -38,16 +38,7 @@ const config: StorybookConfig = {
   ],
   framework: {
     name: '@storybook/angular',
-    options: {
-      builder: {
-        name: '@angular-devkit/build-angular:browser',
-        options: {
-          projectRoot: '',
-          sourceRoot: 'src',
-          tsConfig: '.storybook/tsconfig.json',
-        },
-      },
-    },
+    options: {},
   },
   previewHead: (head) => `
     ${head}
