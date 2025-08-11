@@ -43,26 +43,14 @@ const config: StorybookConfig = {
   previewHead: (head) => `
     ${head}
     <script>
-      // Override ResizeObserver to prevent loop errors
-      (function() {
-        if (typeof window !== 'undefined' && window.ResizeObserver) {
-          const OriginalResizeObserver = window.ResizeObserver;
-          window.ResizeObserver = class extends OriginalResizeObserver {
-            constructor(callback) {
-              super((entries, observer) => {
-                try {
-                  callback(entries, observer);
-                } catch (error) {
-                  // Silently ignore ResizeObserver errors
-                  if (!error.message || !error.message.includes('ResizeObserver')) {
-                    throw error;
-                  }
-                }
-              });
-            }
-          };
+      // Immediate ResizeObserver error suppression
+      const _error = console.error;
+      console.error = function() {
+        if (arguments[0] && arguments[0].toString().includes('ResizeObserver loop completed with undelivered notifications')) {
+          return;
         }
-      })();
+        _error.apply(console, arguments);
+      };
     </script>
     <!-- PrimeNG CSS from CDN for reliable loading -->
     <link rel="stylesheet" href="https://unpkg.com/primeng@17.18.15/resources/themes/lara-light-blue/theme.css">
