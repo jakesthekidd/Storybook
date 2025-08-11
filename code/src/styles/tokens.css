@@ -1,0 +1,145 @@
+/* Design Tokens for Brand Theming */
+/* Uses PrimeNG theme tokens. Customize these values for your brand. */
+
+:root {
+  /* Primary Brand Colors */
+  --brand-primary: var(--blue-500);
+  --brand-primary-light: var(--blue-100);
+  --brand-primary-dark: var(--blue-700);
+  
+  /* Secondary Brand Colors */
+  --brand-secondary: var(--gray-500);
+  --brand-secondary-light: var(--gray-100);
+  --brand-secondary-dark: var(--gray-700);
+  
+  /* Success Colors */
+  --brand-success: var(--green-500);
+  --brand-success-light: var(--green-100);
+  --brand-success-dark: var(--green-700);
+  
+  /* Warning Colors */
+  --brand-warning: var(--yellow-500);
+  --brand-warning-light: var(--yellow-100);
+  --brand-warning-dark: var(--yellow-700);
+  
+  /* Danger Colors */
+  --brand-danger: var(--red-500);
+  --brand-danger-light: var(--red-100);
+  --brand-danger-dark: var(--red-700);
+  
+  /* Info Colors */
+  --brand-info: var(--cyan-500);
+  --brand-info-light: var(--cyan-100);
+  --brand-info-dark: var(--cyan-700);
+  
+  /* Surface Colors */
+  --brand-surface-ground: var(--surface-ground);
+  --brand-surface-section: var(--surface-section);
+  --brand-surface-card: var(--surface-card);
+  --brand-surface-overlay: var(--surface-overlay);
+  --brand-surface-border: var(--surface-border);
+  --brand-surface-hover: var(--surface-hover);
+  
+  /* Text Colors */
+  --brand-text-color: var(--text-color);
+  --brand-text-color-secondary: var(--text-color-secondary);
+  --brand-text-color-disabled: var(--text-color-disabled);
+  
+  /* Typography */
+  --brand-font-family: var(--font-family);
+  --brand-font-size: var(--font-size);
+  --brand-font-size-small: var(--font-size-small);
+  --brand-font-size-large: var(--font-size-large);
+  
+  /* Spacing */
+  --brand-spacing-xs: 0.25rem;
+  --brand-spacing-sm: 0.5rem;
+  --brand-spacing-md: 0.75rem;
+  --brand-spacing-lg: 1rem;
+  --brand-spacing-xl: 1.5rem;
+  --brand-spacing-2xl: 2rem;
+  --brand-spacing-3xl: 3rem;
+  
+  /* Border Radius */
+  --brand-border-radius: var(--border-radius);
+  --brand-border-radius-sm: calc(var(--border-radius) / 2);
+  --brand-border-radius-lg: calc(var(--border-radius) * 2);
+  
+  /* Shadows */
+  --brand-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --brand-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --brand-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --brand-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  
+  /* Focus Ring */
+  --brand-focus-ring: var(--focus-ring);
+  --brand-focus-ring-width: var(--focus-ring-width);
+  --brand-focus-ring-style: var(--focus-ring-style);
+  --brand-focus-ring-color: var(--focus-ring-color);
+  
+  /* Component Specific Tokens */
+  
+  /* Button Tokens */
+  --brand-button-padding-y: var(--brand-spacing-sm);
+  --brand-button-padding-x: var(--brand-spacing-lg);
+  --brand-button-font-weight: 500;
+  --brand-button-border-width: 1px;
+  
+  /* Input Tokens */
+  --brand-input-padding-y: var(--brand-spacing-sm);
+  --brand-input-padding-x: var(--brand-spacing-md);
+  --brand-input-border-width: 1px;
+  --brand-input-background: var(--surface-a);
+  
+  /* Card Tokens */
+  --brand-card-padding: var(--brand-spacing-xl);
+  --brand-card-background: var(--brand-surface-card);
+  --brand-card-border: 1px solid var(--brand-surface-border);
+  
+  /* Dialog Tokens */
+  --brand-dialog-header-padding: var(--brand-spacing-xl);
+  --brand-dialog-content-padding: var(--brand-spacing-xl);
+  --brand-dialog-footer-padding: var(--brand-spacing-xl);
+  
+  /* Table Tokens */
+  --brand-table-header-background: var(--brand-surface-section);
+  --brand-table-header-padding: var(--brand-spacing-md);
+  --brand-table-cell-padding: var(--brand-spacing-md);
+  --brand-table-border: 1px solid var(--brand-surface-border);
+  
+  /* Toast Tokens */
+  --brand-toast-padding: var(--brand-spacing-lg);
+  --brand-toast-border-radius: var(--brand-border-radius);
+  --brand-toast-shadow: var(--brand-shadow-lg);
+}
+
+/* Dark Theme Overrides */
+[data-theme="dark"] {
+  /* Adjust tokens for dark theme if needed */
+  --brand-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+  --brand-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+  --brand-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+}
+
+/* Utility Classes Using Brand Tokens */
+.brand-text-primary { color: var(--brand-primary); }
+.brand-text-secondary { color: var(--brand-secondary); }
+.brand-text-success { color: var(--brand-success); }
+.brand-text-warning { color: var(--brand-warning); }
+.brand-text-danger { color: var(--brand-danger); }
+.brand-text-info { color: var(--brand-info); }
+
+.brand-bg-primary { background-color: var(--brand-primary); }
+.brand-bg-secondary { background-color: var(--brand-secondary); }
+.brand-bg-success { background-color: var(--brand-success); }
+.brand-bg-warning { background-color: var(--brand-warning); }
+.brand-bg-danger { background-color: var(--brand-danger); }
+.brand-bg-info { background-color: var(--brand-info); }
+
+.brand-border-primary { border-color: var(--brand-primary); }
+.brand-border-secondary { border-color: var(--brand-secondary); }
+
+.brand-shadow-sm { box-shadow: var(--brand-shadow-sm); }
+.brand-shadow { box-shadow: var(--brand-shadow); }
+.brand-shadow-md { box-shadow: var(--brand-shadow-md); }
+.brand-shadow-lg { box-shadow: var(--brand-shadow-lg); }
