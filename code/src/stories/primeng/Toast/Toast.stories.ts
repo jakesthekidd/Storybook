@@ -387,22 +387,22 @@ export const FormSubmissionFlow: Story = {
       },
       isSubmitting: false,
       submitForm: function() {
-        if (!this.formData.name || !this.formData.email) {
+        if (!this['formData'].name || !this['formData'].email) {
           console.log('Validation Error: Please fill in all required fields');
           return;
         }
 
-        this.isSubmitting = true;
+        this['isSubmitting'] = true;
 
         // Simulate API call
         setTimeout(() => {
-          this.isSubmitting = false;
+          this['isSubmitting'] = false;
           console.log('Success: Form submitted successfully!');
-          this.resetForm();
+          this['resetForm']();
         }, 2000);
       },
       resetForm: function() {
-        this.formData = { name: '', email: '' };
+        this['formData'] = { name: '', email: '' };
         console.log('Info: Form has been cleared');
       }
     },
