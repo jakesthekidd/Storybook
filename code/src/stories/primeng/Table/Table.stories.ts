@@ -211,7 +211,7 @@ export const WithFiltering: Story = {
         }
       },
       filterGlobal: function(event: any, matchMode: string) {
-        this.globalFilter = event.target.value;
+        this['globalFilter'] = event.target.value;
       }
     },
     template: `
