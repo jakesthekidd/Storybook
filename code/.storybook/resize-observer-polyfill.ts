@@ -18,23 +18,31 @@ export function suppressResizeObserverErrors(): void {
     window.ResizeObserver = class extends OriginalResizeObserver {
       constructor(callback: ResizeObserverCallback) {
         const wrappedCallback: ResizeObserverCallback = (entries, observer) => {
-          try {
-            // Use requestAnimationFrame to avoid immediate loop issues
-            requestAnimationFrame(() => {
-              try {
-                callback(entries, observer);
-              } catch (error) {
-                if (!isResizeObserverLoopError(error)) {
-                  console.error('ResizeObserver callback error:', error);
+          // Debounce the callback to prevent rapid firing
+          let timeoutId: number;
+          clearTimeout(timeoutId);
+
+          timeoutId = setTimeout(() => {
+            try {
+              // Use requestAnimationFrame to avoid immediate loop issues
+              requestAnimationFrame(() => {
+                try {
+                  callback(entries, observer);
+                } catch (error) {
+                  if (!isResizeObserverLoopError(error)) {
+                    // Only log non-ResizeObserver errors
+                    console.error('ResizeObserver callback error:', error);
+                  }
+                  // Always suppress ResizeObserver loop errors
                 }
+              });
+            } catch (error) {
+              // Suppress all ResizeObserver-related errors at this level
+              if (!isResizeObserverLoopError(error)) {
+                throw error;
               }
-            });
-          } catch (error) {
-            // Suppress ResizeObserver loop errors
-            if (!isResizeObserverLoopError(error)) {
-              throw error;
             }
-          }
+          }, 0);
         };
         super(wrappedCallback);
       }
