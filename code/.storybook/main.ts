@@ -43,11 +43,9 @@ const config: StorybookConfig = {
   previewHead: (head) => `
     <script>
       const _error = console.error;
-      console.error = function(message) {
-        if (typeof message === 'string' && message.indexOf('ResizeObserver loop completed with undelivered notifications') !== -1) {
-          return;
-        }
-        _error.apply(console, arguments);
+      console.error = function() {
+        if (arguments[0] && arguments[0].toString().indexOf('ResizeObserver loop') !== -1) return;
+        _error.apply(this, arguments);
       };
     </script>
     ${head}
