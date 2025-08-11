@@ -72,7 +72,22 @@ const preview: Preview = {
         date: /Date$/,
       },
     },
+    docs: {
+      inlineStories: true,
+    },
   },
+  decorators: [
+    (story) => ({
+      template: `
+        <div class="storybook-wrapper">
+          <story></story>
+        </div>
+      `,
+      providers: [
+        importProvidersFrom(BrowserAnimationsModule)
+      ]
+    })
+  ]
 };
 
 export default preview;
