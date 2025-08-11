@@ -36,6 +36,66 @@ const config: StorybookConfig = {
       },
     },
   },
+  previewHead: (head) => `
+    ${head}
+    <style>
+      /* CSS to help prevent ResizeObserver loops */
+      .sb-show-main,
+      .sb-main-padded {
+        contain: layout style;
+      }
+
+      .docs-story,
+      .sb-story {
+        contain: layout;
+        overflow: hidden;
+      }
+
+      #storybook-root {
+        contain: layout style;
+        min-height: 100vh;
+        box-sizing: border-box;
+      }
+
+      .p-component {
+        contain: layout;
+      }
+
+      .p-dialog,
+      .p-sidebar,
+      .p-menu,
+      .p-dropdown-panel,
+      .p-calendar-panel {
+        contain: layout;
+      }
+
+      .p-datatable {
+        contain: layout;
+      }
+
+      .p-toast {
+        contain: layout;
+        position: fixed;
+      }
+
+      .p-tabview-panels {
+        contain: layout;
+      }
+
+      .p-card {
+        contain: layout;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        contain: layout style;
+        overflow-x: hidden;
+      }
+    </style>
+  `,
 };
 
 export default config;
