@@ -15,6 +15,7 @@ const config: StorybookConfig = {
         options: {
           projectRoot: '',
           sourceRoot: 'src',
+          tsConfig: '.storybook/tsconfig.json',
         },
       },
     },
