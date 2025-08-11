@@ -117,21 +117,34 @@ const config: StorybookConfig = {
       }
 
       /* CSS to help prevent ResizeObserver loops */
+      html, body {
+        contain: layout style;
+        overflow-x: hidden;
+      }
+
       .sb-show-main,
       .sb-main-padded {
-        contain: layout style;
+        contain: layout style paint;
+        will-change: auto;
       }
 
       .docs-story,
       .sb-story {
-        contain: layout;
+        contain: layout style paint;
         overflow: hidden;
+        will-change: auto;
       }
 
       #storybook-root {
-        contain: layout style;
+        contain: layout style paint;
         min-height: 100vh;
         box-sizing: border-box;
+        will-change: auto;
+      }
+
+      .storybook-wrapper {
+        contain: layout style;
+        will-change: auto;
       }
 
       .p-component {
