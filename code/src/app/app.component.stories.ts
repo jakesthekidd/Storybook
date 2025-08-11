@@ -7,7 +7,6 @@ const meta: Meta<AppComponent> = {
   parameters: {
     layout: 'fullscreen',
   },
-  tags: ['autodocs'],
 };
 
 export default meta;
