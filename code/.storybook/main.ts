@@ -116,17 +116,9 @@ const config: StorybookConfig = {
         --brand-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
       }
 
-      /* AGGRESSIVE CSS to prevent ResizeObserver loops */
-      * {
-        contain: layout;
-        will-change: auto;
-      }
-
+      /* Basic CSS to prevent ResizeObserver loops */
       html, body {
-        contain: layout style paint;
         overflow-x: hidden;
-        height: 100%;
-        width: 100%;
         margin: 0;
         padding: 0;
       }
