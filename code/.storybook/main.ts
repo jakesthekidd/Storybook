@@ -42,8 +42,56 @@ const config: StorybookConfig = {
   },
   previewHead: (head) => `
     ${head}
-    <!-- CRITICAL: Load ResizeObserver fix FIRST -->
-    <script src="/resize-observer-fix.js"></script>
+    <!-- CRITICAL: ResizeObserver error suppression - MUST BE FIRST -->
+    <script>
+      (function() {
+        'use strict';
+        function isResizeObserverError(message) {
+          if (!message) return false;
+          const str = String(message).toLowerCase();
+          return str.includes('resizeobserver') && (
+            str.includes('loop') || str.includes('notification') ||
+            str.includes('undelivered') || str.includes('limit') || str.includes('completed')
+          );
+        }
+        if (typeof console !== 'undefined') {
+          const originalError = console.error;
+          const originalWarn = console.warn;
+          console.error = function(...args) {
+            if (isResizeObserverError(args[0])) return;
+            return originalError.apply(this, args);
+          };
+          console.warn = function(...args) {
+            if (isResizeObserverError(args[0])) return;
+            return originalWarn.apply(this, args);
+          };
+        }
+        if (typeof window !== 'undefined') {
+          window.onerror = function(message) {
+            if (isResizeObserverError(message)) return true;
+            return false;
+          };
+          window.addEventListener('unhandledrejection', function(event) {
+            if (isResizeObserverError(event.reason)) event.preventDefault();
+          });
+          if (typeof ResizeObserver !== 'undefined') {
+            const OriginalResizeObserver = ResizeObserver;
+            window.ResizeObserver = function(callback) {
+              let timeoutId;
+              const debouncedCallback = function(entries, observer) {
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(() => {
+                  try { callback.call(this, entries, observer); }
+                  catch (error) { if (!isResizeObserverError(error.message)) throw error; }
+                }, 16);
+              };
+              return new OriginalResizeObserver(debouncedCallback);
+            };
+            Object.setPrototypeOf(window.ResizeObserver, OriginalResizeObserver);
+          }
+        }
+      })();
+    </script>
     <!-- PrimeNG CSS from CDN for reliable loading -->
     <link rel="stylesheet" href="https://unpkg.com/primeng@17.18.15/resources/themes/lara-light-blue/theme.css">
     <link rel="stylesheet" href="https://unpkg.com/primeng@17.18.15/resources/primeng.min.css">
