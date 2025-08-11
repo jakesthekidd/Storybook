@@ -9,11 +9,16 @@ const config: StorybookConfig = {
   ],
   framework: {
     name: '@storybook/angular',
-    options: {},
+    options: {
+      builder: {
+        name: '@angular-devkit/build-angular:browser',
+        options: {
+          projectRoot: '',
+          sourceRoot: 'src',
+        },
+      },
+    },
   },
-  core: {
-    builder: '@storybook/builder-webpack5'
-  }
 };
 
 export default config;
