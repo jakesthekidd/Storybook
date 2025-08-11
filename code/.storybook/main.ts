@@ -43,20 +43,26 @@ const config: StorybookConfig = {
   previewHead: (head) => `
     ${head}
     <script>
-      // Minimal ResizeObserver error suppression
-      const originalError = console.error;
-      console.error = (...args) => {
-        const msg = String(args[0] || '');
-        if (msg.includes('ResizeObserver loop completed with undelivered notifications')) return;
-        originalError.apply(console, args);
-      };
-
-      window.addEventListener('error', (e) => {
-        if (String(e.message).includes('ResizeObserver loop completed with undelivered notifications')) {
-          e.preventDefault();
-          e.stopPropagation();
+      // Override ResizeObserver to prevent loop errors
+      (function() {
+        if (typeof window !== 'undefined' && window.ResizeObserver) {
+          const OriginalResizeObserver = window.ResizeObserver;
+          window.ResizeObserver = class extends OriginalResizeObserver {
+            constructor(callback) {
+              super((entries, observer) => {
+                try {
+                  callback(entries, observer);
+                } catch (error) {
+                  // Silently ignore ResizeObserver errors
+                  if (!error.message || !error.message.includes('ResizeObserver')) {
+                    throw error;
+                  }
+                }
+              });
+            }
+          };
         }
-      });
+      })();
     </script>
     <!-- PrimeNG CSS from CDN for reliable loading -->
     <link rel="stylesheet" href="https://unpkg.com/primeng@17.18.15/resources/themes/lara-light-blue/theme.css">
