@@ -1,19 +1,27 @@
-import type { StorybookConfig } from '@storybook/angular';
-
-// Suppress ResizeObserver errors globally
-if (typeof window !== 'undefined') {
-  const originalConsoleError = console.error;
-  console.error = (...args: any[]) => {
-    if (
-      args[0] &&
-      typeof args[0] === 'string' &&
-      args[0].includes('ResizeObserver loop completed with undelivered notifications')
-    ) {
-      return;
-    }
-    originalConsoleError.apply(console, args);
+// CRITICAL: Immediate ResizeObserver error suppression - must be at the very top!
+if (typeof globalThis !== 'undefined') {
+  // Override at the global level immediately
+  const suppressResizeObserverError = (message: any) => {
+    const msg = String(message || '');
+    return msg.includes('ResizeObserver') &&
+           (msg.includes('loop') || msg.includes('notification') || msg.includes('undelivered'));
   };
+
+  // Override console methods immediately
+  if (typeof console !== 'undefined') {
+    const origError = console.error;
+    const origWarn = console.warn;
+    console.error = (...args: any[]) => suppressResizeObserverError(args[0]) ? void 0 : origError.apply(console, args);
+    console.warn = (...args: any[]) => suppressResizeObserverError(args[0]) ? void 0 : origWarn.apply(console, args);
+  }
+
+  // Override global error handling
+  if (typeof window !== 'undefined') {
+    window.onerror = (message) => suppressResizeObserverError(message) ? true : false;
+  }
 }
+
+import type { StorybookConfig } from '@storybook/angular';
 
 const config: StorybookConfig = {
   stories: ['../src/**/*.stories.@(js|jsx|ts|tsx|mdx)'],
