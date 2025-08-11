@@ -52,13 +52,13 @@ const config: StorybookConfig = {
   previewHead: (head) => `
     ${head}
     <!-- PrimeNG Theme CSS -->
-    <link rel="stylesheet" href="/node_modules/primeng/resources/themes/lara-light-blue/theme.css">
+    <link rel="stylesheet" href="./node_modules/primeng/resources/themes/lara-light-blue/theme.css">
     <!-- PrimeNG Core CSS -->
-    <link rel="stylesheet" href="/node_modules/primeng/resources/primeng.min.css">
+    <link rel="stylesheet" href="./node_modules/primeng/resources/primeng.min.css">
     <!-- PrimeIcons CSS -->
-    <link rel="stylesheet" href="/node_modules/primeicons/primeicons.css">
+    <link rel="stylesheet" href="./node_modules/primeicons/primeicons.css">
     <!-- PrimeFlex CSS -->
-    <link rel="stylesheet" href="/node_modules/primeflex/primeflex.css">
+    <link rel="stylesheet" href="./node_modules/primeflex/primeflex.css">
     <style>
       /* Design Tokens for Brand Theming */
       :root {
