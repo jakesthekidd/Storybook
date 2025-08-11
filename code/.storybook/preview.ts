@@ -40,6 +40,7 @@ window.addEventListener('error', (event) => {
     event.stopPropagation();
     return false;
   }
+  return true;
 });
 
 const preview: Preview = {
