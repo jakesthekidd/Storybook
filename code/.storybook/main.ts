@@ -42,10 +42,11 @@ const config: StorybookConfig = {
   },
   previewHead: (head) => `
     <script>
-      const _error = console.error;
-      console.error = function() {
-        if (arguments[0] && arguments[0].toString().indexOf('ResizeObserver loop') !== -1) return;
-        _error.apply(this, arguments);
+      // Suppress harmless ResizeObserver warnings
+      const originalError = console.error;
+      console.error = function(msg) {
+        if (msg && msg.includes && msg.includes('ResizeObserver loop')) return;
+        originalError.apply(console, arguments);
       };
     </script>
     ${head}
