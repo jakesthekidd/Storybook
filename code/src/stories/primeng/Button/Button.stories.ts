@@ -207,3 +207,49 @@ export const Large: Story = {
     size: 'large'
   }
 };
+
+export const WithBrandTokens: Story = {
+  render: (args) => ({
+    props: args,
+    template: `
+      <div class="flex flex-column gap-3">
+        <h6 class="m-0">Brand Token Integration</h6>
+        <div class="flex gap-3">
+          <p-button
+            label="Primary Brand"
+            class="brand-button-primary">
+          </p-button>
+          <p-button
+            label="Secondary Brand"
+            severity="secondary"
+            class="brand-button-secondary">
+          </p-button>
+        </div>
+        <small class="text-600">Uses PrimeNG theme tokens. Customize in tokens.css.</small>
+      </div>
+      <style>
+        .brand-button-primary {
+          background: var(--brand-primary) !important;
+          border-color: var(--brand-primary) !important;
+          color: white !important;
+          padding: var(--brand-button-padding-y) var(--brand-button-padding-x) !important;
+          font-weight: var(--brand-button-font-weight) !important;
+          border-radius: var(--brand-border-radius) !important;
+          box-shadow: var(--brand-shadow) !important;
+        }
+        .brand-button-primary:hover {
+          background: var(--brand-primary-dark) !important;
+          border-color: var(--brand-primary-dark) !important;
+        }
+        .brand-button-secondary {
+          background: var(--brand-secondary) !important;
+          border-color: var(--brand-secondary) !important;
+        }
+        .brand-button-secondary:hover {
+          background: var(--brand-secondary-dark) !important;
+          border-color: var(--brand-secondary-dark) !important;
+        }
+      </style>
+    `
+  })
+};
