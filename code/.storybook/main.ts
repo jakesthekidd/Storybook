@@ -42,15 +42,39 @@ const config: StorybookConfig = {
   },
   previewHead: (head) => `
     <script>
-      // FIRST: Suppress ResizeObserver errors immediately
+      // Comprehensive ResizeObserver error suppression
       (function() {
-        const originalError = console.error;
-        console.error = function(...args) {
-          if (args[0] && String(args[0]).includes('ResizeObserver loop completed with undelivered notifications')) {
-            return;
-          }
-          originalError.apply(console, args);
+        const isResizeObserverError = (msg) => {
+          return msg && String(msg).includes('ResizeObserver loop completed with undelivered notifications');
         };
+
+        // Override all console methods
+        ['error', 'warn', 'log'].forEach(method => {
+          const original = console[method];
+          console[method] = function(...args) {
+            if (isResizeObserverError(args[0])) return;
+            original.apply(console, args);
+          };
+        });
+
+        // Global error handlers
+        window.onerror = function(msg) {
+          if (isResizeObserverError(msg)) return true;
+          return false;
+        };
+
+        window.addEventListener('error', function(e) {
+          if (isResizeObserverError(e.message)) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+        });
+
+        window.addEventListener('unhandledrejection', function(e) {
+          if (isResizeObserverError(e.reason)) {
+            e.preventDefault();
+          }
+        });
       })();
     </script>
     ${head}
