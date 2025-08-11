@@ -238,17 +238,17 @@ export const DynamicTabs: Story = {
       ],
       newTabTitle: 'New Tab',
       addTab: function() {
-        if (this.newTabTitle.trim()) {
-          this.tabs.push({
-            title: this.newTabTitle,
-            content: `Content for ${this.newTabTitle}`,
+        if (this['newTabTitle'].trim()) {
+          this['tabs'].push({
+            title: this['newTabTitle'],
+            content: `Content for ${this['newTabTitle']}`,
             closable: true
           });
-          this.newTabTitle = 'New Tab';
+          this['newTabTitle'] = 'New Tab';
         }
       },
       removeTab: function(event: any) {
-        this.tabs.splice(event.index, 1);
+        this['tabs'].splice(event.index, 1);
       },
       trackByTab: function(index: number, tab: any) {
         return tab.title;
