@@ -236,33 +236,7 @@ export const DynamicTabs: Story = {
         { title: 'Tab 2', content: 'Content for Tab 2', closable: true },
         { title: 'Tab 3', content: 'Content for Tab 3', closable: false }
       ],
-      newTabTitle: 'New Tab'
-    },
-    template: `
-      <div class="flex flex-column gap-3">
-        <div class="flex gap-2">
-          <input 
-            pInputText 
-            [(ngModel)]="newTabTitle" 
-            placeholder="New tab title" />
-          <p-button 
-            label="Add Tab" 
-            icon="pi pi-plus"
-            (click)="addTab()">
-          </p-button>
-        </div>
-        
-        <p-tabView [closable]="true" (onClose)="removeTab($event)">
-          <p-tabPanel 
-            *ngFor="let tab of tabs; trackBy: trackByTab"
-            [header]="tab.title"
-            [closable]="tab.closable">
-            <p>{{ tab.content }}</p>
-          </p-tabPanel>
-        </p-tabView>
-      </div>
-    `,
-    methods: {
+      newTabTitle: 'New Tab',
       addTab: function() {
         if (this.newTabTitle.trim()) {
           this.tabs.push({
@@ -279,7 +253,31 @@ export const DynamicTabs: Story = {
       trackByTab: function(index: number, tab: any) {
         return tab.title;
       }
-    }
+    },
+    template: `
+      <div class="flex flex-column gap-3">
+        <div class="flex gap-2">
+          <input
+            pInputText
+            [(ngModel)]="newTabTitle"
+            placeholder="New tab title" />
+          <p-button
+            label="Add Tab"
+            icon="pi pi-plus"
+            (click)="addTab()">
+          </p-button>
+        </div>
+
+        <p-tabView [closable]="true" (onClose)="removeTab($event)">
+          <p-tabPanel
+            *ngFor="let tab of tabs; trackBy: trackByTab"
+            [header]="tab.title"
+            [closable]="tab.closable">
+            <p>{{ tab.content }}</p>
+          </p-tabPanel>
+        </p-tabView>
+      </div>
+    `
   })
 };
 
