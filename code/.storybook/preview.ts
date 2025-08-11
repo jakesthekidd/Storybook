@@ -17,10 +17,34 @@ function isResizeObserverError(message: any): boolean {
       message.includes('ResizeObserver loop limit exceeded') ||
       message.includes('ResizeObserver loop') ||
       message.includes('ResizeObserver') && message.includes('loop') ||
-      message.includes('ResizeObserver') && message.includes('notification')
+      message.includes('ResizeObserver') && message.includes('notification') ||
+      message.includes('ResizeObserver') && message.includes('undelivered') ||
+      message.toLowerCase().includes('resizeobserver') && message.toLowerCase().includes('loop') ||
+      message.toLowerCase().includes('resizeobserver') && message.toLowerCase().includes('notification')
     );
   }
   return false;
+}
+
+// Global error suppression at the earliest possible point
+if (typeof window !== 'undefined') {
+  // Catch errors immediately when they occur
+  const originalAddEventListener = window.addEventListener;
+  window.addEventListener = function(type, listener, options) {
+    if (type === 'error') {
+      const wrappedListener = function(event: any) {
+        if (event.message && isResizeObserverError(event.message)) {
+          event.preventDefault();
+          event.stopPropagation();
+          event.stopImmediatePropagation();
+          return false;
+        }
+        return typeof listener === 'function' ? listener.call(this, event) : listener.handleEvent(event);
+      };
+      return originalAddEventListener.call(this, type, wrappedListener, options);
+    }
+    return originalAddEventListener.call(this, type, listener, options);
+  };
 }
 
 console.error = (...args: any[]) => {
