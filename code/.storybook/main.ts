@@ -52,68 +52,28 @@ const config: StorybookConfig = {
   previewHead: (head) => `
     ${head}
     <style>
-      /* Design Tokens for Brand Theming */
+      /* Debug: Check if CSS is loading */
+      body::before {
+        content: "Storybook CSS is loaded!";
+        position: fixed;
+        top: 0;
+        right: 0;
+        background: #007acc;
+        color: white;
+        padding: 4px 8px;
+        font-size: 12px;
+        z-index: 999999;
+        pointer-events: none;
+      }
+
+      /* Basic Design Tokens */
       :root {
-        /* Primary Brand Colors */
-        --brand-primary: var(--blue-500);
-        --brand-primary-light: var(--blue-100);
-        --brand-primary-dark: var(--blue-700);
-
-        /* Secondary Brand Colors */
-        --brand-secondary: var(--gray-500);
-        --brand-secondary-light: var(--gray-100);
-        --brand-secondary-dark: var(--gray-700);
-
-        /* Success Colors */
-        --brand-success: var(--green-500);
-        --brand-success-light: var(--green-100);
-        --brand-success-dark: var(--green-700);
-
-        /* Warning Colors */
-        --brand-warning: var(--yellow-500);
-        --brand-warning-light: var(--yellow-100);
-        --brand-warning-dark: var(--yellow-700);
-
-        /* Danger Colors */
-        --brand-danger: var(--red-500);
-        --brand-danger-light: var(--red-100);
-        --brand-danger-dark: var(--red-700);
-
-        /* Info Colors */
-        --brand-info: var(--cyan-500);
-        --brand-info-light: var(--cyan-100);
-        --brand-info-dark: var(--cyan-700);
-
-        /* Surface Colors */
-        --brand-surface-ground: var(--surface-ground);
-        --brand-surface-section: var(--surface-section);
-        --brand-surface-card: var(--surface-card);
-        --brand-surface-overlay: var(--surface-overlay);
-        --brand-surface-border: var(--surface-border);
-        --brand-surface-hover: var(--surface-hover);
-
-        /* Text Colors */
-        --brand-text-color: var(--text-color);
-        --brand-text-color-secondary: var(--text-color-secondary);
-
-        /* Spacing */
-        --brand-spacing-xs: 0.25rem;
-        --brand-spacing-sm: 0.5rem;
-        --brand-spacing-md: 0.75rem;
-        --brand-spacing-lg: 1rem;
-        --brand-spacing-xl: 1.5rem;
-        --brand-spacing-2xl: 2rem;
-
-        /* Border Radius */
-        --brand-border-radius: var(--border-radius);
-        --brand-border-radius-sm: calc(var(--border-radius) / 2);
-        --brand-border-radius-lg: calc(var(--border-radius) * 2);
-
-        /* Shadows */
-        --brand-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-        --brand-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-        --brand-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        --brand-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --brand-primary: #007acc;
+        --brand-secondary: #6c757d;
+        --brand-success: #28a745;
+        --brand-warning: #ffc107;
+        --brand-danger: #dc3545;
+        --brand-info: #17a2b8;
       }
 
       /* Basic CSS to prevent ResizeObserver loops */
