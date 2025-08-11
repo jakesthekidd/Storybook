@@ -165,3 +165,42 @@ export const Minimal: Story = {
     content: 'Clean and simple card design'
   }
 };
+
+export const WithBrandTokens: Story = {
+  render: (args) => ({
+    props: args,
+    template: `
+      <p-card class="brand-card">
+        <div class="text-center">
+          <i class="pi pi-star text-4xl brand-text-primary mb-3"></i>
+          <h5 class="m-0">{{ header }}</h5>
+          <p class="brand-text-secondary">{{ content }}</p>
+          <div class="flex justify-content-center mt-3">
+            <div class="brand-bg-primary text-white px-3 py-2 border-round text-sm font-semibold">
+              Premium Feature
+            </div>
+          </div>
+        </div>
+      </p-card>
+      <style>
+        .brand-card {
+          background: var(--brand-surface-card) !important;
+          border: var(--brand-card-border) !important;
+          border-radius: var(--brand-border-radius) !important;
+          box-shadow: var(--brand-shadow) !important;
+          padding: var(--brand-card-padding) !important;
+        }
+        .brand-card:hover {
+          box-shadow: var(--brand-shadow-md) !important;
+          transform: translateY(-2px);
+          transition: all 0.3s ease;
+        }
+      </style>
+      <small class="text-600 block mt-3">Uses PrimeNG theme tokens. Customize in tokens.css.</small>
+    `
+  }),
+  args: {
+    header: 'Brand Token Card',
+    content: 'This card demonstrates consistent brand theming using design tokens'
+  }
+};
