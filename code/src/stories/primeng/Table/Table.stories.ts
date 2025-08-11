@@ -201,7 +201,18 @@ export const WithFiltering: Story = {
   render: (args) => ({
     props: {
       ...args,
-      globalFilter: ''
+      globalFilter: '',
+      getStatusSeverity: function(status: string) {
+        switch (status) {
+          case 'INSTOCK': return 'success';
+          case 'LOWSTOCK': return 'warning';
+          case 'OUTOFSTOCK': return 'danger';
+          default: return 'info';
+        }
+      },
+      filterGlobal: function(event: any, matchMode: string) {
+        this.globalFilter = event.target.value;
+      }
     },
     template: `
       <div class="flex flex-column gap-3">
@@ -209,15 +220,15 @@ export const WithFiltering: Story = {
           <h5 class="m-0">Products</h5>
           <span class="p-input-icon-left">
             <i class="pi pi-search"></i>
-            <input 
-              pInputText 
-              type="text" 
+            <input
+              pInputText
+              type="text"
               [(ngModel)]="globalFilter"
               placeholder="Search products..." />
           </span>
         </div>
-        
-        <p-table 
+
+        <p-table
           [value]="data"
           [globalFilterFields]="['name', 'category', 'status']"
           [globalFilter]="globalFilter"
@@ -228,9 +239,9 @@ export const WithFiltering: Story = {
               <th>
                 <div class="flex flex-column gap-2">
                   <span>Name</span>
-                  <input 
-                    pInputText 
-                    type="text" 
+                  <input
+                    pInputText
+                    type="text"
                     (input)="filterGlobal($event, 'contains')"
                     placeholder="Filter by name"
                     class="p-column-filter" />
@@ -247,7 +258,7 @@ export const WithFiltering: Story = {
               <td>{{ product.category }}</td>
               <td>{{ product.price | currency }}</td>
               <td>
-                <p-tag 
+                <p-tag
                   [value]="product.status"
                   [severity]="getStatusSeverity(product.status)">
                 </p-tag>
@@ -256,20 +267,7 @@ export const WithFiltering: Story = {
           </ng-template>
         </p-table>
       </div>
-    `,
-    methods: {
-      getStatusSeverity: function(status: string) {
-        switch (status) {
-          case 'INSTOCK': return 'success';
-          case 'LOWSTOCK': return 'warning';
-          case 'OUTOFSTOCK': return 'danger';
-          default: return 'info';
-        }
-      },
-      filterGlobal: function(event: any, matchMode: string) {
-        this.globalFilter = event.target.value;
-      }
-    }
+    `
   })
 };
 
