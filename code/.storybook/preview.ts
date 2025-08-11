@@ -107,7 +107,6 @@ document.addEventListener('error', (event) => {
     event.preventDefault();
     event.stopPropagation();
     event.stopImmediatePropagation();
-    return false;
   }
 }, true); // Use capture phase
 
