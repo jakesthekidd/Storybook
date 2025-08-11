@@ -42,12 +42,11 @@ const config: StorybookConfig = {
   },
   previewHead: (head) => `
     <script>
-      // Simple ResizeObserver error suppression
-      const originalError = console.error;
-      console.error = (...args) => {
-        if (args[0]?.includes?.('ResizeObserver loop completed with undelivered notifications')) return;
-        originalError.apply(console, args);
-      };
+      window.addEventListener('error', e => {
+        if (e.message.includes('ResizeObserver loop completed with undelivered notifications')) {
+          e.stopImmediatePropagation();
+        }
+      });
     </script>
     ${head}
     <!-- PrimeNG CSS from CDN for reliable loading -->
