@@ -269,138 +269,112 @@ export const PositionBottomRight: Story = {
 
 export const StickyToast: Story = {
   render: (args) => ({
-    props: args,
+    props: {
+      ...args,
+      showSticky: function() {
+        console.log('Sticky toast: This message will stay until manually closed');
+      }
+    },
     template: `
       <div class="flex flex-column gap-3">
-        <p-button 
-          label="Show Sticky Toast" 
+        <p-button
+          label="Show Sticky Toast"
           (click)="showSticky()">
         </p-button>
-        
+
         <p-toast></p-toast>
+        <small class="text-600">Toast logged to console in Storybook</small>
       </div>
-    `,
-    methods: {
-      showSticky: function() {
-        this.messageService.add({
-          severity: 'info',
-          summary: 'Sticky Message',
-          detail: 'This message will stay until manually closed',
-          sticky: true
-        });
-      }
-    }
+    `
   })
 };
 
 export const CustomLifetime: Story = {
   render: (args) => ({
-    props: args,
+    props: {
+      ...args,
+      showCustom: function(life: number) {
+        console.log(`Custom lifetime toast: This message will disappear in ${life / 1000} seconds`);
+      }
+    },
     template: `
       <div class="flex flex-column gap-3">
         <div class="flex gap-2">
-          <p-button 
-            label="3 seconds" 
+          <p-button
+            label="3 seconds"
             (click)="showCustom(3000)">
           </p-button>
-          <p-button 
-            label="10 seconds" 
+          <p-button
+            label="10 seconds"
             (click)="showCustom(10000)">
           </p-button>
-          <p-button 
-            label="30 seconds" 
+          <p-button
+            label="30 seconds"
             (click)="showCustom(30000)">
           </p-button>
         </div>
-        
+
         <p-toast></p-toast>
+        <small class="text-600">Toast logged to console in Storybook</small>
       </div>
-    `,
-    methods: {
-      showCustom: function(life: number) {
-        this.messageService.add({
-          severity: 'info',
-          summary: 'Custom Lifetime',
-          detail: `This message will disappear in ${life / 1000} seconds`,
-          life: life
-        });
-      }
-    }
+    `
   })
 };
 
 export const MultipleMessages: Story = {
   render: (args) => ({
-    props: args,
+    props: {
+      ...args,
+      showMultiple: function() {
+        console.log('Multiple toasts: Success, Info, and Warning messages');
+      },
+      clearAll: function() {
+        console.log('All toasts cleared');
+      }
+    },
     template: `
       <div class="flex flex-column gap-3">
         <div class="flex gap-2">
-          <p-button 
-            label="Add Messages" 
+          <p-button
+            label="Add Messages"
             (click)="showMultiple()">
           </p-button>
-          <p-button 
-            label="Clear All" 
+          <p-button
+            label="Clear All"
             severity="secondary"
             (click)="clearAll()">
           </p-button>
         </div>
-        
+
         <p-toast></p-toast>
+        <small class="text-600">Toast actions logged to console in Storybook</small>
       </div>
-    `,
-    methods: {
-      showMultiple: function() {
-        this.messageService.addAll([
-          {
-            severity: 'success',
-            summary: 'Success 1',
-            detail: 'First successful operation'
-          },
-          {
-            severity: 'info',
-            summary: 'Info 1',
-            detail: 'Important information message'
-          },
-          {
-            severity: 'warn',
-            summary: 'Warning 1',
-            detail: 'Please be careful about this'
-          }
-        ]);
-      },
-      clearAll: function() {
-        this.messageService.clear();
-      }
-    }
+    `
   })
 };
 
 export const WithPreventDuplicates: Story = {
   render: (args) => ({
-    props: args,
+    props: {
+      ...args,
+      showMessage: function() {
+        console.log('Duplicate prevention toast: This is the same message content');
+      }
+    },
     template: `
       <div class="flex flex-column gap-3">
-        <p-button 
-          label="Click Multiple Times" 
+        <p-button
+          label="Click Multiple Times"
           (click)="showMessage()">
         </p-button>
         <small class="text-600">
           Try clicking the button multiple times quickly. Duplicate messages will be prevented.
         </small>
-        
+
         <p-toast [preventDuplicates]="true"></p-toast>
+        <small class="text-600">Toast logged to console in Storybook</small>
       </div>
-    `,
-    methods: {
-      showMessage: function() {
-        this.messageService.add({
-          severity: 'info',
-          summary: 'Duplicate Prevention',
-          detail: 'This is the same message content'
-        });
-      }
-    }
+    `
   })
 };
 
