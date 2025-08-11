@@ -385,95 +385,87 @@ export const FormSubmissionFlow: Story = {
         name: '',
         email: ''
       },
-      isSubmitting: false
-    },
-    template: `
-      <div class="flex flex-column gap-4 p-4 surface-card border-round max-w-20rem">
-        <h5 class="m-0">Contact Form</h5>
-        
-        <div class="flex flex-column gap-2">
-          <label for="name">Name</label>
-          <input 
-            type="text" 
-            id="name" 
-            [(ngModel)]="formData.name"
-            class="p-inputtext" />
-        </div>
-        
-        <div class="flex flex-column gap-2">
-          <label for="email">Email</label>
-          <input 
-            type="email" 
-            id="email" 
-            [(ngModel)]="formData.email"
-            class="p-inputtext" />
-        </div>
-        
-        <div class="flex gap-2">
-          <p-button 
-            label="Submit" 
-            [loading]="isSubmitting"
-            (click)="submitForm()">
-          </p-button>
-          <p-button 
-            label="Reset" 
-            severity="secondary"
-            outlined="true"
-            (click)="resetForm()">
-          </p-button>
-        </div>
-        
-        <p-toast></p-toast>
-      </div>
-    `,
-    methods: {
+      isSubmitting: false,
       submitForm: function() {
         if (!this.formData.name || !this.formData.email) {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Validation Error',
-            detail: 'Please fill in all required fields'
-          });
+          console.log('Validation Error: Please fill in all required fields');
           return;
         }
-        
+
         this.isSubmitting = true;
-        
+
         // Simulate API call
         setTimeout(() => {
           this.isSubmitting = false;
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Success',
-            detail: 'Form submitted successfully!'
-          });
+          console.log('Success: Form submitted successfully!');
           this.resetForm();
         }, 2000);
       },
       resetForm: function() {
         this.formData = { name: '', email: '' };
-        this.messageService.add({
-          severity: 'info',
-          summary: 'Form Reset',
-          detail: 'Form has been cleared'
-        });
+        console.log('Info: Form has been cleared');
       }
-    }
+    },
+    template: `
+      <div class="flex flex-column gap-4 p-4 surface-card border-round max-w-20rem">
+        <h5 class="m-0">Contact Form</h5>
+
+        <div class="flex flex-column gap-2">
+          <label for="name">Name</label>
+          <input
+            type="text"
+            id="name"
+            [(ngModel)]="formData.name"
+            class="p-inputtext" />
+        </div>
+
+        <div class="flex flex-column gap-2">
+          <label for="email">Email</label>
+          <input
+            type="email"
+            id="email"
+            [(ngModel)]="formData.email"
+            class="p-inputtext" />
+        </div>
+
+        <div class="flex gap-2">
+          <p-button
+            label="Submit"
+            [loading]="isSubmitting"
+            (click)="submitForm()">
+          </p-button>
+          <p-button
+            label="Reset"
+            severity="secondary"
+            outlined="true"
+            (click)="resetForm()">
+          </p-button>
+        </div>
+
+        <p-toast></p-toast>
+        <small class="text-600">Form actions logged to console in Storybook</small>
+      </div>
+    `
   })
 };
 
 export const CustomStyling: Story = {
   render: (args) => ({
-    props: args,
+    props: {
+      ...args,
+      showCustom: function() {
+        console.log('Custom styled toast: This toast uses brand tokens for consistent theming');
+      }
+    },
     template: `
       <div class="flex flex-column gap-3">
-        <p-button 
-          label="Show Custom Toast" 
+        <p-button
+          label="Show Custom Toast"
           (click)="showCustom()">
         </p-button>
-        
+
         <p-toast styleClass="custom-toast"></p-toast>
-        
+
         <style>
           .custom-toast .p-toast-message {
             background: linear-gradient(135deg, var(--brand-primary), var(--brand-secondary));
@@ -485,17 +477,9 @@ export const CustomStyling: Story = {
             color: white;
           }
         </style>
+
+        <small class="text-600">Toast logged to console in Storybook. Uses brand tokens for theming.</small>
       </div>
-    `,
-    methods: {
-      showCustom: function() {
-        this.messageService.add({
-          severity: 'info',
-          summary: 'Custom Styled Toast',
-          detail: 'This toast uses brand tokens for consistent theming',
-          life: 4000
-        });
-      }
-    }
+    `
   })
 };
