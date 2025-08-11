@@ -1,6 +1,12 @@
 import type { Preview } from '@storybook/angular';
 import './resize-observer-polyfill';
 
+// Import PrimeNG styles for Storybook
+import 'primeng/resources/themes/lara-light-blue/theme.css';
+import 'primeng/resources/primeng.min.css';
+import 'primeicons/primeicons.css';
+import 'primeflex/primeflex.css';
+
 // Comprehensive error suppression for ResizeObserver issues
 const originalConsoleError = console.error;
 const originalConsoleWarn = console.warn;
