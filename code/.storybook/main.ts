@@ -143,54 +143,17 @@ const config: StorybookConfig = {
         padding: 1rem;
       }
 
+      /* Basic PrimeNG component styling */
       .p-component {
-        contain: layout style;
-        will-change: auto;
+        box-sizing: border-box;
       }
 
-      .p-dialog,
-      .p-sidebar,
-      .p-menu,
-      .p-dropdown-panel,
-      .p-calendar-panel,
-      .p-overlay,
-      .p-overlaypanel {
-        contain: layout style;
-        will-change: auto;
+      .p-button {
+        cursor: pointer;
       }
 
-      .p-datatable,
-      .p-datatable-wrapper {
-        contain: layout style;
-        will-change: auto;
-      }
-
-      .p-toast,
-      .p-toast-message {
-        contain: layout style;
-        position: fixed;
-        will-change: auto;
-      }
-
-      .p-tabview-panels,
-      .p-tabview-nav {
-        contain: layout style;
-        will-change: auto;
-      }
-
-      .p-card,
-      .p-panel {
-        contain: layout style;
-        will-change: auto;
-      }
-
-      /* Additional PrimeNG components */
-      .p-accordion,
-      .p-fieldset,
-      .p-splitter,
-      .p-scrollpanel {
-        contain: layout style;
-        will-change: auto;
+      .p-card {
+        box-sizing: border-box;
       }
 
       * {
