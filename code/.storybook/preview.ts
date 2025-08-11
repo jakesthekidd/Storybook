@@ -1,3 +1,27 @@
+// IMMEDIATE ResizeObserver error suppression - must be first!
+if (typeof window !== 'undefined') {
+  // Override console methods immediately
+  const originalError = console.error;
+  const originalWarn = console.warn;
+  const originalLog = console.log;
+
+  const suppressError = (args: any[]) => {
+    const message = String(args[0] || '');
+    return message.includes('ResizeObserver') &&
+           (message.includes('loop') || message.includes('notification') || message.includes('undelivered'));
+  };
+
+  console.error = (...args: any[]) => suppressError(args) ? void 0 : originalError.apply(console, args);
+  console.warn = (...args: any[]) => suppressError(args) ? void 0 : originalWarn.apply(console, args);
+  console.log = (...args: any[]) => suppressError(args) ? void 0 : originalLog.apply(console, args);
+
+  // Immediate window.onerror override
+  window.onerror = (message) => {
+    const msg = String(message || '');
+    return msg.includes('ResizeObserver') && (msg.includes('loop') || msg.includes('notification'));
+  };
+}
+
 import type { Preview } from '@storybook/angular';
 import { setCompodocJson } from '@storybook/addon-docs/angular';
 import { importProvidersFrom } from '@angular/core';
