@@ -68,11 +68,24 @@ console.log = (...args: any[]) => {
   originalConsoleLog.apply(console, args);
 };
 
+// Immediate window.onerror override - highest priority
+const originalWindowOnError = window.onerror;
+window.onerror = function(message, source, lineno, colno, error) {
+  if (typeof message === 'string' && isResizeObserverError(message)) {
+    return true; // Suppress the error
+  }
+  if (error && isResizeObserverError(error.message || String(error))) {
+    return true; // Suppress the error
+  }
+  return originalWindowOnError ? originalWindowOnError.call(this, message, source, lineno, colno, error) : false;
+};
+
 // Handle ResizeObserver errors at the window level
 window.addEventListener('error', (event) => {
   if (event.message && isResizeObserverError(event.message)) {
     event.preventDefault();
     event.stopPropagation();
+    event.stopImmediatePropagation();
     return false;
   }
   return true;
@@ -86,6 +99,16 @@ window.addEventListener('unhandledrejection', (event) => {
   }
   return true;
 });
+
+// Additional DOM error catching
+document.addEventListener('error', (event) => {
+  if (event.message && isResizeObserverError(event.message)) {
+    event.preventDefault();
+    event.stopPropagation();
+    event.stopImmediatePropagation();
+    return false;
+  }
+}, true); // Use capture phase
 
 const preview: Preview = {
   parameters: {
