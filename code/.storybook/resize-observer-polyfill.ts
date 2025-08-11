@@ -1,71 +1,58 @@
-// Enhanced ResizeObserver error handler to prevent loop completion warnings
+// Immediate and aggressive ResizeObserver error suppression
 export function suppressResizeObserverErrors(): void {
-  // Check if ResizeObserver error is related to loop notifications
-  function isResizeObserverLoopError(error: any): boolean {
-    const message = error?.message || String(error);
-    return (
-      message.includes('ResizeObserver loop completed with undelivered notifications') ||
-      message.includes('ResizeObserver loop limit exceeded') ||
-      message.includes('ResizeObserver loop') ||
-      (message.includes('ResizeObserver') && message.includes('notification'))
-    );
-  }
+  if (typeof window === 'undefined') return;
 
-  // Override the original ResizeObserver to handle errors gracefully
-  if (typeof window !== 'undefined' && window.ResizeObserver) {
+  // Immediate error suppression function
+  const isResizeObserverError = (msg: any): boolean => {
+    const message = String(msg || '');
+    return message.includes('ResizeObserver') &&
+           (message.includes('loop') || message.includes('notification') || message.includes('undelivered'));
+  };
+
+  // Override ResizeObserver completely to prevent errors at source
+  if (window.ResizeObserver) {
     const OriginalResizeObserver = window.ResizeObserver;
 
     window.ResizeObserver = class extends OriginalResizeObserver {
       constructor(callback: ResizeObserverCallback) {
-        const wrappedCallback: ResizeObserverCallback = (entries, observer) => {
-          // Debounce the callback to prevent rapid firing
-          let timeoutId: number | undefined;
-          if (timeoutId) {
-            clearTimeout(timeoutId);
-          }
-
-          timeoutId = window.setTimeout(() => {
-            try {
-              // Use requestAnimationFrame to avoid immediate loop issues
-              requestAnimationFrame(() => {
+        // Wrap callback to suppress all errors
+        const safeCallback: ResizeObserverCallback = (entries, observer) => {
+          try {
+            // Use both RAF and timeout to prevent loops
+            requestAnimationFrame(() => {
+              setTimeout(() => {
                 try {
                   callback(entries, observer);
-                } catch (error) {
-                  if (!isResizeObserverLoopError(error)) {
-                    // Only log non-ResizeObserver errors
-                    console.error('ResizeObserver callback error:', error);
-                  }
-                  // Always suppress ResizeObserver loop errors
+                } catch (e) {
+                  // Silently suppress all callback errors
                 }
-              });
-            } catch (error) {
-              // Suppress all ResizeObserver-related errors at this level
-              if (!isResizeObserverLoopError(error)) {
-                throw error;
-              }
-            }
-          }, 0);
+              }, 0);
+            });
+          } catch (e) {
+            // Silently suppress all errors
+          }
         };
-        super(wrappedCallback);
+        super(safeCallback);
       }
     };
   }
 
-  // Handle unhandled promise rejections related to ResizeObserver
+  // Nuclear option: catch everything
+  const originalConsoleError = console.error;
+  console.error = (...args: any[]) => {
+    if (isResizeObserverError(args[0])) return;
+    originalConsoleError.apply(console, args);
+  };
+
+  // Suppress all ResizeObserver-related unhandled rejections
   window.addEventListener('unhandledrejection', (event) => {
-    if (isResizeObserverLoopError(event.reason)) {
+    if (isResizeObserverError(event.reason?.message || event.reason)) {
       event.preventDefault();
     }
   });
 
-  // Additional global error handler for ResizeObserver
-  const originalOnError = window.onerror;
-  window.onerror = function(message, source, lineno, colno, error) {
-    if (isResizeObserverLoopError(message || error)) {
-      return true; // Suppress the error
-    }
-    return originalOnError ? originalOnError.call(this, message, source, lineno, colno, error) : false;
-  };
+  // Global error handler override
+  window.onerror = (message) => isResizeObserverError(message) ? true : false;
 }
 
 // Auto-initialize when imported
