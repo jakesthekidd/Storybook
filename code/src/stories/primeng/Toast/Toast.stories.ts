@@ -125,134 +125,115 @@ export const Default: Story = {
 
 export const Primary: Story = {
   render: (args) => ({
-    props: args,
+    props: {
+      ...args,
+      showSuccess: function() {
+        console.log('Success toast: Message sent successfully');
+      }
+    },
     template: `
       <div class="flex flex-column gap-3">
-        <p-button 
-          label="Show Success Toast" 
+        <p-button
+          label="Show Success Toast"
           (click)="showSuccess()">
         </p-button>
-        
+
         <p-toast position="top-right"></p-toast>
+        <small class="text-600">Toast logged to console in Storybook</small>
       </div>
-    `,
-    methods: {
-      showSuccess: function() {
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Success',
-          detail: 'Message sent successfully'
-        });
-      }
-    }
+    `
   })
 };
 
 export const SuccessToast: Story = {
   render: (args) => ({
-    props: args,
+    props: {
+      ...args,
+      showSuccess: function() {
+        console.log('Success toast: Data saved successfully');
+      }
+    },
     template: `
       <div class="flex flex-column gap-3">
-        <p-button 
-          label="Show Success" 
+        <p-button
+          label="Show Success"
           severity="success"
           (click)="showSuccess()">
         </p-button>
-        
+
         <p-toast></p-toast>
+        <small class="text-600">Toast logged to console in Storybook</small>
       </div>
-    `,
-    methods: {
-      showSuccess: function() {
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Success',
-          detail: 'Data saved successfully',
-          life: 3000
-        });
-      }
-    }
+    `
   })
 };
 
 export const InfoToast: Story = {
   render: (args) => ({
-    props: args,
+    props: {
+      ...args,
+      showInfo: function() {
+        console.log('Info toast: New update available');
+      }
+    },
     template: `
       <div class="flex flex-column gap-3">
-        <p-button 
-          label="Show Info" 
+        <p-button
+          label="Show Info"
           severity="info"
           (click)="showInfo()">
         </p-button>
-        
+
         <p-toast></p-toast>
+        <small class="text-600">Toast logged to console in Storybook</small>
       </div>
-    `,
-    methods: {
-      showInfo: function() {
-        this.messageService.add({
-          severity: 'info',
-          summary: 'Information',
-          detail: 'New update available',
-          life: 3000
-        });
-      }
-    }
+    `
   })
 };
 
 export const WarningToast: Story = {
   render: (args) => ({
-    props: args,
+    props: {
+      ...args,
+      showWarn: function() {
+        console.log('Warning toast: Session will expire in 5 minutes');
+      }
+    },
     template: `
       <div class="flex flex-column gap-3">
-        <p-button 
-          label="Show Warning" 
+        <p-button
+          label="Show Warning"
           severity="warning"
           (click)="showWarn()">
         </p-button>
-        
+
         <p-toast></p-toast>
+        <small class="text-600">Toast logged to console in Storybook</small>
       </div>
-    `,
-    methods: {
-      showWarn: function() {
-        this.messageService.add({
-          severity: 'warn',
-          summary: 'Warning',
-          detail: 'Session will expire in 5 minutes',
-          life: 3000
-        });
-      }
-    }
+    `
   })
 };
 
 export const ErrorToast: Story = {
   render: (args) => ({
-    props: args,
+    props: {
+      ...args,
+      showError: function() {
+        console.log('Error toast: Failed to save data. Please try again.');
+      }
+    },
     template: `
       <div class="flex flex-column gap-3">
-        <p-button 
-          label="Show Error" 
+        <p-button
+          label="Show Error"
           severity="danger"
           (click)="showError()">
         </p-button>
-        
+
         <p-toast></p-toast>
+        <small class="text-600">Toast logged to console in Storybook</small>
       </div>
-    `,
-    methods: {
-      showError: function() {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to save data. Please try again.',
-          life: 5000
-        });
-      }
-    }
+    `
   })
 };
 
