@@ -64,34 +64,49 @@ type Story = StoryObj;
 
 export const Default: Story = {
   render: (args) => ({
-    props: args,
+    props: {
+      ...args,
+      showSuccess: function() {
+        // For Storybook demonstration - in real app inject MessageService
+        console.log('Success toast would show: Operation completed successfully');
+      },
+      showInfo: function() {
+        console.log('Info toast would show: Here is some important information');
+      },
+      showWarn: function() {
+        console.log('Warning toast would show: Please check your input');
+      },
+      showError: function() {
+        console.log('Error toast would show: Something went wrong');
+      }
+    },
     template: `
       <div class="flex flex-column gap-3">
         <h5 class="m-0">Toast Messages</h5>
         <div class="flex flex-wrap gap-2">
-          <p-button 
-            label="Success" 
+          <p-button
+            label="Success"
             severity="success"
             (click)="showSuccess()">
           </p-button>
-          <p-button 
-            label="Info" 
+          <p-button
+            label="Info"
             severity="info"
             (click)="showInfo()">
           </p-button>
-          <p-button 
-            label="Warning" 
+          <p-button
+            label="Warning"
             severity="warning"
             (click)="showWarn()">
           </p-button>
-          <p-button 
-            label="Error" 
+          <p-button
+            label="Error"
             severity="danger"
             (click)="showError()">
           </p-button>
         </div>
-        
-        <p-toast 
+
+        <p-toast
           [position]="position"
           [autoZIndex]="autoZIndex"
           [preventOpenDuplicates]="preventOpenDuplicates"
@@ -101,38 +116,10 @@ export const Default: Story = {
           [showTransitionOptions]="showTransitionOptions"
           [hideTransitionOptions]="hideTransitionOptions">
         </p-toast>
+
+        <small class="text-600">Note: In Storybook, toasts are logged to console. In real apps, inject MessageService.</small>
       </div>
-    `,
-    methods: {
-      showSuccess: function() {
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Success',
-          detail: 'Operation completed successfully'
-        });
-      },
-      showInfo: function() {
-        this.messageService.add({
-          severity: 'info',
-          summary: 'Info',
-          detail: 'Here is some important information'
-        });
-      },
-      showWarn: function() {
-        this.messageService.add({
-          severity: 'warn',
-          summary: 'Warning',
-          detail: 'Please check your input'
-        });
-      },
-      showError: function() {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Something went wrong'
-        });
-      }
-    }
+    `
   })
 };
 
