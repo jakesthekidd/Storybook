@@ -1,6 +1,5 @@
 import type { Preview } from '@storybook/angular';
 import './resize-observer-polyfill';
-import './primeng-styles.css';
 
 // Comprehensive error suppression for ResizeObserver issues
 const originalConsoleError = console.error;
