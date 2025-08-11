@@ -51,6 +51,11 @@ const config: StorybookConfig = {
   },
   previewHead: (head) => `
     ${head}
+    <!-- PrimeNG CSS from CDN for reliable loading -->
+    <link rel="stylesheet" href="https://unpkg.com/primeng@17.18.15/resources/themes/lara-light-blue/theme.css">
+    <link rel="stylesheet" href="https://unpkg.com/primeng@17.18.15/resources/primeng.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/primeicons@7.0.0/primeicons.css">
+    <link rel="stylesheet" href="https://unpkg.com/primeflex@4.0.0/primeflex.css">
     <style>
       /* Debug: Check if CSS is loading */
       body::before {
