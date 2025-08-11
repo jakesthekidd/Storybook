@@ -42,6 +42,8 @@ const config: StorybookConfig = {
   },
   previewHead: (head) => `
     ${head}
+    <!-- CRITICAL: Load ResizeObserver fix FIRST -->
+    <script src="/resize-observer-fix.js"></script>
     <!-- PrimeNG CSS from CDN for reliable loading -->
     <link rel="stylesheet" href="https://unpkg.com/primeng@17.18.15/resources/themes/lara-light-blue/theme.css">
     <link rel="stylesheet" href="https://unpkg.com/primeng@17.18.15/resources/primeng.min.css">
