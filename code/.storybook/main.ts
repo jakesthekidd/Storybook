@@ -196,6 +196,22 @@ const config: StorybookConfig = {
       .brand-shadow-lg { box-shadow: var(--brand-shadow-lg); }
     </style>
   `,
+  webpackFinal: async (config) => {
+    // Ensure CSS files are handled properly
+    const cssRule = config.module?.rules?.find((rule: any) =>
+      rule.test && rule.test.toString().includes('css')
+    );
+
+    if (cssRule && Array.isArray(cssRule.use)) {
+      cssRule.use.forEach((use: any) => {
+        if (use.loader && use.loader.includes('css-loader') && use.options) {
+          use.options.url = false; // Disable URL processing for CSS files
+        }
+      });
+    }
+
+    return config;
+  },
 };
 
 export default config;
