@@ -98,14 +98,9 @@
           "options": {
             "configDir": ".storybook",
             "browserTarget": "code:build",
-            "compodoc": true,
-            "compodocArgs": [
-              "-e",
-              "json",
-              "-d",
-              "."
-            ],
-            "port": 6006
+            "compodoc": false,
+            "port": 4200,
+            "host": "0.0.0.0"
           }
         },
         "build-storybook": {
