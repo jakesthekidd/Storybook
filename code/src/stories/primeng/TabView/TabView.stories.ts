@@ -267,7 +267,7 @@ export const DynamicTabs: Story = {
         if (this.newTabTitle.trim()) {
           this.tabs.push({
             title: this.newTabTitle,
-            content: \`Content for \${this.newTabTitle}\`,
+            content: `Content for ${this.newTabTitle}`,
             closable: true
           });
           this.newTabTitle = 'New Tab';
