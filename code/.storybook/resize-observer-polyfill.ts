@@ -19,10 +19,12 @@ export function suppressResizeObserverErrors(): void {
       constructor(callback: ResizeObserverCallback) {
         const wrappedCallback: ResizeObserverCallback = (entries, observer) => {
           // Debounce the callback to prevent rapid firing
-          let timeoutId: number;
-          clearTimeout(timeoutId);
+          let timeoutId: number | undefined;
+          if (timeoutId) {
+            clearTimeout(timeoutId);
+          }
 
-          timeoutId = setTimeout(() => {
+          timeoutId = window.setTimeout(() => {
             try {
               // Use requestAnimationFrame to avoid immediate loop issues
               requestAnimationFrame(() => {
