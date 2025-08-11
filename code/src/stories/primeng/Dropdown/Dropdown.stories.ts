@@ -154,18 +154,12 @@ export const WithIcons: Story = {
       ]
     },
     template: `
-      <p-dropdown 
+      <p-dropdown
         [options]="options"
         [(ngModel)]="selectedOption"
         [placeholder]="placeholder"
         optionLabel="label"
         optionValue="value">
-        <ng-template pTemplate="selectedItem">
-          <div class="flex align-items-center gap-2" *ngIf="selectedOption">
-            <i [class]="getSelectedIcon()"></i>
-            <span>{{ getSelectedLabel() }}</span>
-          </div>
-        </ng-template>
         <ng-template let-country pTemplate="item">
           <div class="flex align-items-center gap-2">
             <i [class]="country.icon"></i>
@@ -173,15 +167,7 @@ export const WithIcons: Story = {
           </div>
         </ng-template>
       </p-dropdown>
-    `,
-    methods: {
-      getSelectedIcon: function() {
-        return this.options.find((opt: any) => opt.value === this.selectedOption)?.icon;
-      },
-      getSelectedLabel: function() {
-        return this.options.find((opt: any) => opt.value === this.selectedOption)?.label;
-      }
-    }
+    `
   }),
   args: {
     placeholder: 'Select a Country'
