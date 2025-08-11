@@ -199,8 +199,8 @@ const config: StorybookConfig = {
   webpackFinal: async (config) => {
     // Ensure CSS files are handled properly
     const cssRule = config.module?.rules?.find((rule: any) =>
-      rule.test && rule.test.toString().includes('css')
-    );
+      rule && typeof rule === 'object' && rule.test && rule.test.toString().includes('css')
+    ) as any;
 
     if (cssRule && Array.isArray(cssRule.use)) {
       cssRule.use.forEach((use: any) => {
