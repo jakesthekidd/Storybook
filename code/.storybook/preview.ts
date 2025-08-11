@@ -1,4 +1,7 @@
 import type { Preview } from '@storybook/angular';
+import { setCompodocJson } from '@storybook/addon-docs/angular';
+import { importProvidersFrom } from '@angular/core';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import './resize-observer-polyfill';
 
 // Comprehensive error suppression for ResizeObserver issues
