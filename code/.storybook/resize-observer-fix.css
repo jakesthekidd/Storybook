@@ -1,0 +1,67 @@
+/* CSS to help prevent ResizeObserver loops */
+
+/* Ensure stable sizing for Storybook components */
+.sb-show-main,
+.sb-main-padded {
+  contain: layout style;
+}
+
+/* Prevent layout thrashing in stories */
+.docs-story,
+.sb-story {
+  contain: layout;
+  overflow: hidden;
+}
+
+/* Stabilize iframe content */
+#storybook-root {
+  contain: layout style;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+/* Prevent PrimeNG components from causing resize loops */
+.p-component {
+  contain: layout;
+}
+
+/* Specific fixes for PrimeNG components that commonly trigger ResizeObserver */
+.p-dialog,
+.p-sidebar,
+.p-menu,
+.p-dropdown-panel,
+.p-calendar-panel {
+  contain: layout;
+}
+
+/* Prevent table resize issues */
+.p-datatable {
+  contain: layout;
+}
+
+/* Fix for toast positioning issues */
+.p-toast {
+  contain: layout;
+  position: fixed;
+}
+
+/* Prevent tab content from causing loops */
+.p-tabview-panels {
+  contain: layout;
+}
+
+/* Ensure stable card sizing */
+.p-card {
+  contain: layout;
+}
+
+/* General stability improvements */
+* {
+  box-sizing: border-box;
+}
+
+/* Prevent content shift during initial load */
+body {
+  contain: layout style;
+  overflow-x: hidden;
+}
