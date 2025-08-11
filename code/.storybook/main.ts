@@ -81,8 +81,8 @@ const config: StorybookConfig = {
       }
 
       /* Prevent ResizeObserver loops */
-      * {
-        contain: layout style;
+      .sb-show-main, .docs-story, #storybook-root {
+        contain: strict;
       }
 
       html, body {
