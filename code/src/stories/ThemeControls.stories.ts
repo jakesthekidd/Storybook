@@ -127,22 +127,26 @@ export const ThemeEditor: Story = {
 
               <div class="demo-grid">
                 <div class="demo-group">
-                  <h4>Buttons</h4>
+                  <h4>Token-Driven Buttons</h4>
                   <div class="button-showcase">
-                    <p-button label="Primary" severity="primary"></p-button>
-                    <p-button label="Secondary" severity="secondary"></p-button>
-                    <p-button label="Success" severity="success"></p-button>
-                    <p-button label="Warning" severity="warning"></p-button>
-                    <p-button label="Danger" severity="danger"></p-button>
+                    <button class="p-button p-button-primary" style="margin-right: 8px;">Primary Token</button>
+                    <button class="p-button p-button-secondary" style="margin-right: 8px;">Secondary Token</button>
+                    <button class="p-button p-button-success" style="margin-right: 8px;">Success Token</button>
+                    <button class="p-button p-button-warning" style="margin-right: 8px;">Warning Token</button>
+                    <button class="p-button p-button-danger">Danger Token</button>
+                  </div>
+
+                  <div style="margin-top: 12px; font-size: 0.875rem; color: var(--p-text-muted-color, #64748b);">
+                    ✨ These buttons use --p-button-* CSS variables from your Token Studio JSON
                   </div>
                 </div>
 
                 <div class="demo-group">
-                  <h4>Outlined Buttons</h4>
+                  <h4>Outlined Variants</h4>
                   <div class="button-showcase">
-                    <p-button label="Primary" severity="primary" [outlined]="true"></p-button>
-                    <p-button label="Secondary" severity="secondary" [outlined]="true"></p-button>
-                    <p-button label="Success" severity="success" [outlined]="true"></p-button>
+                    <button class="p-button p-button-outlined p-button-primary" style="margin-right: 8px;">Primary Outlined</button>
+                    <button class="p-button p-button-outlined p-button-secondary" style="margin-right: 8px;">Secondary Outlined</button>
+                    <button class="p-button p-button-outlined p-button-success">Success Outlined</button>
                   </div>
                 </div>
               </div>
