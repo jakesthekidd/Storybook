@@ -2,14 +2,47 @@ import type { Meta, StoryObj } from '@storybook/angular';
 import { moduleMetadata } from '@storybook/angular';
 import { CalendarModule } from 'primeng/calendar';
 import { FormsModule } from '@angular/forms';
+import { applyTokens } from '../../../theme/simple-token-loader';
 
-const meta: Meta = {
+interface CalendarArgs {
+  selectedDate: Date | null;
+  placeholder: string;
+  disabled: boolean;
+  readonly: boolean;
+  showIcon: boolean;
+  icon: string;
+  dateFormat: string;
+  selectionMode: 'single' | 'multiple' | 'range';
+  showTime: boolean;
+  timeOnly: boolean;
+  inline: boolean;
+  showButtonBar: boolean;
+  showWeek: boolean;
+}
+
+// Apply tokens when this story loads
+if (typeof document !== 'undefined') {
+  applyTokens('light');
+}
+
+const meta: Meta<CalendarArgs> = {
   title: 'PrimeNG/Calendar',
-  decorators: [
-    moduleMetadata({
-      imports: [CalendarModule, FormsModule],
-    }),
-  ],
+  decorators: [moduleMetadata({ imports: [CalendarModule, FormsModule] })],
+  args: {
+    selectedDate: null,
+    placeholder: 'Select a date',
+    disabled: false,
+    readonly: false,
+    showIcon: true,
+    icon: 'pi pi-calendar',
+    dateFormat: 'mm/dd/yy',
+    selectionMode: 'single',
+    showTime: false,
+    timeOnly: false,
+    inline: false,
+    showButtonBar: false,
+    showWeek: false
+  },
   argTypes: {
     selectedDate: {
       control: 'date',
@@ -65,6 +98,299 @@ const meta: Meta = {
       description: 'Whether to display week numbers'
     }
   },
+  render: (args) => ({
+    template: `
+      <div class="calendar-demo-container">
+        <p-calendar 
+          [(ngModel)]="selectedDate"
+          [placeholder]="placeholder"
+          [disabled]="disabled"
+          [readonly]="readonly"
+          [showIcon]="showIcon"
+          [icon]="icon"
+          [dateFormat]="dateFormat"
+          [selectionMode]="selectionMode"
+          [showTime]="showTime"
+          [timeOnly]="timeOnly"
+          [inline]="inline"
+          [showButtonBar]="showButtonBar"
+          [showWeek]="showWeek"
+          class="token-calendar">
+        </p-calendar>
+        <div class="token-info">
+          <small>Using Token Studio JSON colors</small>
+        </div>
+      </div>
+    `,
+    props: args,
+    styles: [`
+      .calendar-demo-container {
+        padding: 2rem;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+        background: var(--surface-ground);
+        border-radius: 8px;
+        min-height: 120px;
+      }
+
+      .token-info {
+        opacity: 0.7;
+        font-family: 'Inter', system-ui, sans-serif;
+        font-size: 12px;
+        color: #666;
+      }
+
+      /* DIRECT TOKEN INTEGRATION FOR CALENDAR */
+      
+      /* Calendar Input Field */
+      .token-calendar .p-inputtext {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+        border: 1px solid var(--surface-400) !important;
+        border-radius: 8px !important;
+        background: #ffffff !important;
+        color: var(--blue-700) !important;
+        padding: 0.75rem !important;
+        transition: all 0.2s ease !important;
+      }
+
+      .token-calendar .p-inputtext:focus {
+        border-color: var(--blue-500) !important;
+        box-shadow: 0 0 0 2px rgba(36, 116, 187, 0.1) !important;
+        outline: none !important;
+      }
+
+      .token-calendar .p-inputtext::placeholder {
+        color: var(--surface-500) !important;
+      }
+
+      /* Calendar Icon */
+      .token-calendar .p-datepicker-trigger {
+        background: var(--blue-500) !important;
+        border: 1px solid var(--blue-500) !important;
+        border-radius: 8px !important;
+        color: #ffffff !important;
+        transition: all 0.2s ease !important;
+      }
+
+      .token-calendar .p-datepicker-trigger:hover {
+        background: var(--blue-600) !important;
+        border-color: var(--blue-600) !important;
+      }
+
+      /* Calendar Panel */
+      .p-datepicker {
+        border: 1px solid var(--surface-400) !important;
+        border-radius: 8px !important;
+        background: #ffffff !important;
+        font-family: 'Inter', system-ui, sans-serif !important;
+      }
+
+      /* Calendar Header */
+      .p-datepicker .p-datepicker-header {
+        background: var(--surface-50) !important;
+        border-bottom: 1px solid var(--surface-400) !important;
+        border-radius: 8px 8px 0 0 !important;
+        padding: 1rem !important;
+      }
+
+      .p-datepicker .p-datepicker-title {
+        color: var(--blue-700) !important;
+        font-weight: 600 !important;
+      }
+
+      /* Navigation buttons */
+      .p-datepicker .p-datepicker-prev,
+      .p-datepicker .p-datepicker-next {
+        background: transparent !important;
+        border: 1px solid transparent !important;
+        border-radius: 6px !important;
+        color: var(--blue-500) !important;
+        transition: all 0.2s ease !important;
+      }
+
+      .p-datepicker .p-datepicker-prev:hover,
+      .p-datepicker .p-datepicker-next:hover {
+        background: var(--blue-50) !important;
+        border-color: var(--blue-500) !important;
+      }
+
+      /* Calendar Table */
+      .p-datepicker table {
+        border-collapse: separate !important;
+        border-spacing: 2px !important;
+      }
+
+      /* Day Headers */
+      .p-datepicker .p-datepicker-calendar thead th {
+        background: var(--surface-100) !important;
+        color: var(--blue-700) !important;
+        font-weight: 600 !important;
+        padding: 0.75rem !important;
+        border-radius: 6px !important;
+      }
+
+      /* Day Cells */
+      .p-datepicker .p-datepicker-calendar td {
+        padding: 2px !important;
+      }
+
+      .p-datepicker .p-datepicker-calendar td > span {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 2.5rem !important;
+        height: 2.5rem !important;
+        border-radius: 8px !important;
+        transition: all 0.2s ease !important;
+        font-weight: 500 !important;
+        cursor: pointer !important;
+      }
+
+      /* Regular days */
+      .p-datepicker .p-datepicker-calendar td:not(.p-datepicker-other-month) > span {
+        color: var(--blue-700) !important;
+        background: transparent !important;
+      }
+
+      .p-datepicker .p-datepicker-calendar td:not(.p-datepicker-other-month) > span:hover {
+        background: var(--blue-50) !important;
+        color: var(--blue-600) !important;
+      }
+
+      /* Today */
+      .p-datepicker .p-datepicker-calendar td.p-datepicker-today > span {
+        background: var(--cyan-50) !important;
+        color: var(--blue-700) !important;
+        border: 1px solid var(--cyan-500) !important;
+      }
+
+      .p-datepicker .p-datepicker-calendar td.p-datepicker-today > span:hover {
+        background: var(--cyan-100) !important;
+      }
+
+      /* Selected date */
+      .p-datepicker .p-datepicker-calendar td > span.p-highlight {
+        background: var(--blue-500) !important;
+        color: #ffffff !important;
+        font-weight: 600 !important;
+      }
+
+      .p-datepicker .p-datepicker-calendar td > span.p-highlight:hover {
+        background: var(--blue-600) !important;
+      }
+
+      /* Other month days */
+      .p-datepicker .p-datepicker-calendar td.p-datepicker-other-month > span {
+        color: var(--surface-500) !important;
+        opacity: 0.6 !important;
+      }
+
+      /* Button Bar */
+      .p-datepicker .p-datepicker-buttonbar {
+        border-top: 1px solid var(--surface-400) !important;
+        background: var(--surface-50) !important;
+        padding: 1rem !important;
+        border-radius: 0 0 8px 8px !important;
+      }
+
+      .p-datepicker .p-datepicker-buttonbar .p-button {
+        font-family: 'Inter', system-ui, sans-serif !important;
+        font-weight: 500 !important;
+        border-radius: 6px !important;
+        padding: 0.5rem 1rem !important;
+        transition: all 0.2s ease !important;
+      }
+
+      .p-datepicker .p-datepicker-buttonbar .p-button.p-button-text {
+        background: transparent !important;
+        border: 1px solid transparent !important;
+        color: var(--blue-500) !important;
+      }
+
+      .p-datepicker .p-datepicker-buttonbar .p-button.p-button-text:hover {
+        background: var(--blue-50) !important;
+        border-color: var(--blue-500) !important;
+      }
+
+      /* Time Picker */
+      .p-datepicker .p-timepicker {
+        border-top: 1px solid var(--surface-400) !important;
+        background: var(--surface-50) !important;
+        padding: 1rem !important;
+      }
+
+      .p-datepicker .p-timepicker .p-hour-picker,
+      .p-datepicker .p-timepicker .p-minute-picker,
+      .p-datepicker .p-timepicker .p-second-picker,
+      .p-datepicker .p-timepicker .p-ampm-picker {
+        color: var(--blue-700) !important;
+        font-weight: 600 !important;
+      }
+
+      .p-datepicker .p-timepicker button {
+        background: transparent !important;
+        border: 1px solid var(--surface-400) !important;
+        border-radius: 6px !important;
+        color: var(--blue-500) !important;
+        transition: all 0.2s ease !important;
+      }
+
+      .p-datepicker .p-timepicker button:hover {
+        background: var(--blue-50) !important;
+        border-color: var(--blue-500) !important;
+      }
+
+      /* Inline Calendar */
+      .token-calendar .p-datepicker-inline {
+        border: 1px solid var(--surface-400) !important;
+        border-radius: 8px !important;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+      }
+
+      /* Week Numbers */
+      .p-datepicker .p-datepicker-calendar .p-datepicker-weeknumber {
+        color: var(--surface-600) !important;
+        font-weight: 600 !important;
+        background: var(--surface-100) !important;
+        border-radius: 6px !important;
+      }
+
+      /* Range Selection */
+      .p-datepicker .p-datepicker-calendar td > span.p-highlight.p-datepicker-range {
+        background: var(--blue-100) !important;
+        color: var(--blue-700) !important;
+      }
+
+      .p-datepicker .p-datepicker-calendar td > span.p-highlight.p-datepicker-range-start,
+      .p-datepicker .p-datepicker-calendar td > span.p-highlight.p-datepicker-range-end {
+        background: var(--blue-500) !important;
+        color: #ffffff !important;
+      }
+
+      /* Disabled State */
+      .token-calendar .p-inputtext:disabled {
+        background: var(--surface-100) !important;
+        color: var(--surface-500) !important;
+        opacity: 0.6 !important;
+      }
+
+      .token-calendar .p-datepicker-trigger:disabled {
+        background: var(--surface-200) !important;
+        border-color: var(--surface-200) !important;
+        color: var(--surface-500) !important;
+        opacity: 0.6 !important;
+      }
+    `]
+  }),
+};
+
+export default meta;
+type Story = StoryObj<CalendarArgs>;
+
+// Main Interactive Story
+export const Interactive: Story = {
   args: {
     selectedDate: null,
     placeholder: 'Select a date',
@@ -82,34 +408,13 @@ const meta: Meta = {
   }
 };
 
-export default meta;
-type Story = StoryObj;
-
-export const Default: Story = {
-  render: (args) => ({
-    props: args,
-    template: `
-      <p-calendar 
-        [(ngModel)]="selectedDate"
-        [placeholder]="placeholder"
-        [disabled]="disabled"
-        [readonly]="readonly"
-        [showIcon]="showIcon"
-        [icon]="icon"
-        [dateFormat]="dateFormat"
-        [selectionMode]="selectionMode"
-        [showTime]="showTime"
-        [timeOnly]="timeOnly"
-        [inline]="inline"
-        [showButtonBar]="showButtonBar"
-        [showWeek]="showWeek">
-      </p-calendar>
-    `
-  })
+// Quick Examples
+export const BasicCalendar: Story = {
+  args: { placeholder: 'Select a date' }
 };
 
-export const Primary: Story = {
-  args: {
+export const WithSelectedDate: Story = {
+  args: { 
     selectedDate: new Date(),
     placeholder: 'Date selected'
   }
@@ -129,27 +434,10 @@ export const WithoutIcon: Story = {
   }
 };
 
-export const Disabled: Story = {
-  args: {
-    disabled: true,
-    selectedDate: new Date(),
-    placeholder: 'Disabled calendar'
-  }
-};
-
-export const Readonly: Story = {
-  args: {
-    readonly: true,
-    selectedDate: new Date(),
-    placeholder: 'Readonly calendar'
-  }
-};
-
 export const WithTime: Story = {
   args: {
     showTime: true,
     placeholder: 'Select date and time',
-    dateFormat: 'mm/dd/yy',
     showButtonBar: true
   }
 };
@@ -159,78 +447,6 @@ export const TimeOnly: Story = {
     timeOnly: true,
     placeholder: 'Select time only',
     showButtonBar: true
-  }
-};
-
-export const Inline: Story = {
-  render: (args) => ({
-    props: {
-      ...args,
-      selectedDate: new Date()
-    },
-    template: `
-      <div class="flex flex-column gap-3">
-        <h6 class="m-0">Inline Calendar</h6>
-        <p-calendar 
-          [(ngModel)]="selectedDate"
-          [inline]="true"
-          [showButtonBar]="showButtonBar">
-        </p-calendar>
-        <small class="text-600">Selected: {{ selectedDate | date:'medium' }}</small>
-      </div>
-    `
-  }),
-  args: {
-    showButtonBar: true
-  }
-};
-
-export const MultipleSelection: Story = {
-  render: (args) => ({
-    props: {
-      selectedDates: [new Date(), new Date(Date.now() + 86400000)],
-      ...args
-    },
-    template: `
-      <div class="flex flex-column gap-3">
-        <p-calendar 
-          [(ngModel)]="selectedDates"
-          [placeholder]="placeholder"
-          [selectionMode]="'multiple'"
-          [showButtonBar]="true">
-        </p-calendar>
-        <small class="text-600">Selected dates: {{ selectedDates?.length || 0 }}</small>
-      </div>
-    `
-  }),
-  args: {
-    placeholder: 'Select multiple dates'
-  }
-};
-
-export const RangeSelection: Story = {
-  render: (args) => ({
-    props: {
-      selectedRange: [new Date(), new Date(Date.now() + 7 * 86400000)],
-      ...args
-    },
-    template: `
-      <div class="flex flex-column gap-3">
-        <p-calendar 
-          [(ngModel)]="selectedRange"
-          [placeholder]="placeholder"
-          [selectionMode]="'range'"
-          [showButtonBar]="true">
-        </p-calendar>
-        <small class="text-600" *ngIf="selectedRange && selectedRange[0] && selectedRange[1]">
-          From: {{ selectedRange[0] | date:'mediumDate' }} 
-          To: {{ selectedRange[1] | date:'mediumDate' }}
-        </small>
-      </div>
-    `
-  }),
-  args: {
-    placeholder: 'Select date range'
   }
 };
 
@@ -248,132 +464,42 @@ export const WithWeekNumbers: Story = {
   }
 };
 
-export const DifferentFormats: Story = {
-  render: (args) => ({
-    props: {
-      date1: new Date(),
-      date2: new Date(),
-      date3: new Date(),
-      date4: new Date()
-    },
-    template: `
-      <div class="flex flex-column gap-4">
-        <h6 class="m-0">Different Date Formats</h6>
-        
-        <div class="flex flex-column gap-2">
-          <label class="font-semibold">US Format (mm/dd/yy)</label>
-          <p-calendar 
-            [(ngModel)]="date1"
-            dateFormat="mm/dd/yy"
-            placeholder="mm/dd/yy">
-          </p-calendar>
-        </div>
-        
-        <div class="flex flex-column gap-2">
-          <label class="font-semibold">European Format (dd/mm/yy)</label>
-          <p-calendar 
-            [(ngModel)]="date2"
-            dateFormat="dd/mm/yy"
-            placeholder="dd/mm/yy">
-          </p-calendar>
-        </div>
-        
-        <div class="flex flex-column gap-2">
-          <label class="font-semibold">ISO Format (yy-mm-dd)</label>
-          <p-calendar 
-            [(ngModel)]="date3"
-            dateFormat="yy-mm-dd"
-            placeholder="yy-mm-dd">
-          </p-calendar>
-        </div>
-        
-        <div class="flex flex-column gap-2">
-          <label class="font-semibold">Custom Format (DD, MM d, yy)</label>
-          <p-calendar 
-            [(ngModel)]="date4"
-            dateFormat="DD, MM d, yy"
-            placeholder="Monday, January 1, 23">
-          </p-calendar>
-        </div>
-      </div>
-    `
-  })
-};
-
-export const Invalid: Story = {
-  render: (args) => ({
-    props: args,
-    template: `
-      <div class="flex flex-column gap-2">
-        <label class="font-semibold text-red-500">Birth Date *</label>
-        <p-calendar 
-          [(ngModel)]="selectedDate"
-          [placeholder]="placeholder"
-          [showIcon]="showIcon"
-          class="ng-invalid ng-dirty">
-        </p-calendar>
-        <small class="text-red-500">Birth date is required</small>
-      </div>
-    `
-  }),
+export const InlineCalendar: Story = {
   args: {
-    placeholder: 'Required field'
+    inline: true,
+    selectedDate: new Date(),
+    showButtonBar: true
   }
 };
 
-export const FormIntegration: Story = {
-  render: (args) => ({
-    props: {
-      formData: {
-        startDate: new Date(),
-        endDate: new Date(Date.now() + 7 * 86400000),
-        meetingTime: new Date(),
-        deadline: null
-      }
-    },
-    template: `
-      <div class="flex flex-column gap-4 p-4 surface-card border-round">
-        <h5 class="m-0">Event Planning Form</h5>
-        
-        <div class="flex flex-column gap-2">
-          <label class="font-semibold">Event Date Range</label>
-          <div class="flex gap-3">
-            <p-calendar 
-              [(ngModel)]="formData.startDate"
-              placeholder="Start date"
-              dateFormat="mm/dd/yy">
-            </p-calendar>
-            <p-calendar 
-              [(ngModel)]="formData.endDate"
-              placeholder="End date"
-              dateFormat="mm/dd/yy">
-            </p-calendar>
-          </div>
-        </div>
-        
-        <div class="flex flex-column gap-2">
-          <label class="font-semibold">Meeting Time</label>
-          <p-calendar 
-            [(ngModel)]="formData.meetingTime"
-            [showTime]="true"
-            placeholder="Select meeting time"
-            dateFormat="mm/dd/yy">
-          </p-calendar>
-        </div>
-        
-        <div class="flex flex-column gap-2">
-          <label class="font-semibold">Project Deadline</label>
-          <p-calendar 
-            [(ngModel)]="formData.deadline"
-            placeholder="Optional deadline"
-            [showButtonBar]="true">
-          </p-calendar>
-        </div>
-        
-        <div class="mt-3 p-3 surface-100 border-round">
-          <small class="text-600">Form Data: {{ formData | json }}</small>
-        </div>
-      </div>
-    `
-  })
+export const RangeSelection: Story = {
+  args: {
+    selectionMode: 'range',
+    placeholder: 'Select date range',
+    showButtonBar: true
+  }
+};
+
+export const MultipleSelection: Story = {
+  args: {
+    selectionMode: 'multiple',
+    placeholder: 'Select multiple dates',
+    showButtonBar: true
+  }
+};
+
+export const Disabled: Story = {
+  args: {
+    disabled: true,
+    selectedDate: new Date(),
+    placeholder: 'Disabled calendar'
+  }
+};
+
+export const Readonly: Story = {
+  args: {
+    readonly: true,
+    selectedDate: new Date(),
+    placeholder: 'Readonly calendar'
+  }
 };
