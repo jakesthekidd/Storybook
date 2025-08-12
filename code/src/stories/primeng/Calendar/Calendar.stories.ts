@@ -199,22 +199,22 @@ const meta: Meta<CalendarArgs> = {
 
       /* Calendar Panel */
       .p-datepicker {
-        border: 1px solid var(--surface-400) !important;
+        border: 1px solid var(--palette-surface-border) !important;
         border-radius: 8px !important;
-        background: #ffffff !important;
+        background: var(--palette-surface) !important;
         font-family: 'Inter', system-ui, sans-serif !important;
       }
 
       /* Calendar Header */
       .p-datepicker .p-datepicker-header {
-        background: var(--surface-50) !important;
-        border-bottom: 1px solid var(--surface-400) !important;
+        background: var(--palette-surface-hover) !important;
+        border-bottom: 1px solid var(--palette-surface-border) !important;
         border-radius: 8px 8px 0 0 !important;
         padding: 1rem !important;
       }
 
       .p-datepicker .p-datepicker-title {
-        color: var(--blue-700) !important;
+        color: var(--palette-text-primary) !important;
         font-weight: 600 !important;
       }
 
@@ -224,14 +224,14 @@ const meta: Meta<CalendarArgs> = {
         background: transparent !important;
         border: 1px solid transparent !important;
         border-radius: 6px !important;
-        color: var(--blue-500) !important;
+        color: var(--palette-primary) !important;
         transition: all 0.2s ease !important;
       }
 
       .p-datepicker .p-datepicker-prev:hover,
       .p-datepicker .p-datepicker-next:hover {
-        background: var(--blue-50) !important;
-        border-color: var(--blue-500) !important;
+        background: var(--palette-primary)10 !important;
+        border-color: var(--palette-primary) !important;
       }
 
       /* Calendar Table */
