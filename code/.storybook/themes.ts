@@ -1,5 +1,5 @@
 // Theme configuration for PrimeNG Lara Light and Dark themes
-export const PRIMENG_THEMES = {
+const PRIMENG_THEMES = {
   light: {
     name: 'Lara Light',
     css: 'https://unpkg.com/primeng@17.18.15/resources/themes/lara-light-blue/theme.css',
