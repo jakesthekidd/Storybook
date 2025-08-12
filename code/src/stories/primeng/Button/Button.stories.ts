@@ -14,6 +14,8 @@ interface ButtonArgs {
   raised?: boolean;
   rounded?: boolean;
   size?: 'p-button-sm' | 'p-button-lg' | '';
+  // Enterprise design system integration
+  forceUpdate?: boolean;
 }
 
 const meta: Meta<ButtonArgs> = {
