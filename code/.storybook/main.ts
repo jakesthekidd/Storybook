@@ -12,20 +12,21 @@ if (typeof globalThis !== 'undefined') {
     );
   };
 
-  // Immediate console override
+  // Immediate console override with proper typing
   if (typeof console !== 'undefined') {
-    const origMethods = {
-      error: console.error,
-      warn: console.warn,
-      log: console.log,
-      info: console.info
-    };
+    const methods = ['error', 'warn'] as const;
+    type ConsoleMethod = typeof methods[number];
 
-    ['error', 'warn', 'log', 'info'].forEach(method => {
-      console[method] = (...args: any[]) => {
+    const original: Partial<Record<ConsoleMethod, (...args: any[]) => void>> = {};
+
+    methods.forEach((method) => {
+      const orig = console[method].bind(console);
+      original[method] = orig;
+
+      console[method] = ((...args: unknown[]) => {
         if (args.some(arg => suppressResizeObserverError(arg))) return;
-        origMethods[method].apply(console, args);
-      };
+        orig(...(args as any));
+      }) as any;
     });
   }
 
@@ -110,8 +111,8 @@ const config: StorybookConfig = {
           info: console.info
         };
 
-        ['error', 'warn', 'log', 'info'].forEach(method => {
-          console[method] = function(...args) {
+        ['error', 'warn'].forEach(method => {
+          (console as any)[method] = function(...args: any[]) {
             if (args.some(arg => isResizeObserverError(arg))) return;
             originalConsole[method].apply(console, args);
           };
