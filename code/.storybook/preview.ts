@@ -2,7 +2,6 @@ import type { Preview } from '@storybook/angular';
 import { applicationConfig } from '@storybook/angular';
 import { importProvidersFrom } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { providePrimeNG } from 'primeng/config';
 import { loadTokens, type ThemeMode } from '../src/theme/loadTokens';
 
 // Store current tokens globally for access across stories
