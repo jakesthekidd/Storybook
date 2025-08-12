@@ -56,6 +56,7 @@ const config: StorybookConfig = {
     '@storybook/addon-actions',
     '@storybook/addon-controls',
     '@storybook/addon-viewport',
+    './addons/enterprise-token-addon.ts',
   ],
   staticDirs: [
     '../src/assets',
