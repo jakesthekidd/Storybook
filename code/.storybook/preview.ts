@@ -8,9 +8,112 @@ import { loadTokens, type ThemeMode } from '../src/theme/loadTokens';
 let currentTokens: any = null;
 let currentCSSVars: Record<string, string> = {};
 
+// Inject base PrimeNG CSS dynamically
+function injectBasePrimeNGCSS() {
+  if (document.querySelector('#primeng-base-css')) return;
+
+  const style = document.createElement('style');
+  style.id = 'primeng-base-css';
+  style.textContent = `
+    /* PrimeNG Base Styles - Token Driven */
+    :root {
+      font-family: var(--p-font-family, "Inter", system-ui, sans-serif);
+      font-size: var(--p-font-size, 14px);
+    }
+
+    .p-component {
+      font-family: var(--p-font-family, "Inter", system-ui, sans-serif);
+      font-size: var(--p-font-size, 14px);
+    }
+
+    .p-button {
+      border-radius: var(--p-border-radius, 6px);
+      font-family: var(--p-font-family, "Inter", system-ui, sans-serif);
+      font-weight: 500;
+      padding: 0.5rem 1rem;
+      border: 1px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .p-button.p-button-primary {
+      background-color: var(--p-button-primary-background, var(--p-primary-color, #3b82f6));
+      border-color: var(--p-button-primary-border-color, var(--p-primary-color, #3b82f6));
+      color: var(--p-button-primary-color, var(--p-primary-contrast-color, #ffffff));
+    }
+
+    .p-button.p-button-primary:not(:disabled):hover {
+      background-color: var(--p-button-primary-hover-background, var(--p-primary-hover-color, #2563eb));
+      border-color: var(--p-button-primary-hover-border-color, var(--p-primary-hover-color, #2563eb));
+      color: var(--p-button-primary-hover-color, #ffffff);
+    }
+
+    .p-button.p-button-primary:not(:disabled):active {
+      background-color: var(--p-button-primary-active-background, var(--p-primary-active-color, #1d4ed8));
+      border-color: var(--p-button-primary-active-border-color, var(--p-primary-active-color, #1d4ed8));
+      color: var(--p-button-primary-active-color, #ffffff);
+    }
+
+    .p-button.p-button-secondary {
+      background-color: var(--p-button-secondary-background, var(--p-surface-500, #64748b));
+      border-color: var(--p-button-secondary-border-color, var(--p-surface-500, #64748b));
+      color: var(--p-button-secondary-color, #ffffff);
+    }
+
+    .p-button.p-button-secondary:not(:disabled):hover {
+      background-color: var(--p-button-secondary-hover-background, var(--p-surface-600, #475569));
+    }
+
+    .p-button.p-button-success {
+      background-color: var(--p-button-success-background, #10b981);
+      border-color: var(--p-button-success-background, #10b981);
+      color: #ffffff;
+    }
+
+    .p-button.p-button-info {
+      background-color: var(--p-button-info-background, #3b82f6);
+      border-color: var(--p-button-info-background, #3b82f6);
+      color: #ffffff;
+    }
+
+    .p-button.p-button-warning {
+      background-color: var(--p-button-warning-background, #f59e0b);
+      border-color: var(--p-button-warning-background, #f59e0b);
+      color: #ffffff;
+    }
+
+    .p-button.p-button-danger {
+      background-color: var(--p-button-danger-background, #ef4444);
+      border-color: var(--p-button-danger-background, #ef4444);
+      color: #ffffff;
+    }
+
+    .p-button.p-button-outlined.p-button-primary {
+      background-color: transparent;
+      border-color: var(--p-primary-color, #3b82f6);
+      color: var(--p-primary-color, #3b82f6);
+    }
+
+    .p-button.p-button-outlined.p-button-primary:not(:disabled):hover {
+      background-color: var(--p-primary-color, #3b82f6);
+      color: var(--p-primary-contrast-color, #ffffff);
+    }
+
+    /* Surface and content styling */
+    body {
+      background-color: var(--p-surface-0, #ffffff);
+      color: var(--p-text-color, #0f172a);
+      font-family: var(--p-font-family, "Inter", system-ui, sans-serif);
+    }
+  `;
+  document.head.appendChild(style);
+}
+
 // Function to apply tokens and update theme
 function applyTokenTheme(theme: ThemeMode) {
   try {
+    // Inject base PrimeNG CSS first
+    injectBasePrimeNGCSS();
+
     // Load tokens for the specified theme
     const { preset, cssVars } = loadTokens(theme);
     currentTokens = preset;
@@ -19,9 +122,9 @@ function applyTokenTheme(theme: ThemeMode) {
     // Apply CSS variables to document root
     const root = document.documentElement;
 
-    // Clear previous custom CSS variables
+    // Clear previous token CSS variables
     Array.from(root.style).forEach(property => {
-      if (property.startsWith('--tf-') || property.startsWith('--brand-')) {
+      if (property.startsWith('--tf-') || property.startsWith('--brand-') || property.startsWith('--p-')) {
         root.style.removeProperty(property);
       }
     });
@@ -32,47 +135,42 @@ function applyTokenTheme(theme: ThemeMode) {
     });
 
     // Apply semantic brand variables for backward compatibility
-    if (preset.semantic?.primary) {
-      root.style.setProperty('--brand-primary', preset.semantic.primary[500] || '#3b82f6');
-    }
+    const primaryColor = cssVars['--p-primary-color'] || '#3b82f6';
+    const textColor = cssVars['--p-text-color'] || (theme === 'light' ? '#0f172a' : '#f1f5f9');
+    const surfaceColor = cssVars['--p-surface-0'] || (theme === 'light' ? '#ffffff' : '#0f172a');
 
-    if (preset.semantic?.colorScheme?.[theme]) {
-      const colorScheme = preset.semantic.colorScheme[theme];
-      if (colorScheme.primary?.color) {
-        root.style.setProperty('--brand-primary', colorScheme.primary.color);
-      }
-      if (colorScheme.text?.color) {
-        root.style.setProperty('--brand-text-primary', colorScheme.text.color);
-      }
-      if (colorScheme.surface?.[0]) {
-        root.style.setProperty('--brand-surface', colorScheme.surface[0]);
-      }
-      if (colorScheme.text?.mutedColor) {
-        root.style.setProperty('--brand-secondary', colorScheme.text.mutedColor);
-      }
-    }
+    root.style.setProperty('--brand-primary', primaryColor);
+    root.style.setProperty('--brand-text-primary', textColor);
+    root.style.setProperty('--brand-surface', surfaceColor);
+    root.style.setProperty('--brand-secondary', cssVars['--p-text-muted-color'] || '#64748b');
 
-    console.log(`Applied ${theme} theme with ${Object.keys(cssVars).length} CSS variables`);
+    console.log(`✅ Applied ${theme} theme with ${Object.keys(cssVars).length} CSS variables`);
+    console.log(`🎨 PrimeNG variables applied: ${Object.keys(cssVars).filter(k => k.startsWith('--p-')).length}`);
 
     // Store theme in localStorage for persistence
     localStorage.setItem('storybook-theme-mode', theme);
 
   } catch (error) {
-    console.error(`Failed to apply ${theme} theme:`, error);
+    console.error(`❌ Failed to apply ${theme} theme:`, error);
 
     // Fallback to basic theme variables
     const root = document.documentElement;
-    if (theme === 'dark') {
-      root.style.setProperty('--brand-primary', '#3b82f6');
-      root.style.setProperty('--brand-secondary', '#64748b');
-      root.style.setProperty('--brand-surface', '#1e293b');
-      root.style.setProperty('--brand-text-primary', '#f1f5f9');
-    } else {
-      root.style.setProperty('--brand-primary', '#007acc');
-      root.style.setProperty('--brand-secondary', '#6c757d');
-      root.style.setProperty('--brand-surface', '#ffffff');
-      root.style.setProperty('--brand-text-primary', '#495057');
-    }
+    const fallbackVars = {
+      '--p-primary-color': '#3b82f6',
+      '--p-primary-contrast-color': '#ffffff',
+      '--p-surface-0': theme === 'dark' ? '#0f172a' : '#ffffff',
+      '--p-text-color': theme === 'dark' ? '#f1f5f9' : '#0f172a',
+      '--p-font-family': '"Inter", system-ui, sans-serif',
+      '--p-font-size': '14px',
+      '--p-border-radius': '6px',
+      '--brand-primary': '#3b82f6',
+      '--brand-surface': theme === 'dark' ? '#0f172a' : '#ffffff',
+      '--brand-text-primary': theme === 'dark' ? '#f1f5f9' : '#0f172a'
+    };
+
+    Object.entries(fallbackVars).forEach(([prop, value]) => {
+      root.style.setProperty(prop, value);
+    });
   }
 }
 
