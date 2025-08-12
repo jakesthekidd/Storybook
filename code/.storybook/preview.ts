@@ -124,16 +124,27 @@ const preview: Preview = {
   },
   globalTypes: {
     theme: {
-      description: 'PrimeNG Theme',
-      defaultValue: 'light',
+      description: 'Token Studio Theme',
+      defaultValue: getInitialTheme(),
       toolbar: {
-        title: 'Theme',
+        title: 'Theme Mode',
         icon: 'paintbrush',
         items: [
-          { value: 'light', title: 'Lara Light', left: '🌞' },
-          { value: 'dark', title: 'Lara Dark', left: '🌙' }
+          {
+            value: 'light',
+            title: 'Lara Light (Token Studio)',
+            left: '🌞',
+            right: '🎨'
+          },
+          {
+            value: 'dark',
+            title: 'Lara Dark (Token Studio)',
+            left: '🌙',
+            right: '🎨'
+          }
         ],
         dynamicTitle: true,
+        showName: true
       },
     },
   },
