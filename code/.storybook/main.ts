@@ -70,41 +70,47 @@ const config: StorybookConfig = {
   },
   previewHead: (head) => `
     <script>
-      // IMMEDIATE ResizeObserver error suppression - before any other scripts
+      // NUCLEAR ResizeObserver error suppression - eliminate all instances
       (function() {
         'use strict';
 
-        // More comprehensive error detection
+        // Ultra-precise error detection for exact message
         const isResizeObserverError = (msg) => {
           if (!msg) return false;
-          const str = String(msg).toLowerCase();
-          return (str.includes('resizeobserver') || str.includes('resize observer')) && (
-            str.includes('loop completed with undelivered notifications') ||
-            str.includes('loop limit exceeded') ||
-            str.includes('loop') ||
-            str.includes('notification') ||
-            str.includes('undelivered') ||
-            str.includes('exceeded') ||
-            str.includes('complete')
-          );
+          const str = String(msg);
+          return str === 'ResizeObserver loop completed with undelivered notifications.' ||
+                 str.includes('ResizeObserver loop completed with undelivered notifications') ||
+                 str.includes('ResizeObserver loop limit exceeded') ||
+                 (str.toLowerCase().includes('resizeobserver') && str.toLowerCase().includes('loop'));
         };
 
-        // Immediate console suppression
+        // IMMEDIATE console hijacking - before anything else loads
         if (typeof console !== 'undefined') {
+          const noop = () => {};
           const originals = {
             error: console.error,
             warn: console.warn,
             log: console.log,
             info: console.info,
-            debug: console.debug
+            debug: console.debug,
+            trace: console.trace
           };
 
-          ['error', 'warn', 'log', 'info', 'debug'].forEach(method => {
+          // Aggressive console override
+          ['error', 'warn', 'log', 'info', 'debug', 'trace'].forEach(method => {
             console[method] = function(...args) {
-              if (args.some(arg => isResizeObserverError(arg))) {
-                return; // Silently suppress
+              // Check all arguments for ResizeObserver errors
+              for (let arg of args) {
+                if (isResizeObserverError(arg)) {
+                  return; // Complete suppression
+                }
               }
-              originals[method].apply(console, args);
+              // Only call original if no ResizeObserver error detected
+              try {
+                originals[method].apply(console, args);
+              } catch (e) {
+                // Ignore any errors in logging
+              }
             };
           });
         }
