@@ -45,8 +45,8 @@ const preview: Preview = {
       providers: [importProvidersFrom(BrowserAnimationsModule)],
     }),
     (story, context) => {
-      // Apply theme based on global
-      const theme = context.globals.theme || 'light';
+      // Apply theme based on global with proper property access
+      const theme = (context.globals['theme'] as 'light' | 'dark') ?? 'light';
       updateThemeCSS(theme);
       return story();
     }
