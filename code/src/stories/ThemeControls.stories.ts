@@ -553,6 +553,13 @@ export const ThemeEditor: Story = {
         const updateStatus = async () => {
           try {
             const currentMode = localStorage.getItem('storybook-theme-mode') || 'light';
+
+            // Update theme indicator
+            const themeIndicator = document.getElementById('theme-indicator');
+            if (themeIndicator) {
+              themeIndicator.textContent = `${currentMode.charAt(0).toUpperCase() + currentMode.slice(1)} Mode`;
+            }
+
             const modeElement = document.getElementById('current-mode');
             if (modeElement) {
               modeElement.textContent = currentMode.charAt(0).toUpperCase() + currentMode.slice(1);
@@ -560,10 +567,18 @@ export const ThemeEditor: Story = {
 
             // Count CSS variables
             const root = document.documentElement;
-            const cssVarCount = Array.from(root.style).filter(prop => prop.startsWith('--tf-')).length;
+            const allVars = Array.from(root.style);
+            const primeVars = allVars.filter(prop => prop.startsWith('--p-')).length;
+            const tokenVars = allVars.filter(prop => prop.startsWith('--tf-')).length;
+
             const countElement = document.getElementById('css-var-count');
             if (countElement) {
-              countElement.textContent = cssVarCount.toString();
+              countElement.textContent = `${primeVars + tokenVars} (${primeVars} PrimeNG)`;
+            }
+
+            const cssVarCountElement = document.getElementById('css-vars-count');
+            if (cssVarCountElement) {
+              cssVarCountElement.textContent = (primeVars + tokenVars).toString();
             }
           } catch (error) {
             console.error('Status update failed:', error);
