@@ -31,6 +31,7 @@ const config: StorybookConfig = {
     '@storybook/addon-viewport',
     '@storybook/addon-toolbars',
     '@storybook/addon-themes',
+    './.storybook/theme-controls-addon/manager.tsx',
   ],
   staticDirs: [
     '../src/assets',
