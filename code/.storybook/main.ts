@@ -423,6 +423,37 @@ const config: StorybookConfig = {
         }
       })();
     </script>
+    <script>
+      // FINAL layer - catch any remaining ResizeObserver errors after all other scripts load
+      window.addEventListener('DOMContentLoaded', function() {
+        setTimeout(() => {
+          const isResizeObserverError = (msg) => {
+            const str = String(msg || '');
+            return str.includes('ResizeObserver') && str.includes('loop completed with undelivered notifications');
+          };
+
+          // Override any remaining console methods that might have been restored
+          const methods = ['error', 'warn', 'log'];
+          methods.forEach(method => {
+            const original = console[method];
+            console[method] = function(...args) {
+              if (args.some(isResizeObserverError)) return;
+              return original.apply(console, args);
+            };
+          });
+
+          // Final window error handler override
+          const originalErrorHandler = window.onerror;
+          window.onerror = function(msg, source, line, col, error) {
+            if (isResizeObserverError(msg) || isResizeObserverError(error?.message)) {
+              return true;
+            }
+            return originalErrorHandler ? originalErrorHandler.apply(this, arguments) : false;
+          };
+
+        }, 100);
+      });
+    </script>
     ${head}
     <!-- Only load PrimeIcons, PrimeNG theme will be token-driven -->
     <link rel="stylesheet" href="https://unpkg.com/primeicons@7.0.0/primeicons.css">
