@@ -124,17 +124,10 @@ const meta: Meta<CalendarArgs> = {
     `,
     props: args,
     ngOnInit: () => {
-      // Force apply tokens when component initializes
+      // Initialize color palette when component loads
       if (typeof document !== 'undefined') {
-        applyTokens('light');
-
-        // Double-check that CSS variables are set correctly
-        const root = document.documentElement;
-        root.style.setProperty('--blue-500', '#2474BB');
-        root.style.setProperty('--blue-600', '#2068A8');
-        root.style.setProperty('--blue-700', '#1D5D96');
-
-        console.log('✅ Calendar: Force-applied token CSS variables');
+        colorPaletteManager.setThemeMode('light');
+        console.log('✅ Calendar: Initialized Color Palette Manager');
       }
     },
     styles: [`
