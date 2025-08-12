@@ -117,8 +117,8 @@ const meta: Meta<CalendarArgs> = {
           [showWeek]="showWeek"
           class="token-calendar">
         </p-calendar>
-        <div class="token-info">
-          <small>Using Token Studio JSON colors</small>
+        <div class="palette-info">
+          <small>🎨 Colors from Color Palette Manager</small>
         </div>
       </div>
     `,
