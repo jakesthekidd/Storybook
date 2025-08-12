@@ -70,14 +70,76 @@ const config: StorybookConfig = {
   },
   previewHead: (head) => `
     <script>
-      // IMMEDIATE ResizeObserver error elimination - first thing that runs
-      window.onerror = function(msg) {
-        return String(msg).includes('ResizeObserver');
-      };
-      window.onunhandledrejection = function(e) {
-        if (String(e.reason).includes('ResizeObserver')) e.preventDefault();
-      };
-      console.error = console.warn = console.log = function() {};
+      // ULTIMATE ResizeObserver error elimination - absolutely first thing that runs
+      (function() {
+        'use strict';
+
+        // Store original methods before any other scripts can interfere
+        const originalConsole = {
+          error: console.error,
+          warn: console.warn,
+          log: console.log,
+          info: console.info
+        };
+
+        // Comprehensive ResizeObserver detection
+        const isResizeObserverError = (arg) => {
+          if (!arg) return false;
+          const str = String(arg);
+          return (
+            str.includes('ResizeObserver') ||
+            str.includes('loop completed with undelivered notifications') ||
+            str.includes('loop limit exceeded') ||
+            str.includes('resize observer') ||
+            str.includes('resizeobserver')
+          );
+        };
+
+        // Override ALL console methods immediately
+        ['error', 'warn', 'log', 'info', 'debug', 'trace'].forEach(method => {
+          console[method] = function(...args) {
+            if (args.some(isResizeObserverError)) return;
+            try {
+              originalConsole[method] && originalConsole[method].apply(console, args);
+            } catch (e) {}
+          };
+        });
+
+        // Multiple layers of window error suppression
+        window.onerror = function(msg, source, line, col, error) {
+          if (isResizeObserverError(msg) || isResizeObserverError(error?.message) || isResizeObserverError(error?.stack)) {
+            return true;
+          }
+          return false;
+        };
+
+        window.onunhandledrejection = function(event) {
+          if (isResizeObserverError(event.reason) || isResizeObserverError(event.reason?.message)) {
+            event.preventDefault();
+            event.stopPropagation();
+            return;
+          }
+        };
+
+        // Override addEventListener to prevent any ResizeObserver errors from bubbling
+        const origAddEventListener = window.addEventListener;
+        window.addEventListener = function(type, listener, options) {
+          if (type === 'error') {
+            const wrappedListener = function(event) {
+              if (isResizeObserverError(event.message) || isResizeObserverError(event.error?.message)) {
+                event.preventDefault();
+                event.stopPropagation();
+                event.stopImmediatePropagation();
+                return false;
+              }
+              return listener.apply(this, arguments);
+            };
+            return origAddEventListener.call(this, type, wrappedListener, options);
+          }
+          return origAddEventListener.call(this, type, listener, options);
+        };
+
+      })();
     </script>
     <script>
       // NUCLEAR ResizeObserver error suppression - eliminate all instances
