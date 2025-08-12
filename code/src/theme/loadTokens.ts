@@ -462,7 +462,7 @@ function createPrimeNGPreset(tokens: TokenSet, mode: ThemeMode): any {
  */
 export function loadTokens(mode: ThemeMode = 'light'): LoadedTokens {
   const cacheKey = `${mode}`;
-  
+
   if (tokenCache.has(cacheKey)) {
     return tokenCache.get(cacheKey);
   }
@@ -475,57 +475,47 @@ export function loadTokens(mode: ThemeMode = 'light'): LoadedTokens {
       throw new Error(`Theme "${themeKey}" not found in token data`);
     }
 
-    // Create PrimeNG preset
+    // Create PrimeNG preset (for potential future use)
     const preset = createPrimeNGPreset(tokens, mode);
 
-    // Convert all tokens to CSS variables
+    // Generate PrimeNG-specific CSS variables
+    const primeNGVars = createPrimeNGCSSVars(tokens, mode);
+
+    // Convert remaining tokens to custom CSS variables
     const allCSSVars = convertToCSSVars(tokens);
 
-    // Filter out tokens that are already handled by the preset
-    const handledPaths = new Set([
-      'theme.primary', 'surface', 'root.surface', 'global.textColor', 
-      'global.textSecondaryColor', 'global.borderRadius', 'global.fontSize',
-      'button.background', 'button.color', 'button.borderColor',
-      'button.hover', 'button.active', 'button.secondary', 'button.info',
-      'button.success', 'button.warning', 'button.help', 'button.danger'
-    ]);
-
-    const cssVars: Record<string, string> = {};
-    for (const [varName, value] of Object.entries(allCSSVars)) {
-      const path = varName.replace('--tf-', '').replace(/-/g, '.');
-      const isHandled = Array.from(handledPaths).some(handledPath => 
-        path.startsWith(handledPath)
-      );
-      
-      if (!isHandled) {
-        cssVars[varName] = value;
-      }
-    }
+    // Combine PrimeNG variables with custom variables
+    const cssVars: Record<string, string> = {
+      ...primeNGVars,
+      ...allCSSVars
+    };
 
     const result = { preset, cssVars };
     tokenCache.set(cacheKey, result);
-    
+
+    console.log(`✅ Loaded ${Object.keys(cssVars).length} CSS variables for ${mode} theme`);
+    console.log(`🎨 PrimeNG variables: ${Object.keys(primeNGVars).length}`);
+
     return result;
   } catch (error) {
     console.error('Error loading tokens:', error);
-    
-    // Return minimal fallback
-    const fallback = {
-      preset: {
-        semantic: {
-          primary: { 500: '#3b82f6' },
-          colorScheme: {
-            [mode]: {
-              primary: { color: '#3b82f6', contrastColor: '#ffffff' },
-              surface: { 0: mode === 'light' ? '#ffffff' : '#0f172a' },
-              text: { color: mode === 'light' ? '#0f172a' : '#f1f5f9' }
-            }
-          }
-        }
-      },
-      cssVars: {}
+
+    // Return minimal fallback with PrimeNG variables
+    const fallbackPrimeVars = {
+      '--p-primary-color': '#3b82f6',
+      '--p-primary-contrast-color': '#ffffff',
+      '--p-surface-0': mode === 'light' ? '#ffffff' : '#0f172a',
+      '--p-text-color': mode === 'light' ? '#0f172a' : '#f1f5f9',
+      '--p-font-family': '"Inter", system-ui, sans-serif',
+      '--p-font-size': '14px',
+      '--p-border-radius': '6px'
     };
-    
+
+    const fallback = {
+      preset: {},
+      cssVars: fallbackPrimeVars
+    };
+
     tokenCache.set(cacheKey, fallback);
     return fallback;
   }
