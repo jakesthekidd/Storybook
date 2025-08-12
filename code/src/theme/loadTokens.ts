@@ -98,7 +98,7 @@ function extractTokenValue(token: any): string {
 }
 
 /**
- * Converts a nested token object to flat CSS variables
+ * Converts a nested token object to flat CSS variables with PrimeNG prefixes
  */
 function convertToCSSVars(
   tokens: TokenSet,
@@ -123,6 +123,84 @@ function convertToCSSVars(
   }
 
   return cssVars;
+}
+
+/**
+ * Creates PrimeNG-specific CSS variables from tokens
+ */
+function createPrimeNGCSSVars(tokens: TokenSet, mode: ThemeMode): Record<string, string> {
+  const getToken = (path: string, fallback?: string): string => {
+    const value = getNestedTokenValue(tokens, path);
+    if (value === undefined) {
+      return fallback || '';
+    }
+    const rawValue = extractTokenValue(value);
+    return resolveTokenReference(rawValue, tokens);
+  };
+
+  const primeVars: Record<string, string> = {};
+
+  // Primary color system
+  const primaryColor = getToken('theme.primary.color', '#3b82f6');
+  primeVars['--p-primary-color'] = primaryColor;
+  primeVars['--p-primary-contrast-color'] = getToken('theme.primary.contrast.color', '#ffffff');
+  primeVars['--p-primary-hover-color'] = getToken('theme.primary.dark.color', '#2563eb');
+  primeVars['--p-primary-active-color'] = getToken('theme.primary.darker.color', '#1d4ed8');
+
+  // Surface colors
+  primeVars['--p-surface-0'] = getToken('surface.0', mode === 'light' ? '#ffffff' : '#0f172a');
+  primeVars['--p-surface-50'] = getToken('surface.50', mode === 'light' ? '#f8fafc' : '#0f172a');
+  primeVars['--p-surface-100'] = getToken('surface.100', mode === 'light' ? '#f1f5f9' : '#1e293b');
+  primeVars['--p-surface-200'] = getToken('surface.200', mode === 'light' ? '#e2e8f0' : '#334155');
+  primeVars['--p-surface-300'] = getToken('surface.300', mode === 'light' ? '#cbd5e1' : '#475569');
+  primeVars['--p-surface-400'] = getToken('surface.400', mode === 'light' ? '#94a3b8' : '#64748b');
+  primeVars['--p-surface-500'] = getToken('surface.500', mode === 'light' ? '#64748b' : '#94a3b8');
+  primeVars['--p-surface-600'] = getToken('surface.600', mode === 'light' ? '#475569' : '#cbd5e1');
+  primeVars['--p-surface-700'] = getToken('surface.700', mode === 'light' ? '#334155' : '#e2e8f0');
+  primeVars['--p-surface-800'] = getToken('surface.800', mode === 'light' ? '#1e293b' : '#f1f5f9');
+  primeVars['--p-surface-900'] = getToken('surface.900', mode === 'light' ? '#0f172a' : '#f8fafc');
+
+  // Content colors
+  primeVars['--p-content-background'] = getToken('root.surface-section', primeVars['--p-surface-0']);
+  primeVars['--p-content-hover-background'] = getToken('root.surface-hover', primeVars['--p-surface-100']);
+  primeVars['--p-content-border-color'] = getToken('root.surface-border', primeVars['--p-surface-300']);
+
+  // Text colors
+  primeVars['--p-text-color'] = getToken('global.textColor', mode === 'light' ? '#0f172a' : '#f1f5f9');
+  primeVars['--p-text-muted-color'] = getToken('global.textSecondaryColor', mode === 'light' ? '#64748b' : '#94a3b8');
+  primeVars['--p-text-hover-color'] = primeVars['--p-text-color'];
+  primeVars['--p-text-hover-muted-color'] = primeVars['--p-text-muted-color'];
+
+  // Typography
+  primeVars['--p-font-family'] = getToken('global.fontFamily', '"Inter", system-ui, sans-serif');
+  primeVars['--p-font-size'] = getToken('global.fontSize', '14px');
+  primeVars['--p-border-radius'] = getToken('global.borderRadius', '6px');
+
+  // Component-specific colors
+  // Button
+  primeVars['--p-button-primary-background'] = getToken('button.background', primaryColor);
+  primeVars['--p-button-primary-border-color'] = getToken('button.borderColor', primaryColor);
+  primeVars['--p-button-primary-color'] = getToken('button.color', '#ffffff');
+  primeVars['--p-button-primary-hover-background'] = getToken('button.hover.background', primeVars['--p-primary-hover-color']);
+  primeVars['--p-button-primary-hover-border-color'] = getToken('button.hover.borderColor', primeVars['--p-primary-hover-color']);
+  primeVars['--p-button-primary-hover-color'] = getToken('button.hover.color', '#ffffff');
+  primeVars['--p-button-primary-active-background'] = getToken('button.active.background', primeVars['--p-primary-active-color']);
+  primeVars['--p-button-primary-active-border-color'] = getToken('button.active.borderColor', primeVars['--p-primary-active-color']);
+  primeVars['--p-button-primary-active-color'] = getToken('button.active.color', '#ffffff');
+
+  // Secondary button
+  primeVars['--p-button-secondary-background'] = getToken('button.secondary.background', primeVars['--p-surface-500']);
+  primeVars['--p-button-secondary-border-color'] = getToken('button.secondary.borderColor', primeVars['--p-surface-500']);
+  primeVars['--p-button-secondary-color'] = getToken('button.secondary.color', '#ffffff');
+  primeVars['--p-button-secondary-hover-background'] = getToken('button.secondary.hover.background', primeVars['--p-surface-600']);
+
+  // Success/Info/Warning/Danger
+  primeVars['--p-button-success-background'] = getToken('button.success.background', getToken('green.500', '#10b981'));
+  primeVars['--p-button-info-background'] = getToken('button.info.background', getToken('blue.500', '#3b82f6'));
+  primeVars['--p-button-warning-background'] = getToken('button.warning.background', getToken('yellow.500', '#f59e0b'));
+  primeVars['--p-button-danger-background'] = getToken('button.danger.background', getToken('red.500', '#ef4444'));
+
+  return primeVars;
 }
 
 /**
