@@ -36,8 +36,7 @@ const config: StorybookConfig = {
     '../src/assets',
     { from: '../node_modules/primeng', to: '/node_modules/primeng' },
     { from: '../node_modules/primeicons', to: '/node_modules/primeicons' },
-    { from: '../node_modules/primeflex', to: '/node_modules/primeflex' },
-    { from: './.storybook', to: '/' }
+    { from: '../node_modules/primeflex', to: '/node_modules/primeflex' }
   ],
   framework: {
     name: '@storybook/angular',
