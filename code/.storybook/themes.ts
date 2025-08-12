@@ -173,4 +173,12 @@ export class ThemeManager {
   }
 }
 
-export const themeManager = new ThemeManager();
+const themeManager = new ThemeManager();
+
+// Export for use in other modules
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { PRIMENG_THEMES, themeManager, tokensToCSSVars, applyCSSVars, ThemeManager };
+} else if (typeof window !== 'undefined') {
+  window.PRIMENG_THEMES = PRIMENG_THEMES;
+  window.themeManager = themeManager;
+}
