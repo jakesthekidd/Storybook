@@ -207,67 +207,255 @@ export const ThemeEditor: Story = {
       </div>
       
       <style>
-        .color-control {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          margin-bottom: 15px;
+        .theme-editor-container {
+          padding: 24px;
+          font-family: 'Inter', system-ui, sans-serif;
+          background: var(--brand-surface, #ffffff);
+          color: var(--brand-text-primary, #0f172a);
+          min-height: 100vh;
         }
-        .color-control label {
-          min-width: 120px;
+
+        .header-section {
+          margin-bottom: 32px;
+          text-align: center;
+        }
+
+        .editor-title {
+          font-size: 2.5rem;
+          font-weight: 700;
+          margin: 0 0 8px 0;
+          background: linear-gradient(135deg, var(--brand-primary, #3b82f6), #8b5cf6);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+
+        .editor-subtitle {
+          font-size: 1.1rem;
+          color: var(--brand-secondary, #64748b);
+          margin: 0;
+        }
+
+        .toolbar-section {
+          margin-bottom: 32px;
+        }
+
+        .toolbar-card {
+          background: var(--brand-surface, #ffffff);
+          border: 1px solid var(--tf-root-surface-border, #e2e8f0);
+          border-radius: 12px;
+          padding: 24px;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .toolbar-card h3 {
+          margin: 0 0 16px 0;
+          font-size: 1.25rem;
+          font-weight: 600;
+        }
+
+        .toolbar-actions {
+          display: flex;
+          gap: 12px;
+          flex-wrap: wrap;
+        }
+
+        .content-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 24px;
+          margin-bottom: 32px;
+        }
+
+        @media (max-width: 1024px) {
+          .content-grid {
+            grid-template-columns: 1fr;
+          }
+        }
+
+        .info-card, .preview-card, .demo-card, .instructions-card {
+          background: var(--brand-surface, #ffffff);
+          border: 1px solid var(--tf-root-surface-border, #e2e8f0);
+          border-radius: 12px;
+          padding: 24px;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .info-card h3, .preview-card h3, .demo-card h3, .instructions-card h3 {
+          margin: 0 0 16px 0;
+          font-size: 1.25rem;
+          font-weight: 600;
+        }
+
+        .status-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 16px;
+        }
+
+        .status-item {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+        }
+
+        .status-label {
+          font-size: 0.875rem;
+          color: var(--brand-secondary, #64748b);
           font-weight: 500;
         }
-        .color-control input[type="color"] {
-          width: 40px;
-          height: 32px;
-          border: none;
-          border-radius: 4px;
+
+        .status-value {
+          font-size: 1rem;
+          font-weight: 600;
+          font-family: 'JetBrains Mono', monospace;
+        }
+
+        .status-active {
+          color: #10b981;
+        }
+
+        .color-swatches {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+
+        .swatch-row {
+          display: flex;
+          gap: 8px;
+        }
+
+        .swatch {
+          width: 48px;
+          height: 48px;
+          border-radius: 8px;
+          border: 2px solid var(--tf-root-surface-border, #e2e8f0);
+          position: relative;
           cursor: pointer;
+          transition: transform 0.2s ease;
         }
-        .color-control span {
-          font-family: monospace;
-          background: #f8f9fa;
-          padding: 4px 8px;
-          border-radius: 4px;
-          border: 1px solid #ddd;
-          min-width: 80px;
+
+        .swatch:hover {
+          transform: scale(1.1);
         }
-        .range-control {
+
+        .swatch.primary { background: var(--brand-primary, #3b82f6); }
+        .swatch.secondary { background: var(--brand-secondary, #64748b); }
+        .swatch.success { background: var(--tf-green-500, #10b981); }
+        .swatch.warning { background: var(--tf-yellow-500, #f59e0b); }
+        .swatch.danger { background: var(--tf-red-500, #ef4444); }
+        .swatch.surface-0 { background: var(--tf-surface-0, #ffffff); }
+        .swatch.surface-100 { background: var(--tf-surface-100, #f1f5f9); }
+        .swatch.surface-300 { background: var(--tf-surface-300, #cbd5e1); }
+        .swatch.surface-600 { background: var(--tf-surface-600, #475569); }
+        .swatch.surface-900 { background: var(--tf-surface-900, #0f172a); }
+
+        .demo-description {
+          color: var(--brand-secondary, #64748b);
+          margin-bottom: 24px;
+          line-height: 1.6;
+        }
+
+        .demo-grid {
+          display: flex;
+          flex-direction: column;
+          gap: 24px;
+          margin-bottom: 24px;
+        }
+
+        .demo-group h4 {
+          margin: 0 0 12px 0;
+          font-size: 1.1rem;
+          font-weight: 600;
+        }
+
+        .button-showcase {
+          display: flex;
+          gap: 8px;
+          flex-wrap: wrap;
+        }
+
+        .token-info {
+          border-top: 1px solid var(--tf-root-surface-border, #e2e8f0);
+          padding-top: 24px;
+        }
+
+        .token-info h4 {
+          margin: 0 0 16px 0;
+          font-size: 1.1rem;
+          font-weight: 600;
+        }
+
+        .token-mappings {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+        }
+
+        .mapping-item {
           display: flex;
           align-items: center;
-          gap: 10px;
-          margin-bottom: 15px;
+          gap: 12px;
+          padding: 8px 12px;
+          background: var(--tf-surface-50, #f8fafc);
+          border-radius: 6px;
+          border-left: 3px solid var(--brand-primary, #3b82f6);
+          font-size: 0.875rem;
         }
-        .range-control label {
-          min-width: 120px;
-          font-weight: 500;
-        }
-        .range-control input[type="range"] {
-          flex: 1;
-        }
-        .range-control span {
-          font-family: monospace;
-          background: #f8f9fa;
-          padding: 4px 8px;
+
+        .mapping-item code {
+          background: var(--tf-surface-100, #f1f5f9);
+          padding: 2px 6px;
           border-radius: 4px;
-          border: 1px solid #ddd;
-          min-width: 50px;
+          font-family: 'JetBrains Mono', monospace;
+          font-weight: 600;
+          color: var(--brand-primary, #3b82f6);
         }
-        .text-control {
+
+        .instructions-section {
+          margin-top: 32px;
+        }
+
+        .instruction-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 16px;
+        }
+
+        @media (max-width: 768px) {
+          .instruction-grid {
+            grid-template-columns: 1fr;
+          }
+        }
+
+        .instruction-item {
+          display: flex;
+          gap: 16px;
+          align-items: flex-start;
+        }
+
+        .instruction-number {
+          background: var(--brand-primary, #3b82f6);
+          color: white;
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
           display: flex;
           align-items: center;
-          gap: 10px;
-          margin-bottom: 15px;
+          justify-content: center;
+          font-weight: 600;
+          flex-shrink: 0;
         }
-        .text-control label {
-          min-width: 120px;
-          font-weight: 500;
+
+        .instruction-content {
+          line-height: 1.6;
         }
-        .text-control select {
-          flex: 1;
-          padding: 6px 8px;
-          border: 1px solid #ddd;
-          border-radius: 4px;
+
+        .instruction-content strong {
+          color: var(--brand-text-primary, #0f172a);
+          display: block;
+          margin-bottom: 4px;
         }
       </style>
     `,
