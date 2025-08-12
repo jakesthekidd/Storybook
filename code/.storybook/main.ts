@@ -51,6 +51,7 @@ const config: StorybookConfig = {
         originalError.apply(console, arguments);
       };
     </script>
+    <script src="/themes.js"></script>
     ${head}
     <!-- PrimeNG CSS from CDN for reliable loading -->
     <link rel="stylesheet" href="https://unpkg.com/primeng@17.18.15/resources/themes/lara-light-blue/theme.css">
