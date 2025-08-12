@@ -3,6 +3,7 @@ import { applicationConfig } from '@storybook/angular';
 import { importProvidersFrom } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { loadTokens, type ThemeMode } from '../src/theme/loadTokens';
+import { enterpriseDesignSystem } from '../src/theme/enterprise-design-system';
 
 // Store current tokens globally for access across stories
 let currentTokens: any = null;
