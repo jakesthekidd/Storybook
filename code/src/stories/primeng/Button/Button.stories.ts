@@ -130,12 +130,12 @@ const meta: Meta<ButtonArgs> = {
 
       /* Secondary Button - Light Blue/Gray */
       .p-button.p-button-secondary {
-        background: var(--surface-100, #F7F8F9) !important;
+        background: var(--cyan-50, #F1FAFE) !important;
         border-color: var(--surface-400, #E2E6EB) !important;
         color: var(--blue-700, #1D5D96) !important;
       }
       .p-button.p-button-secondary:hover:not(:disabled) {
-        background: var(--surface-200, #F3F5F7) !important;
+        background: var(--cyan-100, #E3F5FD) !important;
         border-color: var(--surface-500, #C6CCD6) !important;
       }
 
@@ -510,12 +510,12 @@ export const AllVariations: Story = {
 
       /* Secondary Button - Light Blue/Gray */
       .p-button.p-button-secondary {
-        background: var(--surface-100, #F7F8F9) !important;
+        background: var(--cyan-50, #F1FAFE) !important;
         border-color: var(--surface-400, #E2E6EB) !important;
         color: var(--blue-700, #1D5D96) !important;
       }
       .p-button.p-button-secondary:hover:not(:disabled) {
-        background: var(--surface-200, #F3F5F7) !important;
+        background: var(--cyan-100, #E3F5FD) !important;
         border-color: var(--surface-500, #C6CCD6) !important;
       }
 
