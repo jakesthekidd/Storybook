@@ -42,45 +42,146 @@ const config: StorybookConfig = {
   },
   previewHead: (head) => `
     <script>
-      // Enhanced ResizeObserver error suppression
+      // Comprehensive ResizeObserver error suppression
       (function() {
         const isResizeObserverError = (msg) => {
-          return msg && typeof msg === 'string' &&
-                 msg.includes('ResizeObserver') &&
-                 (msg.includes('loop completed with undelivered notifications') ||
-                  msg.includes('loop limit exceeded') ||
-                  msg.includes('loop') ||
-                  msg.includes('notification'));
+          if (!msg) return false;
+          const str = String(msg);
+          return str.includes('ResizeObserver') && (
+            str.includes('loop completed with undelivered notifications') ||
+            str.includes('loop limit exceeded') ||
+            str.includes('loop') ||
+            str.includes('notification') ||
+            str.includes('undelivered')
+          );
         };
 
-        // Override console methods
-        const originalError = console.error;
-        const originalWarn = console.warn;
+        // Override native ResizeObserver constructor
+        if (typeof window !== 'undefined' && window.ResizeObserver) {
+          const OriginalResizeObserver = window.ResizeObserver;
+          window.ResizeObserver = class extends OriginalResizeObserver {
+            constructor(callback) {
+              const wrappedCallback = (entries, observer) => {
+                try {
+                  callback(entries, observer);
+                } catch (e) {
+                  if (!isResizeObserverError(e.message)) {
+                    throw e;
+                  }
+                  // Silently ignore ResizeObserver errors
+                }
+              };
+              super(wrappedCallback);
+            }
+          };
+        }
 
-        console.error = function(...args) {
-          if (isResizeObserverError(args[0])) return;
-          originalError.apply(console, args);
+        // Override all console methods
+        const originalConsole = {
+          error: console.error,
+          warn: console.warn,
+          log: console.log,
+          info: console.info
         };
 
-        console.warn = function(...args) {
-          if (isResizeObserverError(args[0])) return;
-          originalWarn.apply(console, args);
-        };
-
-        // Override window error handler
-        window.addEventListener('error', function(e) {
-          if (isResizeObserverError(e.message)) {
-            e.preventDefault();
-            e.stopPropagation();
-          }
+        ['error', 'warn', 'log', 'info'].forEach(method => {
+          console[method] = function(...args) {
+            if (args.some(arg => isResizeObserverError(arg))) return;
+            originalConsole[method].apply(console, args);
+          };
         });
 
-        // Override unhandled promise rejections
-        window.addEventListener('unhandledrejection', function(e) {
-          if (isResizeObserverError(e.reason)) {
-            e.preventDefault();
-          }
-        });
+        // Multiple layers of error handling
+        const errorHandlers = [
+          // Window error handler
+          window.addEventListener('error', function(e) {
+            if (isResizeObserverError(e.message) || isResizeObserverError(e.error?.message)) {
+              e.preventDefault();
+              e.stopPropagation();
+              e.stopImmediatePropagation();
+              return false;
+            }
+          }, true),
+
+          // Unhandled promise rejections
+          window.addEventListener('unhandledrejection', function(e) {
+            if (isResizeObserverError(e.reason) || isResizeObserverError(e.reason?.message)) {
+              e.preventDefault();
+              e.stopPropagation();
+              e.stopImmediatePropagation();
+              return false;
+            }
+          }, true),
+
+          // Override window.onerror
+          (() => {
+            const originalOnError = window.onerror;
+            window.onerror = function(message, source, lineno, colno, error) {
+              if (isResizeObserverError(message) || isResizeObserverError(error?.message)) {
+                return true; // Prevent default browser error handling
+              }
+              return originalOnError ? originalOnError.apply(this, arguments) : false;
+            };
+          })(),
+
+          // Override window.onunhandledrejection
+          (() => {
+            const originalOnRejection = window.onunhandledrejection;
+            window.onunhandledrejection = function(event) {
+              if (isResizeObserverError(event.reason) || isResizeObserverError(event.reason?.message)) {
+                event.preventDefault();
+                return true;
+              }
+              return originalOnRejection ? originalOnRejection.apply(this, arguments) : false;
+            };
+          })()
+        ];
+
+        // Monkey patch setTimeout and setInterval to catch async errors
+        const originalSetTimeout = window.setTimeout;
+        const originalSetInterval = window.setInterval;
+
+        window.setTimeout = function(callback, delay, ...args) {
+          const wrappedCallback = function() {
+            try {
+              return callback.apply(this, arguments);
+            } catch (e) {
+              if (!isResizeObserverError(e.message)) {
+                throw e;
+              }
+            }
+          };
+          return originalSetTimeout.call(this, wrappedCallback, delay, ...args);
+        };
+
+        window.setInterval = function(callback, delay, ...args) {
+          const wrappedCallback = function() {
+            try {
+              return callback.apply(this, arguments);
+            } catch (e) {
+              if (!isResizeObserverError(e.message)) {
+                throw e;
+              }
+            }
+          };
+          return originalSetInterval.call(this, wrappedCallback, delay, ...args);
+        };
+
+        // Additional protection for requestAnimationFrame
+        const originalRAF = window.requestAnimationFrame;
+        window.requestAnimationFrame = function(callback) {
+          const wrappedCallback = function(timestamp) {
+            try {
+              return callback(timestamp);
+            } catch (e) {
+              if (!isResizeObserverError(e.message)) {
+                throw e;
+              }
+            }
+          };
+          return originalRAF.call(this, wrappedCallback);
+        };
+
       })();
     </script>
     ${head}
