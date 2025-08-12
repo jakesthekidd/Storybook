@@ -1,4 +1,24 @@
-import tokenData from './transflo.tokens.json';
+// Import token data with fallback for different environments
+let tokenData: any;
+try {
+  // Try to import as ES module
+  tokenData = require('./transflo.tokens.json');
+} catch (e) {
+  // Fallback to empty structure if import fails
+  console.warn('Failed to load token data, using minimal fallback');
+  tokenData = {
+    'lara-light': {
+      surface: { 0: { value: '#ffffff' } },
+      theme: { primary: { color: { value: '#3b82f6' } } },
+      global: { textColor: { value: '#0f172a' } }
+    },
+    'lara-dark': {
+      surface: { 0: { value: '#0f172a' } },
+      theme: { primary: { color: { value: '#3b82f6' } } },
+      global: { textColor: { value: '#f1f5f9' } }
+    }
+  };
+}
 
 export type ThemeMode = 'light' | 'dark';
 
