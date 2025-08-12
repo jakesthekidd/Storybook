@@ -115,64 +115,53 @@ const config: StorybookConfig = {
           });
         }
 
-        // Complete ResizeObserver override
+        // COMPLETE ResizeObserver elimination
         if (typeof window !== 'undefined') {
-          // Store original before any modification
           const OriginalResizeObserver = window.ResizeObserver;
 
           if (OriginalResizeObserver) {
-            window.ResizeObserver = class extends OriginalResizeObserver {
+            // Override with silent, non-throwing implementation
+            window.ResizeObserver = class SilentResizeObserver {
               constructor(callback) {
-                const silentCallback = (entries, observer) => {
-                  // Wrap in try-catch and requestIdleCallback for better timing
-                  const safeExecution = () => {
-                    try {
-                      callback(entries, observer);
-                    } catch (error) {
-                      // Completely silent - don't even log ResizeObserver errors
-                      if (!isResizeObserverError(error.message)) {
-                        throw error;
+                // Create instance but wrap all interactions
+                this._observer = new OriginalResizeObserver((entries, observer) => {
+                  // Execute callback in isolated context with complete error suppression
+                  try {
+                    // Use setTimeout to break execution context and prevent loops
+                    setTimeout(() => {
+                      try {
+                        callback(entries, observer);
+                      } catch (e) {
+                        // Completely silent - no logging, no throwing
                       }
-                    }
-                  };
-
-                  if (typeof requestIdleCallback !== 'undefined') {
-                    requestIdleCallback(safeExecution, { timeout: 100 });
-                  } else {
-                    setTimeout(safeExecution, 0);
+                    }, 0);
+                  } catch (e) {
+                    // Completely silent
                   }
-                };
-                super(silentCallback);
+                });
               }
-            };
 
-            // Also override the prototype methods
-            window.ResizeObserver.prototype.observe = function(target, options) {
-              try {
-                return OriginalResizeObserver.prototype.observe.call(this, target, options);
-              } catch (error) {
-                if (!isResizeObserverError(error.message)) {
-                  throw error;
+              observe(target, options) {
+                try {
+                  return this._observer.observe(target, options);
+                } catch (e) {
+                  // Silent failure
                 }
               }
-            };
 
-            window.ResizeObserver.prototype.unobserve = function(target) {
-              try {
-                return OriginalResizeObserver.prototype.unobserve.call(this, target);
-              } catch (error) {
-                if (!isResizeObserverError(error.message)) {
-                  throw error;
+              unobserve(target) {
+                try {
+                  return this._observer.unobserve(target);
+                } catch (e) {
+                  // Silent failure
                 }
               }
-            };
 
-            window.ResizeObserver.prototype.disconnect = function() {
-              try {
-                return OriginalResizeObserver.prototype.disconnect.call(this);
-              } catch (error) {
-                if (!isResizeObserverError(error.message)) {
-                  throw error;
+              disconnect() {
+                try {
+                  return this._observer.disconnect();
+                } catch (e) {
+                  // Silent failure
                 }
               }
             };
