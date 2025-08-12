@@ -1,23 +1,49 @@
-// CRITICAL: Immediate ResizeObserver error suppression - must be at the very top!
+// CRITICAL: Immediate and comprehensive ResizeObserver error suppression
 if (typeof globalThis !== 'undefined') {
-  // Override at the global level immediately
   const suppressResizeObserverError = (message: any) => {
-    const msg = String(message || '');
-    return msg.includes('ResizeObserver') &&
-           (msg.includes('loop') || msg.includes('notification') || msg.includes('undelivered'));
+    if (!message) return false;
+    const msg = String(message);
+    return msg.includes('ResizeObserver') && (
+      msg.includes('loop completed with undelivered notifications') ||
+      msg.includes('loop limit exceeded') ||
+      msg.includes('loop') ||
+      msg.includes('notification') ||
+      msg.includes('undelivered')
+    );
   };
 
-  // Override console methods immediately
+  // Immediate console override
   if (typeof console !== 'undefined') {
-    const origError = console.error;
-    const origWarn = console.warn;
-    console.error = (...args: any[]) => suppressResizeObserverError(args[0]) ? void 0 : origError.apply(console, args);
-    console.warn = (...args: any[]) => suppressResizeObserverError(args[0]) ? void 0 : origWarn.apply(console, args);
+    const origMethods = {
+      error: console.error,
+      warn: console.warn,
+      log: console.log,
+      info: console.info
+    };
+
+    ['error', 'warn', 'log', 'info'].forEach(method => {
+      console[method] = (...args: any[]) => {
+        if (args.some(arg => suppressResizeObserverError(arg))) return;
+        origMethods[method].apply(console, args);
+      };
+    });
   }
 
-  // Override global error handling
+  // Global error handling with multiple layers
   if (typeof window !== 'undefined') {
-    window.onerror = (message) => suppressResizeObserverError(message) ? true : false;
+    // Primary error handler
+    window.onerror = (message, source, lineno, colno, error) => {
+      return suppressResizeObserverError(message) || suppressResizeObserverError(error?.message);
+    };
+
+    // Unhandled rejection handler
+    window.onunhandledrejection = (event) => {
+      if (suppressResizeObserverError(event.reason) || suppressResizeObserverError(event.reason?.message)) {
+        event.preventDefault();
+        return true;
+      }
+      return false;
+    };
   }
 }
 
