@@ -6,8 +6,7 @@ const meta: Meta = {
   title: 'Theme/Controls',
   decorators: [
     moduleMetadata({
-      imports: [CommonModule, ButtonModule, ToastModule],
-      providers: [MessageService],
+      imports: [CommonModule],
     }),
   ],
   parameters: {
