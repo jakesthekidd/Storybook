@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { addons, types } from '@storybook/manager-api';
+import { addons, types } from '@storybook/addons';
 import { AddonPanel } from '@storybook/components';
 import { PRIMENG_THEMES, themeManager } from '../themes';
 
