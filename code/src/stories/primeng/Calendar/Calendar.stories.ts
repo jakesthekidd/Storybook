@@ -165,18 +165,22 @@ const meta: Meta<CalendarArgs> = {
         color: var(--surface-500) !important;
       }
 
-      /* Calendar Icon */
+      /* Calendar Icon - Higher specificity to override PrimeNG */
+      .token-calendar .p-button.p-datepicker-trigger,
+      .token-calendar .p-datepicker-trigger.p-button,
       .token-calendar .p-datepicker-trigger {
-        background: var(--blue-500) !important;
-        border: 1px solid var(--blue-500) !important;
+        background: var(--blue-500, #2474BB) !important;
+        border: 1px solid var(--blue-500, #2474BB) !important;
         border-radius: 8px !important;
         color: #ffffff !important;
         transition: all 0.2s ease !important;
       }
 
+      .token-calendar .p-button.p-datepicker-trigger:hover,
+      .token-calendar .p-datepicker-trigger.p-button:hover,
       .token-calendar .p-datepicker-trigger:hover {
-        background: var(--blue-600) !important;
-        border-color: var(--blue-600) !important;
+        background: var(--blue-600, #2068A8) !important;
+        border-color: var(--blue-600, #2068A8) !important;
       }
 
       /* Calendar Panel */
