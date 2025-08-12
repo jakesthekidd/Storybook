@@ -42,12 +42,46 @@ const config: StorybookConfig = {
   },
   previewHead: (head) => `
     <script>
-      // Suppress harmless ResizeObserver warnings
-      const originalError = console.error;
-      console.error = function(msg) {
-        if (msg && msg.includes && msg.includes('ResizeObserver loop')) return;
-        originalError.apply(console, arguments);
-      };
+      // Enhanced ResizeObserver error suppression
+      (function() {
+        const isResizeObserverError = (msg) => {
+          return msg && typeof msg === 'string' &&
+                 msg.includes('ResizeObserver') &&
+                 (msg.includes('loop completed with undelivered notifications') ||
+                  msg.includes('loop limit exceeded') ||
+                  msg.includes('loop') ||
+                  msg.includes('notification'));
+        };
+
+        // Override console methods
+        const originalError = console.error;
+        const originalWarn = console.warn;
+
+        console.error = function(...args) {
+          if (isResizeObserverError(args[0])) return;
+          originalError.apply(console, args);
+        };
+
+        console.warn = function(...args) {
+          if (isResizeObserverError(args[0])) return;
+          originalWarn.apply(console, args);
+        };
+
+        // Override window error handler
+        window.addEventListener('error', function(e) {
+          if (isResizeObserverError(e.message)) {
+            e.preventDefault();
+            e.stopPropagation();
+          }
+        });
+
+        // Override unhandled promise rejections
+        window.addEventListener('unhandledrejection', function(e) {
+          if (isResizeObserverError(e.reason)) {
+            e.preventDefault();
+          }
+        });
+      })();
     </script>
     ${head}
     <!-- PrimeNG CSS will be loaded dynamically by theme switcher -->
