@@ -161,22 +161,22 @@ const meta: Meta<CalendarArgs> = {
       /* Calendar Input Field */
       .token-calendar .p-inputtext {
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
-        border: 1px solid var(--surface-400) !important;
+        border: 1px solid var(--palette-surface-border) !important;
         border-radius: 8px !important;
-        background: #ffffff !important;
-        color: var(--blue-700) !important;
+        background: var(--palette-surface) !important;
+        color: var(--palette-text-primary) !important;
         padding: 0.75rem !important;
         transition: all 0.2s ease !important;
       }
 
       .token-calendar .p-inputtext:focus {
-        border-color: var(--blue-500) !important;
-        box-shadow: 0 0 0 2px rgba(36, 116, 187, 0.1) !important;
+        border-color: var(--palette-primary) !important;
+        box-shadow: 0 0 0 2px var(--palette-primary)20 !important;
         outline: none !important;
       }
 
       .token-calendar .p-inputtext::placeholder {
-        color: var(--surface-500) !important;
+        color: var(--palette-text-muted) !important;
       }
 
       /* Calendar Icon - Higher specificity to override PrimeNG */
