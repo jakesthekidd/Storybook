@@ -70,420 +70,53 @@ const config: StorybookConfig = {
   },
   previewHead: (head) => `
     <script>
-      // ULTIMATE ResizeObserver error elimination - absolutely first thing that runs
+      // Simple, effective ResizeObserver error suppression
       (function() {
         'use strict';
 
-        // Store original methods before any other scripts can interfere
-        const originalConsole = {
-          error: console.error,
-          warn: console.warn,
-          log: console.log,
-          info: console.info
+        // Store original console methods
+        const originalError = console.error;
+        const originalWarn = console.warn;
+
+        // Simple detection for ResizeObserver errors
+        const isResizeObserverError = (message) => {
+          const str = String(message);
+          return str.includes('ResizeObserver loop completed with undelivered notifications');
         };
 
-        // Comprehensive ResizeObserver detection
-        const isResizeObserverError = (arg) => {
-          if (!arg) return false;
-          const str = String(arg);
-          return (
-            str.includes('ResizeObserver') ||
-            str.includes('loop completed with undelivered notifications') ||
-            str.includes('loop limit exceeded') ||
-            str.includes('resize observer') ||
-            str.includes('resizeobserver')
-          );
-        };
-
-        // Override ALL console methods immediately
-        ['error', 'warn', 'log', 'info', 'debug', 'trace'].forEach(method => {
-          console[method] = function(...args) {
-            if (args.some(isResizeObserverError)) return;
-            try {
-              originalConsole[method] && originalConsole[method].apply(console, args);
-            } catch (e) {}
-          };
-        });
-
-        // Multiple layers of window error suppression
-        window.onerror = function(msg, source, line, col, error) {
-          if (isResizeObserverError(msg) || isResizeObserverError(error?.message) || isResizeObserverError(error?.stack)) {
-            return true;
+        // Override console.error to suppress ResizeObserver errors
+        console.error = function(...args) {
+          if (args.some(isResizeObserverError)) {
+            return; // Silent suppression
           }
-          return false;
+          return originalError.apply(console, args);
         };
 
-        window.onunhandledrejection = function(event) {
-          if (isResizeObserverError(event.reason) || isResizeObserverError(event.reason?.message)) {
+        console.warn = function(...args) {
+          if (args.some(isResizeObserverError)) {
+            return; // Silent suppression
+          }
+          return originalWarn.apply(console, args);
+        };
+
+        // Catch unhandled errors
+        window.addEventListener('error', function(event) {
+          if (isResizeObserverError(event.message)) {
             event.preventDefault();
             event.stopPropagation();
-            return;
+            return false;
           }
-        };
-
-        // Override addEventListener to prevent any ResizeObserver errors from bubbling
-        const origAddEventListener = window.addEventListener;
-        window.addEventListener = function(type, listener, options) {
-          if (type === 'error') {
-            const wrappedListener = function(event) {
-              if (isResizeObserverError(event.message) || isResizeObserverError(event.error?.message)) {
-                event.preventDefault();
-                event.stopPropagation();
-                event.stopImmediatePropagation();
-                return false;
-              }
-              return listener.apply(this, arguments);
-            };
-            return origAddEventListener.call(this, type, wrappedListener, options);
-          }
-          return origAddEventListener.call(this, type, listener, options);
-        };
-
-      })();
-    </script>
-    <script>
-      // NUCLEAR ResizeObserver error suppression - eliminate all instances
-      (function() {
-        'use strict';
-
-        // Ultra-precise error detection for exact message
-        const isResizeObserverError = (msg) => {
-          if (!msg) return false;
-          const str = String(msg);
-          return str === 'ResizeObserver loop completed with undelivered notifications.' ||
-                 str.includes('ResizeObserver loop completed with undelivered notifications') ||
-                 str.includes('ResizeObserver loop limit exceeded') ||
-                 (str.toLowerCase().includes('resizeobserver') && str.toLowerCase().includes('loop'));
-        };
-
-        // IMMEDIATE console hijacking - before anything else loads
-        if (typeof console !== 'undefined') {
-          const noop = () => {};
-          const originals = {
-            error: console.error,
-            warn: console.warn,
-            log: console.log,
-            info: console.info,
-            debug: console.debug,
-            trace: console.trace
-          };
-
-          // Aggressive console override
-          ['error', 'warn', 'log', 'info', 'debug', 'trace'].forEach(method => {
-            console[method] = function(...args) {
-              // Check all arguments for ResizeObserver errors
-              for (let arg of args) {
-                if (isResizeObserverError(arg)) {
-                  return; // Complete suppression
-                }
-              }
-              // Only call original if no ResizeObserver error detected
-              try {
-                originals[method].apply(console, args);
-              } catch (e) {
-                // Ignore any errors in logging
-              }
-            };
-          });
-        }
-
-        // COMPLETE ResizeObserver elimination
-        if (typeof window !== 'undefined') {
-          const OriginalResizeObserver = window.ResizeObserver;
-
-          if (OriginalResizeObserver) {
-            // Override with ultra-silent, non-throwing implementation
-            window.ResizeObserver = class UltraSilentResizeObserver {
-              constructor(callback) {
-                // Store callback but don't create observer immediately
-                this._callback = callback;
-                this._observer = null;
-                this._isDestroyed = false;
-
-                // Delay observer creation to avoid immediate loops
-                setTimeout(() => {
-                  if (this._isDestroyed) return;
-                  try {
-                    this._observer = new OriginalResizeObserver((entries, observer) => {
-                      if (this._isDestroyed) return;
-
-                      // Multiple layers of protection
-                      try {
-                        // Defer execution to next tick to break potential loops
-                        Promise.resolve().then(() => {
-                          if (this._isDestroyed) return;
-                          setTimeout(() => {
-                            if (this._isDestroyed) return;
-                            try {
-                              this._callback && this._callback(entries, observer);
-                            } catch (e) {
-                              // Ultra-silent suppression
-                            }
-                          }, 1);
-                        }).catch(() => {
-                          // Silent promise rejection handling
-                        });
-                      } catch (e) {
-                        // Silent error handling
-                      }
-                    });
-                  } catch (e) {
-                    // Silent observer creation failure
-                  }
-                }, 10);
-              }
-
-              observe(target, options) {
-                if (this._isDestroyed || !target) return;
-                try {
-                  if (this._observer) {
-                    return this._observer.observe(target, options);
-                  }
-                } catch (e) {
-                  // Ultra-silent failure
-                }
-              }
-
-              unobserve(target) {
-                if (this._isDestroyed || !target) return;
-                try {
-                  if (this._observer) {
-                    return this._observer.unobserve(target);
-                  }
-                } catch (e) {
-                  // Ultra-silent failure
-                }
-              }
-
-              disconnect() {
-                this._isDestroyed = true;
-                this._callback = null;
-                try {
-                  if (this._observer) {
-                    this._observer.disconnect();
-                    this._observer = null;
-                  }
-                } catch (e) {
-                  // Ultra-silent failure
-                }
-              }
-            };
-          }
-        }
-
-        // Override all console methods
-        const originalConsole = {
-          error: console.error,
-          warn: console.warn,
-          log: console.log,
-          info: console.info
-        };
-
-        ['error', 'warn'].forEach(method => {
-          (console as any)[method] = function(...args: any[]) {
-            if (args.some(arg => isResizeObserverError(arg))) return;
-            originalConsole[method].apply(console, args);
-          };
         });
 
-        // NUCLEAR error suppression - multiple layers of interception
-
-        // Immediate window error hijacking
-        window.onerror = function(message, source, lineno, colno, error) {
-          if (isResizeObserverError(message) || isResizeObserverError(error?.message)) {
-            return true; // Completely suppress
-          }
-          return false; // Let other errors through
-        };
-
-        window.onunhandledrejection = function(event) {
-          if (isResizeObserverError(event.reason) || isResizeObserverError(event.reason?.message)) {
+        // Catch unhandled promise rejections
+        window.addEventListener('unhandledrejection', function(event) {
+          if (isResizeObserverError(event.reason)) {
             event.preventDefault();
-            event.stopPropagation();
-            return;
+            return false;
           }
-        };
-
-        // Aggressive event listener suppression
-        const originalAddEventListener = window.addEventListener;
-        window.addEventListener = function(type, listener, options) {
-          if (type === 'error' || type === 'unhandledrejection') {
-            const wrappedListener = function(event) {
-              // Pre-filter ResizeObserver errors before they reach any listener
-              if (type === 'error' && isResizeObserverError(event.message || event.error?.message)) {
-                event.preventDefault();
-                event.stopPropagation();
-                event.stopImmediatePropagation();
-                return;
-              }
-              if (type === 'unhandledrejection' && isResizeObserverError(event.reason || event.reason?.message)) {
-                event.preventDefault();
-                event.stopPropagation();
-                event.stopImmediatePropagation();
-                return;
-              }
-              return listener.apply(this, arguments);
-            };
-            return originalAddEventListener.call(this, type, wrappedListener, options);
-          }
-          return originalAddEventListener.call(this, type, listener, options);
-        };
-
-        // Override setTimeout/setInterval to catch async ResizeObserver errors
-        const originalSetTimeout = window.setTimeout;
-        const originalSetInterval = window.setInterval;
-
-        window.setTimeout = function(callback, delay, ...args) {
-          const wrappedCallback = function() {
-            try {
-              return callback.apply(this, arguments);
-            } catch (e) {
-              if (!isResizeObserverError(e.message)) {
-                throw e;
-              }
-              // Silently suppress ResizeObserver errors
-            }
-          };
-          return originalSetTimeout.call(this, wrappedCallback, delay, ...args);
-        };
-
-        window.setInterval = function(callback, delay, ...args) {
-          const wrappedCallback = function() {
-            try {
-              return callback.apply(this, arguments);
-            } catch (e) {
-              if (!isResizeObserverError(e.message)) {
-                throw e;
-              }
-              // Silently suppress ResizeObserver errors
-            }
-          };
-          return originalSetInterval.call(this, wrappedCallback, delay, ...args);
-        };
-
-        // Comprehensive async function wrapping
-        const wrapAsyncFunction = (fn, context) => {
-          return function(...args) {
-            const callback = args[0];
-            if (typeof callback === 'function') {
-              args[0] = function(...cbArgs) {
-                try {
-                  return callback.apply(this, cbArgs);
-                } catch (error) {
-                  if (!isResizeObserverError(error.message) && !isResizeObserverError(error.stack)) {
-                    throw error;
-                  }
-                  // Silent suppression for ResizeObserver errors
-                }
-              };
-            }
-            return fn.apply(context, args);
-          };
-        };
-
-        // Wrap all async timing functions
-        if (window.setTimeout) {
-          window.setTimeout = wrapAsyncFunction(window.setTimeout, window);
-        }
-        if (window.setInterval) {
-          window.setInterval = wrapAsyncFunction(window.setInterval, window);
-        }
-        if (window.requestAnimationFrame) {
-          window.requestAnimationFrame = wrapAsyncFunction(window.requestAnimationFrame, window);
-        }
-        if (window.requestIdleCallback) {
-          window.requestIdleCallback = wrapAsyncFunction(window.requestIdleCallback, window);
-        }
-
-        // Additional MutationObserver protection (often triggers ResizeObserver)
-        if (window.MutationObserver) {
-          const OriginalMutationObserver = window.MutationObserver;
-          window.MutationObserver = class extends OriginalMutationObserver {
-            constructor(callback) {
-              const wrappedCallback = function(mutations, observer) {
-                try {
-                  callback(mutations, observer);
-                } catch (error) {
-                  if (!isResizeObserverError(error.message)) {
-                    throw error;
-                  }
-                }
-              };
-              super(wrappedCallback);
-            }
-          };
-        }
+        });
 
       })();
-    </script>
-    <script>
-      // Restore console functionality with targeted ResizeObserver suppression
-      (function() {
-        'use strict';
-
-        // Check if console was completely disabled and restore it properly
-        if (typeof console === 'undefined' || !console.error || console.error.toString().includes('function () {}')) {
-          // Create minimal console implementation that only suppresses ResizeObserver
-          window.console = window.console || {};
-
-          const nativeConsole = window.console;
-          const methods = ['error', 'warn', 'log', 'info', 'debug', 'trace'];
-
-          methods.forEach(method => {
-            // Store original or create fallback
-            const original = nativeConsole[method] || function() {};
-
-            nativeConsole[method] = function(...args) {
-              // Only suppress if it's specifically a ResizeObserver error
-              const isResizeObserverError = args.some(arg => {
-                const str = String(arg);
-                return str.includes('ResizeObserver') &&
-                       (str.includes('loop completed with undelivered notifications') ||
-                        str.includes('loop'));
-              });
-
-              if (!isResizeObserverError) {
-                // Let all other console messages through
-                if (typeof original === 'function') {
-                  return original.apply(this, args);
-                }
-              }
-              // Silently suppress only ResizeObserver errors
-            };
-          });
-        }
-      })();
-    </script>
-    <script>
-      // FINAL layer - catch any remaining ResizeObserver errors after all other scripts load
-      window.addEventListener('DOMContentLoaded', function() {
-        setTimeout(() => {
-          const isResizeObserverError = (msg) => {
-            const str = String(msg || '');
-            return str.includes('ResizeObserver') && str.includes('loop completed with undelivered notifications');
-          };
-
-          // Override any remaining console methods that might have been restored
-          const methods = ['error', 'warn', 'log'];
-          methods.forEach(method => {
-            const original = console[method];
-            console[method] = function(...args) {
-              if (args.some(isResizeObserverError)) return;
-              return original.apply(console, args);
-            };
-          });
-
-          // Final window error handler override
-          const originalErrorHandler = window.onerror;
-          window.onerror = function(msg, source, line, col, error) {
-            if (isResizeObserverError(msg) || isResizeObserverError(error?.message)) {
-              return true;
-            }
-            return originalErrorHandler ? originalErrorHandler.apply(this, arguments) : false;
-          };
-
-        }, 100);
-      });
     </script>
     ${head}
     <!-- Only load PrimeIcons, PrimeNG theme will be token-driven -->
