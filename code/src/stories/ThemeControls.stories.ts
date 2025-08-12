@@ -176,7 +176,8 @@ export const ThemeEditor: Story = {
       updateCSSVar: (property: string, value: string) => {
         document.documentElement.style.setProperty(property, value);
         // Update the display value
-        const span = document.querySelector(\`[id="\${property.replace('--brand-', '').replace('-', '')}-value"]\`);
+        const propName = property.replace('--brand-', '').replace('-', '');
+        const span = document.getElementById(propName + '-value');
         if (span) span.textContent = value;
       },
       
@@ -237,7 +238,7 @@ export const ThemeEditor: Story = {
           try {
             const theme = JSON.parse(e.target?.result as string);
             Object.entries(theme).forEach(([key, value]) => {
-              const cssVar = \`--brand-\${key.replace(/([A-Z])/g, '-$1').toLowerCase()}\`;
+              const cssVar = '--brand-' + key.replace(/([A-Z])/g, '-$1').toLowerCase();
               document.documentElement.style.setProperty(cssVar, value as string);
             });
             
