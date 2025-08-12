@@ -3,7 +3,11 @@ import { applicationConfig } from '@storybook/angular';
 import { importProvidersFrom } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
-import { PRIMENG_THEMES, themeManager } from './themes.js';
+// Simple theme configuration
+const THEMES = {
+  light: 'https://unpkg.com/primeng@17.18.15/resources/themes/lara-light-blue/theme.css',
+  dark: 'https://unpkg.com/primeng@17.18.15/resources/themes/lara-dark-blue/theme.css'
+};
 
 const preview: Preview = {
   decorators: [
@@ -13,11 +17,7 @@ const preview: Preview = {
     (story, context) => {
       // Apply theme based on global
       const theme = context.globals.theme || 'light';
-      themeManager.setTheme(theme);
-
-      // Update theme CSS link
       updateThemeCSS(theme);
-
       return story();
     }
   ],
@@ -55,7 +55,7 @@ function updateThemeCSS(theme: 'light' | 'dark') {
   // Add new theme link
   const link = document.createElement('link');
   link.rel = 'stylesheet';
-  link.href = PRIMENG_THEMES[theme].css;
+  link.href = THEMES[theme];
   link.setAttribute('data-theme-css', 'true');
   document.head.appendChild(link);
 }
