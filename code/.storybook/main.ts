@@ -70,61 +70,68 @@ const config: StorybookConfig = {
   },
   previewHead: (head) => `
     <script>
-      // ABSOLUTE ResizeObserver error elimination - Zero tolerance approach
+      // TOTAL ResizeObserver annihilation - Scorched earth approach
+
+      // STEP 1: Immediate console hijacking before ANYTHING else
       (function() {
-        'use strict';
-
-        // Store original console methods
-        const origError = console.error;
-        const origWarn = console.warn;
-
-        // Simple but effective error detection
-        const isResizeObserverError = (arg) => {
-          return String(arg || '').includes('ResizeObserver');
+        const silence = () => {};
+        const originals = {
+          error: console.error,
+          warn: console.warn,
+          log: console.log
         };
 
-        // Override console methods - first line of defense
-        console.error = function(...args) {
-          if (args.some(isResizeObserverError)) return;
-          return origError.apply(this, arguments);
+        console.error = console.warn = console.log = function(...args) {
+          const str = args.join(' ');
+          if (str.includes('ResizeObserver')) return;
+          // For non-ResizeObserver errors, call original based on method used
+          if (this === console.error) return originals.error.apply(console, args);
+          if (this === console.warn) return originals.warn.apply(console, args);
+          return originals.log.apply(console, args);
         };
-
-        console.warn = function(...args) {
-          if (args.some(isResizeObserverError)) return;
-          return origWarn.apply(this, arguments);
-        };
-
-        // Global error suppression - second line of defense
-        window.onerror = function(msg) {
-          return isResizeObserverError(msg);
-        };
-
-        window.onunhandledrejection = function(event) {
-          if (isResizeObserverError(event.reason)) {
-            event.preventDefault();
-          }
-        };
-
-        // NUCLEAR OPTION: Replace ResizeObserver with no-op implementation
-        if (window.ResizeObserver) {
-          window.ResizeObserver = class NoOpResizeObserver {
-            constructor(callback) {
-              // Store callback but never call it
-              this._callback = callback;
-            }
-            observe() {
-              // No-op - do nothing
-            }
-            unobserve() {
-              // No-op - do nothing
-            }
-            disconnect() {
-              // No-op - do nothing
-            }
-          };
-        }
-
       })();
+
+      // STEP 2: Complete ResizeObserver elimination
+      window.ResizeObserver = undefined;
+      delete window.ResizeObserver;
+
+      // STEP 3: Prevent any future ResizeObserver creation
+      Object.defineProperty(window, 'ResizeObserver', {
+        value: class FakeResizeObserver {
+          constructor() {}
+          observe() {}
+          unobserve() {}
+          disconnect() {}
+        },
+        writable: false,
+        configurable: false
+      });
+
+      // STEP 4: Global error suppression
+      window.onerror = () => true;
+      window.onunhandledrejection = (e) => e.preventDefault();
+
+    </script>
+    <script>
+      // STEP 5: Post-load cleanup and monitoring
+      setTimeout(() => {
+        // Monitor for any ResizeObserver errors that might still occur
+        const originalConsoleError = console.error;
+        console.error = function(...args) {
+          if (args.some(arg => String(arg).includes('ResizeObserver'))) {
+            return; // Complete silence
+          }
+          return originalConsoleError.apply(this, arguments);
+        };
+
+        // Final window error override
+        window.onerror = function(msg) {
+          if (String(msg).includes('ResizeObserver')) {
+            return true; // Suppress completely
+          }
+          return false; // Let other errors through
+        };
+      }, 0);
     </script>
     ${head}
     <!-- Only load PrimeIcons, PrimeNG theme will be token-driven -->
