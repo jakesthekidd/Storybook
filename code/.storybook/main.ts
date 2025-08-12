@@ -30,7 +30,6 @@ const config: StorybookConfig = {
     '@storybook/addon-controls',
     '@storybook/addon-viewport',
     '@storybook/addon-toolbars',
-    './.storybook/theme-controls-addon/manager',
   ],
   staticDirs: [
     '../src/assets',
