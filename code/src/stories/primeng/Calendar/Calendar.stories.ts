@@ -394,19 +394,20 @@ const meta: Meta<CalendarArgs> = {
         opacity: 0.6 !important;
       }
 
-      /* FINAL NUCLEAR OVERRIDE - Direct hex value enforcement */
+      /* Ensure Calendar Icon uses Color Palette Variables */
       .token-calendar .p-datepicker-trigger,
       .token-calendar .p-button.p-datepicker-trigger,
       .p-datepicker-trigger.p-button {
-        background-color: #2474BB !important;
-        border-color: #2474BB !important;
+        background: var(--palette-primary, #2474BB) !important;
+        border-color: var(--palette-primary, #2474BB) !important;
+        color: var(--palette-primary-contrast, #ffffff) !important;
       }
 
       .token-calendar .p-datepicker-trigger:hover,
       .token-calendar .p-button.p-datepicker-trigger:hover,
       .p-datepicker-trigger.p-button:hover {
-        background-color: #2068A8 !important;
-        border-color: #2068A8 !important;
+        background: var(--palette-primary-hover, #2068A8) !important;
+        border-color: var(--palette-primary-hover, #2068A8) !important;
       }
     `]
   }),
