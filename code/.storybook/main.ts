@@ -50,6 +50,10 @@ const config: StorybookConfig = {
       };
     </script>
     ${head}
+    <!-- PrimeNG CSS from CDN for reliable loading -->
+    <link rel="stylesheet" href="https://unpkg.com/primeng@17.18.15/resources/themes/lara-light-blue/theme.css">
+    <link rel="stylesheet" href="https://unpkg.com/primeng@17.18.15/resources/primeng.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/primeicons@7.0.0/primeicons.css">
   `,
   webpackFinal: async (config) => {
     // Ensure CSS files are handled properly
