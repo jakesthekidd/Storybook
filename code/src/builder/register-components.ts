@@ -165,8 +165,6 @@ Builder.registerComponent(BuilderInputComponent, {
 // Register Calendar Component
 Builder.registerComponent(BuilderCalendarComponent, {
   name: 'PrimeNG Calendar',
-  group: 'Form Controls',
-  image: 'https://cdn.builder.io/api/v1/image/assets%2FYJIGb4i01jvw0SRdL5Bt%2F4c4e4f4e4f4e4f4e4f4e4f4e4f4e4f4e',
   inputs: [
     {
       name: 'label',
