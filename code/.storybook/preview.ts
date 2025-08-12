@@ -154,8 +154,9 @@ const getInitialTheme = (): ThemeMode => {
   return (stored === 'dark' || stored === 'light') ? stored : 'light';
 };
 
-// Initialize theme immediately
-applyTokenTheme(getInitialTheme());
+// Initialize enterprise design system
+const initialTheme = getInitialTheme();
+enterpriseDesignSystem.initialize(initialTheme);
 
 const preview: Preview = {
   decorators: [
@@ -163,9 +164,14 @@ const preview: Preview = {
       providers: [importProvidersFrom(BrowserAnimationsModule)],
     }),
     (story, context) => {
-      // Apply theme based on global with proper property access
+      // Apply theme using enterprise design system
       const theme = (context.globals['theme'] as 'light' | 'dark') ?? 'light';
-      applyTokenTheme(theme);
+      applyEnterpriseTheme(theme);
+
+      // Notify design system of story render
+      setTimeout(() => {
+        window.dispatchEvent(new CustomEvent('storybook-story-rendered'));
+      }, 10);
 
       return story();
     }
