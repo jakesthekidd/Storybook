@@ -87,32 +87,15 @@ applyTokenTheme(getInitialTheme());
 
 const preview: Preview = {
   decorators: [
+    applicationConfig({
+      providers: [importProvidersFrom(BrowserAnimationsModule)],
+    }),
     (story, context) => {
       // Apply theme based on global with proper property access
       const theme = (context.globals['theme'] as 'light' | 'dark') ?? 'light';
       applyTokenTheme(theme);
 
-      // Return story with PrimeNG providers configured with current tokens
-      return {
-        ...story(),
-        applicationConfig: {
-          providers: [
-            importProvidersFrom(BrowserAnimationsModule),
-            providePrimeNG({
-              theme: {
-                preset: currentTokens || loadTokens(theme).preset,
-                options: {
-                  prefix: 'p',
-                  darkModeSelector: theme === 'dark' ? 'system' : false,
-                  cssLayer: false
-                }
-              },
-              ripple: true,
-              inputStyle: 'outlined'
-            })
-          ]
-        }
-      };
+      return story();
     }
   ],
   parameters: {
