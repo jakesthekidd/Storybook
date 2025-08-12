@@ -70,73 +70,74 @@ const config: StorybookConfig = {
   },
   previewHead: (head) => `
     <script>
-      // ULTIMATE ResizeObserver error elimination
+      // Targeted ResizeObserver error suppression (Storybook-compatible)
       (function() {
         'use strict';
 
-        // Instantly hijack console before any other scripts
-        const noop = () => {};
-        const originalMethods = {};
+        // Store originals before any interference
+        const originalError = console.error;
+        const originalWarn = console.warn;
 
-        ['error', 'warn', 'log', 'info', 'debug', 'trace'].forEach(method => {
-          originalMethods[method] = console[method];
-          console[method] = function(...args) {
-            const message = args.join(' ');
-            if (message.includes('ResizeObserver')) return;
-            return originalMethods[method].apply(console, args);
-          };
+        // Precise ResizeObserver error detection
+        function isResizeObserverError(message) {
+          const str = String(message || '');
+          return str === 'ResizeObserver loop completed with undelivered notifications.' ||
+                 str.includes('ResizeObserver loop completed with undelivered notifications');
+        }
+
+        // Only override console for ResizeObserver errors, leave everything else intact
+        console.error = function(...args) {
+          // Don't interfere with Storybook manager messages
+          if (args.length > 0 && isResizeObserverError(args[0])) {
+            return; // Silent suppression only for exact ResizeObserver error
+          }
+          return originalError.apply(this, arguments);
+        };
+
+        console.warn = function(...args) {
+          if (args.length > 0 && isResizeObserverError(args[0])) {
+            return; // Silent suppression only for exact ResizeObserver error
+          }
+          return originalWarn.apply(this, arguments);
+        };
+
+        // Targeted error event suppression
+        window.addEventListener('error', function(event) {
+          if (isResizeObserverError(event.message)) {
+            event.preventDefault();
+            event.stopPropagation();
+          }
+        }, true);
+
+        // Targeted promise rejection suppression
+        window.addEventListener('unhandledrejection', function(event) {
+          if (isResizeObserverError(event.reason)) {
+            event.preventDefault();
+          }
         });
 
-        // Nuclear error suppression
-        window.onerror = () => true;
-        window.onunhandledrejection = (e) => e.preventDefault();
-
-        // Completely disable ResizeObserver
+        // Gentle ResizeObserver wrapping (doesn't break functionality)
         if (window.ResizeObserver) {
-          window.ResizeObserver = class {
-            constructor() {}
-            observe() {}
-            unobserve() {}
-            disconnect() {}
+          const OriginalResizeObserver = window.ResizeObserver;
+          window.ResizeObserver = class WrappedResizeObserver extends OriginalResizeObserver {
+            constructor(callback) {
+              // Wrap callback to catch and suppress only the specific error
+              const wrappedCallback = (entries, observer) => {
+                try {
+                  callback(entries, observer);
+                } catch (error) {
+                  if (!isResizeObserverError(error.message)) {
+                    throw error; // Re-throw non-ResizeObserver errors
+                  }
+                  // Silently ignore ResizeObserver loop errors
+                }
+              };
+              super(wrappedCallback);
+            }
           };
         }
 
       })();
-    </script>
-    <script>
-      // Restore console with selective suppression after page loads
-      window.addEventListener('load', () => {
-        setTimeout(() => {
-          // Restore original console but with ResizeObserver filtering
-          const originals = {
-            error: Function.prototype.call.bind(console.error.__proto__.constructor.prototype.error || console.error),
-            warn: Function.prototype.call.bind(console.warn.__proto__.constructor.prototype.warn || console.warn)
-          };
-
-          console.error = function(...args) {
-            if (args.some(arg => String(arg).includes('ResizeObserver'))) return;
-            return originals.error(console, ...args);
-          };
-
-          console.warn = function(...args) {
-            if (args.some(arg => String(arg).includes('ResizeObserver'))) return;
-            return originals.warn(console, ...args);
-          };
-
-          // Restore selective error handling
-          window.onerror = function(msg) {
-            return String(msg).includes('ResizeObserver');
-          };
-
-          window.onunhandledrejection = function(event) {
-            if (String(event.reason).includes('ResizeObserver')) {
-              event.preventDefault();
-              return;
-            }
-          };
-
-        }, 100);
-      });
     </script>
     ${head}
     <!-- Only load PrimeIcons, PrimeNG theme will be token-driven -->
