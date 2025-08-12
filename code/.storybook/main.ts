@@ -212,9 +212,8 @@ const config: StorybookConfig = {
       })();
     </script>
     ${head}
-    <!-- PrimeNG CSS will be loaded dynamically by theme switcher -->
+    <!-- Only load PrimeIcons, PrimeNG theme will be token-driven -->
     <link rel="stylesheet" href="https://unpkg.com/primeicons@7.0.0/primeicons.css">
-    <link rel="stylesheet" href="https://unpkg.com/primeng@17.18.15/resources/primeng.min.css">
   `,
   webpackFinal: async (config) => {
     // Ensure CSS files are handled properly
