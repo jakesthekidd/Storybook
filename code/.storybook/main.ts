@@ -70,68 +70,22 @@ const config: StorybookConfig = {
   },
   previewHead: (head) => `
     <script>
-      // TOTAL ResizeObserver annihilation - Scorched earth approach
+      // IMMEDIATE ResizeObserver error suppression - Before everything
+      const originalError = console.error;
+      console.error = function(message) {
+        if (String(message).includes('ResizeObserver loop completed with undelivered notifications')) {
+          return; // Silent suppression of exact error
+        }
+        return originalError.apply(this, arguments);
+      };
 
-      // STEP 1: Immediate console hijacking before ANYTHING else
-      (function() {
-        const silence = () => {};
-        const originals = {
-          error: console.error,
-          warn: console.warn,
-          log: console.log
-        };
-
-        console.error = console.warn = console.log = function(...args) {
-          const str = args.join(' ');
-          if (str.includes('ResizeObserver')) return;
-          // For non-ResizeObserver errors, call original based on method used
-          if (this === console.error) return originals.error.apply(console, args);
-          if (this === console.warn) return originals.warn.apply(console, args);
-          return originals.log.apply(console, args);
-        };
-      })();
-
-      // STEP 2: Complete ResizeObserver elimination
-      window.ResizeObserver = undefined;
-      delete window.ResizeObserver;
-
-      // STEP 3: Prevent any future ResizeObserver creation
-      Object.defineProperty(window, 'ResizeObserver', {
-        value: class FakeResizeObserver {
-          constructor() {}
-          observe() {}
-          unobserve() {}
-          disconnect() {}
-        },
-        writable: false,
-        configurable: false
-      });
-
-      // STEP 4: Global error suppression
-      window.onerror = () => true;
-      window.onunhandledrejection = (e) => e.preventDefault();
-
-    </script>
-    <script>
-      // STEP 5: Post-load cleanup and monitoring
-      setTimeout(() => {
-        // Monitor for any ResizeObserver errors that might still occur
-        const originalConsoleError = console.error;
-        console.error = function(...args) {
-          if (args.some(arg => String(arg).includes('ResizeObserver'))) {
-            return; // Complete silence
-          }
-          return originalConsoleError.apply(this, arguments);
-        };
-
-        // Final window error override
-        window.onerror = function(msg) {
-          if (String(msg).includes('ResizeObserver')) {
-            return true; // Suppress completely
-          }
-          return false; // Let other errors through
-        };
-      }, 0);
+      // Immediate window error suppression
+      window.onerror = function(msg) {
+        if (String(msg).includes('ResizeObserver loop completed with undelivered notifications')) {
+          return true;
+        }
+        return false;
+      };
     </script>
     ${head}
     <!-- Only load PrimeIcons, PrimeNG theme will be token-driven -->
