@@ -21,6 +21,8 @@
     "@angular/platform-browser-dynamic": "^17.3.0",
     "@angular/router": "^17.3.0",
     "@storybook/addon-styling": "^2.0.0",
+    "@storybook/addon-themes": "^9.1.2",
+    "@storybook/addon-toolbars": "^9.0.8",
     "primeflex": "^4.0.0",
     "primeicons": "^7.0.0",
     "primeng": "^17.18.15",

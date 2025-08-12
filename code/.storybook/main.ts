@@ -29,6 +29,8 @@ const config: StorybookConfig = {
     '@storybook/addon-actions',
     '@storybook/addon-controls',
     '@storybook/addon-viewport',
+    '@storybook/addon-toolbars',
+    '@storybook/addon-themes',
   ],
   staticDirs: [
     '../src/assets',
