@@ -187,51 +187,54 @@ const config: StorybookConfig = {
           };
         });
 
-        // Multiple layers of error handling
-        const errorHandlers = [
-          // Window error handler
-          window.addEventListener('error', function(e) {
-            if (isResizeObserverError(e.message) || isResizeObserverError(e.error?.message)) {
-              e.preventDefault();
-              e.stopPropagation();
-              e.stopImmediatePropagation();
-              return false;
+        // Ultra-comprehensive error handling layers
+
+        // Error event listeners with highest priority
+        window.addEventListener('error', function(e) {
+          if (isResizeObserverError(e.message) || isResizeObserverError(e.error?.message) || isResizeObserverError(e.filename)) {
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            return false;
+          }
+        }, { capture: true, passive: false });
+
+        window.addEventListener('unhandledrejection', function(e) {
+          if (isResizeObserverError(e.reason) || isResizeObserverError(e.reason?.message) || isResizeObserverError(e.reason?.stack)) {
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            return false;
+          }
+        }, { capture: true, passive: false });
+
+        // Override window error handlers
+        const originalOnError = window.onerror;
+        window.onerror = function(message, source, lineno, colno, error) {
+          if (isResizeObserverError(message) || isResizeObserverError(error?.message) || isResizeObserverError(source)) {
+            return true; // Prevent default error handling
+          }
+          return originalOnError ? originalOnError.apply(this, arguments) : false;
+        };
+
+        const originalOnRejection = window.onunhandledrejection;
+        window.onunhandledrejection = function(event) {
+          if (isResizeObserverError(event.reason) || isResizeObserverError(event.reason?.message) || isResizeObserverError(event.reason?.stack)) {
+            event.preventDefault();
+            return true;
+          }
+          return originalOnRejection ? originalOnRejection.apply(this, arguments) : false;
+        };
+
+        // Override global error reporting methods
+        if (typeof reportError !== 'undefined') {
+          const originalReportError = reportError;
+          reportError = function(error) {
+            if (!isResizeObserverError(error.message) && !isResizeObserverError(error.stack)) {
+              originalReportError(error);
             }
-          }, true),
-
-          // Unhandled promise rejections
-          window.addEventListener('unhandledrejection', function(e) {
-            if (isResizeObserverError(e.reason) || isResizeObserverError(e.reason?.message)) {
-              e.preventDefault();
-              e.stopPropagation();
-              e.stopImmediatePropagation();
-              return false;
-            }
-          }, true),
-
-          // Override window.onerror
-          (() => {
-            const originalOnError = window.onerror;
-            window.onerror = function(message, source, lineno, colno, error) {
-              if (isResizeObserverError(message) || isResizeObserverError(error?.message)) {
-                return true; // Prevent default browser error handling
-              }
-              return originalOnError ? originalOnError.apply(this, arguments) : false;
-            };
-          })(),
-
-          // Override window.onunhandledrejection
-          (() => {
-            const originalOnRejection = window.onunhandledrejection;
-            window.onunhandledrejection = function(event) {
-              if (isResizeObserverError(event.reason) || isResizeObserverError(event.reason?.message)) {
-                event.preventDefault();
-                return true;
-              }
-              return originalOnRejection ? originalOnRejection.apply(this, arguments) : false;
-            };
-          })()
-        ];
+          };
+        }
 
         // Monkey patch setTimeout and setInterval to catch async errors
         const originalSetTimeout = window.setTimeout;
