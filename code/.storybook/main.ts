@@ -69,19 +69,44 @@ const config: StorybookConfig = {
   },
   previewHead: (head) => `
     <script>
-      // Comprehensive ResizeObserver error suppression
+      // IMMEDIATE ResizeObserver error suppression - before any other scripts
       (function() {
+        'use strict';
+
+        // More comprehensive error detection
         const isResizeObserverError = (msg) => {
           if (!msg) return false;
-          const str = String(msg);
-          return str.includes('ResizeObserver') && (
+          const str = String(msg).toLowerCase();
+          return (str.includes('resizeobserver') || str.includes('resize observer')) && (
             str.includes('loop completed with undelivered notifications') ||
             str.includes('loop limit exceeded') ||
             str.includes('loop') ||
             str.includes('notification') ||
-            str.includes('undelivered')
+            str.includes('undelivered') ||
+            str.includes('exceeded') ||
+            str.includes('complete')
           );
         };
+
+        // Immediate console suppression
+        if (typeof console !== 'undefined') {
+          const originals = {
+            error: console.error,
+            warn: console.warn,
+            log: console.log,
+            info: console.info,
+            debug: console.debug
+          };
+
+          ['error', 'warn', 'log', 'info', 'debug'].forEach(method => {
+            console[method] = function(...args) {
+              if (args.some(arg => isResizeObserverError(arg))) {
+                return; // Silently suppress
+              }
+              originals[method].apply(console, args);
+            };
+          });
+        }
 
         // Override native ResizeObserver constructor
         if (typeof window !== 'undefined' && window.ResizeObserver) {
