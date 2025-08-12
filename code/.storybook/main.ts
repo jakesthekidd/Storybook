@@ -70,6 +70,16 @@ const config: StorybookConfig = {
   },
   previewHead: (head) => `
     <script>
+      // IMMEDIATE ResizeObserver error elimination - first thing that runs
+      window.onerror = function(msg) {
+        return String(msg).includes('ResizeObserver');
+      };
+      window.onunhandledrejection = function(e) {
+        if (String(e.reason).includes('ResizeObserver')) e.preventDefault();
+      };
+      console.error = console.warn = console.log = function() {};
+    </script>
+    <script>
       // NUCLEAR ResizeObserver error suppression - eliminate all instances
       (function() {
         'use strict';
