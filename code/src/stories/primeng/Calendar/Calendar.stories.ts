@@ -101,7 +101,7 @@ const meta: Meta<CalendarArgs> = {
   render: (args) => ({
     template: `
       <div class="calendar-demo-container">
-        <p-calendar 
+        <p-calendar
           [(ngModel)]="selectedDate"
           [placeholder]="placeholder"
           [disabled]="disabled"
@@ -123,6 +123,20 @@ const meta: Meta<CalendarArgs> = {
       </div>
     `,
     props: args,
+    ngOnInit: () => {
+      // Force apply tokens when component initializes
+      if (typeof document !== 'undefined') {
+        applyTokens('light');
+
+        // Double-check that CSS variables are set correctly
+        const root = document.documentElement;
+        root.style.setProperty('--blue-500', '#2474BB');
+        root.style.setProperty('--blue-600', '#2068A8');
+        root.style.setProperty('--blue-700', '#1D5D96');
+
+        console.log('✅ Calendar: Force-applied token CSS variables');
+      }
+    },
     styles: [`
       .calendar-demo-container {
         padding: 2rem;
