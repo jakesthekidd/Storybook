@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/angular';
 import { moduleMetadata } from '@storybook/angular';
 import { ButtonModule } from 'primeng/button';
-import { applyTokens } from '../../../theme/simple-token-loader';
+import { colorPaletteManager } from '../../../theme/color-palette';
 
 type Severity = 'primary' | 'secondary' | 'success' | 'info' | 'warning' | 'help' | 'danger';
 
@@ -17,9 +17,9 @@ interface ButtonArgs {
   size?: 'small' | 'large' | 'normal';
 }
 
-// Apply tokens immediately when this story loads
+// Initialize color palette
 if (typeof document !== 'undefined') {
-  applyTokens('light');
+  colorPaletteManager.setThemeMode('light');
 }
 
 const meta: Meta<ButtonArgs> = {
@@ -44,7 +44,7 @@ const meta: Meta<ButtonArgs> = {
     severity: { 
       control: 'select', 
       options: ['primary','secondary','success','info','warning','help','danger'],
-      description: 'Defines the color scheme of the button'
+      description: 'Defines the color scheme from the color palette'
     },
     outlined: {
       control: 'boolean',
@@ -87,8 +87,8 @@ const meta: Meta<ButtonArgs> = {
           [icon]="buttonIcon"
           [class]="buttonClasses"
         ></button>
-        <div class="token-info">
-          <small>Using Token Studio JSON values directly</small>
+        <div class="palette-info">
+          <small>🎨 Colors from Color Palette Manager</small>
         </div>
       </div>
     `,
@@ -98,7 +98,7 @@ const meta: Meta<ButtonArgs> = {
       buttonIcon: args.icon || null,
       buttonClasses: [
         'p-button',
-        'token-button',
+        'palette-button',
         args.severity ? `p-button-${args.severity}` : '',
         args.outlined ? 'p-button-outlined' : '',
         args.text ? 'p-button-text' : '',
@@ -116,92 +116,92 @@ const meta: Meta<ButtonArgs> = {
         align-items: center;
         justify-content: center;
         gap: 1rem;
-        background: var(--surface-ground);
+        background: var(--palette-surface-ground, #EFF2F4);
         border-radius: 8px;
         min-height: 120px;
       }
 
-      .token-info {
+      .palette-info {
         opacity: 0.7;
         font-family: 'Inter', system-ui, sans-serif;
         font-size: 12px;
-        color: #666;
+        color: var(--palette-text-muted, #666);
       }
 
-      .token-button {
+      /* PALETTE-DRIVEN BUTTON STYLES */
+      
+      .palette-button {
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
         font-weight: 500 !important;
         transition: all 0.2s ease !important;
         border: 1px solid transparent !important;
-        border-radius: 8px !important; /* Default 8px radius for all buttons */
+        border-radius: 8px !important;
       }
 
-      /* DIRECT TOKEN INTEGRATION - Using actual values from transflo.tokens.json */
-      
-      /* Primary Button - Uses blue tokens */
+      /* Primary Button - Uses palette primary color */
       .p-button.p-button-primary {
-        background: var(--blue-500) !important;
-        border-color: var(--blue-500) !important;
-        color: #ffffff !important;
+        background: var(--palette-primary) !important;
+        border-color: var(--palette-primary) !important;
+        color: var(--palette-primary-contrast, #ffffff) !important;
       }
       .p-button.p-button-primary:hover:not(:disabled) {
-        background: var(--blue-600) !important;
-        border-color: var(--blue-600) !important;
+        background: var(--palette-primary-hover) !important;
+        border-color: var(--palette-primary-hover) !important;
       }
 
-      /* Secondary Button - Uses cyan tokens */
+      /* Secondary Button - Uses palette secondary color */
       .p-button.p-button-secondary {
-        background: var(--cyan-50) !important;
-        border-color: var(--surface-400) !important;
-        color: var(--blue-700) !important;
+        background: var(--palette-secondary) !important;
+        border-color: var(--palette-surface-border) !important;
+        color: var(--palette-secondary-contrast) !important;
       }
       .p-button.p-button-secondary:hover:not(:disabled) {
-        background: var(--cyan-100) !important;
-        border-color: var(--surface-500) !important;
+        background: var(--palette-secondary-hover) !important;
+        border-color: var(--palette-surface-border) !important;
       }
 
-      /* Success Button - Uses green tokens */
+      /* Success Button - Uses palette success color */
       .p-button.p-button-success {
-        background: var(--green-500) !important;
-        border-color: var(--green-500) !important;
+        background: var(--palette-success) !important;
+        border-color: var(--palette-success) !important;
         color: #ffffff !important;
       }
       .p-button.p-button-success:hover:not(:disabled) {
-        background: var(--green-600) !important;
-        border-color: var(--green-600) !important;
+        background: var(--palette-success-hover) !important;
+        border-color: var(--palette-success-hover) !important;
       }
 
-      /* Info Button - Uses cyan tokens */
+      /* Info Button - Uses palette info color */
       .p-button.p-button-info {
-        background: var(--cyan-500) !important;
-        border-color: var(--cyan-500) !important;
+        background: var(--palette-info) !important;
+        border-color: var(--palette-info) !important;
         color: #ffffff !important;
       }
       .p-button.p-button-info:hover:not(:disabled) {
-        background: var(--cyan-600) !important;
-        border-color: var(--cyan-600) !important;
+        background: var(--palette-info-hover) !important;
+        border-color: var(--palette-info-hover) !important;
       }
 
-      /* Warning Button - Uses orange tokens */
+      /* Warning Button - Uses palette warning color */
       .p-button.p-button-warning {
-        background: var(--orange-500) !important;
-        border-color: var(--orange-500) !important;
+        background: var(--palette-warning) !important;
+        border-color: var(--palette-warning) !important;
         color: #ffffff !important;
       }
       .p-button.p-button-warning:hover:not(:disabled) {
-        background: var(--orange-600) !important;
-        border-color: var(--orange-600) !important;
+        background: var(--palette-warning-hover) !important;
+        border-color: var(--palette-warning-hover) !important;
       }
 
-      /* Danger Button - Uses red tokens */
+      /* Danger Button - Uses palette danger color */
       .p-button.p-button-danger {
-        background: var(--red-500) !important;
-        border-color: var(--red-500) !important;
+        background: var(--palette-danger) !important;
+        border-color: var(--palette-danger) !important;
         color: #ffffff !important;
       }
       .p-button.p-button-danger:hover:not(:disabled) {
-        background: var(--red-600) !important;
-        border-color: var(--red-600) !important;
+        background: var(--palette-danger-hover) !important;
+        border-color: var(--palette-danger-hover) !important;
       }
 
       /* Text Buttons */
@@ -215,46 +215,46 @@ const meta: Meta<ButtonArgs> = {
         background: transparent !important;
       }
       .p-button.p-button-outlined.p-button-primary {
-        color: var(--blue-500) !important;
-        border-color: var(--blue-500) !important;
+        color: var(--palette-primary) !important;
+        border-color: var(--palette-primary) !important;
       }
       .p-button.p-button-outlined.p-button-primary:hover:not(:disabled) {
-        background: var(--blue-50) !important;
+        background: var(--palette-primary)10 !important;
       }
       .p-button.p-button-outlined.p-button-secondary {
-        color: var(--blue-700) !important;
-        border-color: var(--surface-400) !important;
+        color: var(--palette-secondary-contrast) !important;
+        border-color: var(--palette-surface-border) !important;
       }
       .p-button.p-button-outlined.p-button-secondary:hover:not(:disabled) {
-        background: var(--surface-50) !important;
+        background: var(--palette-surface-hover) !important;
       }
       .p-button.p-button-outlined.p-button-success {
-        color: var(--green-500) !important;
-        border-color: var(--green-500) !important;
+        color: var(--palette-success) !important;
+        border-color: var(--palette-success) !important;
       }
       .p-button.p-button-outlined.p-button-success:hover:not(:disabled) {
-        background: var(--green-50) !important;
+        background: var(--palette-success)10 !important;
       }
       .p-button.p-button-outlined.p-button-info {
-        color: var(--cyan-500) !important;
-        border-color: var(--cyan-500) !important;
+        color: var(--palette-info) !important;
+        border-color: var(--palette-info) !important;
       }
       .p-button.p-button-outlined.p-button-info:hover:not(:disabled) {
-        background: var(--cyan-50) !important;
+        background: var(--palette-info)10 !important;
       }
       .p-button.p-button-outlined.p-button-warning {
-        color: var(--orange-500) !important;
-        border-color: var(--orange-500) !important;
+        color: var(--palette-warning) !important;
+        border-color: var(--palette-warning) !important;
       }
       .p-button.p-button-outlined.p-button-warning:hover:not(:disabled) {
-        background: var(--orange-50) !important;
+        background: var(--palette-warning)10 !important;
       }
       .p-button.p-button-outlined.p-button-danger {
-        color: var(--red-500) !important;
-        border-color: var(--red-500) !important;
+        color: var(--palette-danger) !important;
+        border-color: var(--palette-danger) !important;
       }
       .p-button.p-button-outlined.p-button-danger:hover:not(:disabled) {
-        background: var(--red-50) !important;
+        background: var(--palette-danger)10 !important;
       }
 
       /* Rounded Buttons */
@@ -280,6 +280,9 @@ const meta: Meta<ButtonArgs> = {
 
       /* Disabled State */
       .p-button:disabled {
+        background: var(--palette-disabled-bg) !important;
+        border-color: var(--palette-disabled-bg) !important;
+        color: var(--palette-disabled-text) !important;
         opacity: 0.6 !important;
         cursor: not-allowed !important;
       }
@@ -305,43 +308,56 @@ export const Interactive: Story = {
   }
 };
 
-// Quick Examples Using Token Values
-export const PrimaryButton: Story = {
-  args: { label: 'Primary', severity: 'primary' }
-};
-
-export const SecondaryButton: Story = {
-  args: { label: 'Secondary', severity: 'secondary' }
-};
-
-export const SuccessButton: Story = {
-  args: { label: 'Success', severity: 'success' }
-};
-
-export const InfoButton: Story = {
-  args: { label: 'Info', severity: 'info' }
-};
-
-export const WarningButton: Story = {
-  args: { label: 'Warning', severity: 'warning' }
-};
-
-export const DangerButton: Story = {
-  args: { label: 'Danger', severity: 'danger' }
-};
-
-export const OutlinedPrimary: Story = {
-  args: { label: 'Outlined', severity: 'primary', outlined: true }
-};
-
-export const RoundedSuccess: Story = {
-  args: { label: 'Rounded', severity: 'success', rounded: true }
-};
-
-export const IconButton: Story = {
-  args: { icon: 'pi pi-check', label: '', severity: 'primary', rounded: true }
-};
-
-export const DisabledButton: Story = {
-  args: { label: 'Disabled', severity: 'primary', disabled: true }
+// Quick Examples Using Palette Colors
+export const AllSeverities: Story = {
+  render: () => ({
+    template: `
+      <div class="severities-demo">
+        <h3>All Button Severities Using Color Palette</h3>
+        <div class="button-grid">
+          <button pButton label="Primary" severity="primary" class="palette-button"></button>
+          <button pButton label="Secondary" severity="secondary" class="palette-button"></button>
+          <button pButton label="Success" severity="success" class="palette-button"></button>
+          <button pButton label="Info" severity="info" class="palette-button"></button>
+          <button pButton label="Warning" severity="warning" class="palette-button"></button>
+          <button pButton label="Danger" severity="danger" class="palette-button"></button>
+        </div>
+        <p class="note">💡 Change colors in Theme/ColorPalette to see all buttons update instantly!</p>
+      </div>
+    `,
+    styles: [`
+      .severities-demo {
+        padding: 2rem;
+        background: var(--palette-surface-ground, #EFF2F4);
+        border-radius: 8px;
+        font-family: 'Inter', system-ui, sans-serif;
+      }
+      
+      .severities-demo h3 {
+        margin: 0 0 1.5rem 0;
+        color: var(--palette-text-primary, #3D3D3D);
+        text-align: center;
+      }
+      
+      .button-grid {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-bottom: 1rem;
+      }
+      
+      .note {
+        text-align: center;
+        color: var(--palette-text-secondary, #666);
+        font-style: italic;
+        margin: 0;
+      }
+      
+      .palette-button {
+        font-family: 'Inter', system-ui, sans-serif !important;
+        border-radius: 8px !important;
+      }
+    `]
+  })
 };
