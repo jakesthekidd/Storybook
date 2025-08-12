@@ -460,82 +460,118 @@ export const ThemeEditor: Story = {
       </style>
     `,
     props: {
-      updateCSSVar: (property: string, value: string) => {
-        document.documentElement.style.setProperty(property, value);
-        // Update the display value
-        const propName = property.replace('--brand-', '').replace('-', '');
-        const span = document.getElementById(propName + '-value');
-        if (span) span.textContent = value;
+      triggerFileInput: () => {
+        const fileInput = document.querySelector('#fileInput') as HTMLInputElement;
+        if (fileInput) {
+          fileInput.click();
+        }
       },
-      
-      exportTheme: () => {
-        const styles = getComputedStyle(document.documentElement);
-        const theme = {
-          primary: styles.getPropertyValue('--brand-primary').trim(),
-          secondary: styles.getPropertyValue('--brand-secondary').trim(),
-          success: styles.getPropertyValue('--brand-success').trim(),
-          warning: styles.getPropertyValue('--brand-warning').trim(),
-          danger: styles.getPropertyValue('--brand-danger').trim(),
-          borderRadius: styles.getPropertyValue('--brand-border-radius').trim(),
-          fontFamily: styles.getPropertyValue('--brand-font-family').trim(),
-          fontSizeBase: styles.getPropertyValue('--brand-font-size-base').trim(),
-        };
-        
-        const blob = new Blob([JSON.stringify(theme, null, 2)], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'primeng-theme.json';
-        a.click();
-        URL.revokeObjectURL(url);
-      },
-      
-      resetTheme: () => {
-        const defaults = {
-          '--brand-primary': '#007acc',
-          '--brand-secondary': '#6c757d',
-          '--brand-success': '#28a745',
-          '--brand-warning': '#ffc107',
-          '--brand-danger': '#dc3545',
-          '--brand-border-radius': '6px',
-          '--brand-font-family': '"Inter var", sans-serif',
-          '--brand-font-size-base': '14px'
-        };
-        
-        Object.entries(defaults).forEach(([prop, value]) => {
-          document.documentElement.style.setProperty(prop, value);
-        });
-        
-        // Reset UI controls
-        const colorInputs = document.querySelectorAll('input[type="color"]');
-        colorInputs.forEach((input: any, index) => {
-          const values = ['#007acc', '#6c757d', '#28a745', '#ffc107', '#dc3545'];
-          input.value = values[index];
-        });
-        
-        window.location.reload();
-      },
-      
-      importTheme: (event: Event) => {
+
+      importTokenFile: async (event: Event) => {
         const file = (event.target as HTMLInputElement).files?.[0];
         if (!file) return;
-        
-        const reader = new FileReader();
-        reader.onload = (e) => {
+
+        try {
+          const text = await file.text();
+          const tokenData = JSON.parse(text);
+
+          // Validate Token Studio format
+          if (!tokenData['lara-light'] && !tokenData['lara-dark']) {
+            throw new Error('Invalid Token Studio format. File must contain "lara-light" or "lara-dark" theme objects.');
+          }
+
+          // Store in localStorage for persistence
+          localStorage.setItem('custom-tokens', text);
+
+          // Show success message
+          console.log('✅ Tokens imported successfully');
+
+          // Force reload to apply new tokens
+          window.location.reload();
+
+        } catch (error) {
+          console.error('❌ Failed to import tokens:', error);
+          alert(`Import failed: ${error instanceof Error ? error.message : 'Invalid JSON format'}`);
+        }
+
+        // Reset file input
+        (event.target as HTMLInputElement).value = '';
+      },
+
+      exportCurrentTokens: async () => {
+        try {
+          // Try to get current theme mode
+          const currentMode = localStorage.getItem('storybook-theme-mode') || 'light';
+
+          // Import loadTokens dynamically
+          const { loadTokens, exportTokensAsJSON } = await import('../theme/loadTokens');
+
+          // Get current tokens and export
+          const exportData = exportTokensAsJSON(currentMode as any);
+
+          const blob = new Blob([exportData], { type: 'application/json' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `transflo-tokens-${currentMode}-${new Date().toISOString().split('T')[0]}.json`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+
+          console.log(`✅ Exported ${currentMode} theme tokens`);
+
+        } catch (error) {
+          console.error('❌ Export failed:', error);
+          alert('Export failed. Please try again.');
+        }
+      },
+
+      resetToDefault: () => {
+        try {
+          // Clear custom tokens from localStorage
+          localStorage.removeItem('custom-tokens');
+
+          console.log('✅ Reset to default tokens');
+
+          // Reload to apply default tokens
+          window.location.reload();
+
+        } catch (error) {
+          console.error('❌ Reset failed:', error);
+          alert('Reset failed. Please try again.');
+        }
+      }
+    },
+
+    ngOnInit: () => {
+      // Update status display when component initializes
+      setTimeout(() => {
+        const updateStatus = async () => {
           try {
-            const theme = JSON.parse(e.target?.result as string);
-            Object.entries(theme).forEach(([key, value]) => {
-              const cssVar = '--brand-' + key.replace(/([A-Z])/g, '-$1').toLowerCase();
-              document.documentElement.style.setProperty(cssVar, value as string);
-            });
-            
-            alert('Theme imported successfully! Navigate to component stories to see changes.');
+            const currentMode = localStorage.getItem('storybook-theme-mode') || 'light';
+            const modeElement = document.getElementById('current-mode');
+            if (modeElement) {
+              modeElement.textContent = currentMode.charAt(0).toUpperCase() + currentMode.slice(1);
+            }
+
+            // Count CSS variables
+            const root = document.documentElement;
+            const cssVarCount = Array.from(root.style).filter(prop => prop.startsWith('--tf-')).length;
+            const countElement = document.getElementById('css-var-count');
+            if (countElement) {
+              countElement.textContent = cssVarCount.toString();
+            }
           } catch (error) {
-            alert('Failed to import theme. Please check the JSON format.');
+            console.error('Status update failed:', error);
           }
         };
-        reader.readAsText(file);
-      }
+
+        updateStatus();
+
+        // Update status every 2 seconds
+        setInterval(updateStatus, 2000);
+      }, 100);
     }
   })
 };
