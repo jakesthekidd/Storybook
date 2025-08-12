@@ -9,6 +9,36 @@ const THEMES = {
   dark: 'https://unpkg.com/primeng@17.18.15/resources/themes/lara-dark-blue/theme.css'
 };
 
+// Function to dynamically update theme CSS
+function updateThemeCSS(theme: 'light' | 'dark') {
+  // Remove existing theme link
+  const existingLink = document.querySelector('link[data-theme-css]');
+  if (existingLink) {
+    existingLink.remove();
+  }
+
+  // Add new theme link
+  const link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = THEMES[theme];
+  link.setAttribute('data-theme-css', 'true');
+  document.head.appendChild(link);
+
+  // Apply CSS variables for theme consistency
+  const root = document.documentElement;
+  if (theme === 'dark') {
+    root.style.setProperty('--brand-primary', '#3b82f6');
+    root.style.setProperty('--brand-secondary', '#64748b');
+    root.style.setProperty('--brand-surface', '#1e293b');
+    root.style.setProperty('--brand-text-primary', '#f1f5f9');
+  } else {
+    root.style.setProperty('--brand-primary', '#007acc');
+    root.style.setProperty('--brand-secondary', '#6c757d');
+    root.style.setProperty('--brand-surface', '#ffffff');
+    root.style.setProperty('--brand-text-primary', '#495057');
+  }
+}
+
 const preview: Preview = {
   decorators: [
     applicationConfig({
@@ -43,21 +73,5 @@ const preview: Preview = {
     },
   },
 };
-
-// Function to dynamically update theme CSS
-function updateThemeCSS(theme: 'light' | 'dark') {
-  // Remove existing theme link
-  const existingLink = document.querySelector('link[data-theme-css]');
-  if (existingLink) {
-    existingLink.remove();
-  }
-
-  // Add new theme link
-  const link = document.createElement('link');
-  link.rel = 'stylesheet';
-  link.href = THEMES[theme];
-  link.setAttribute('data-theme-css', 'true');
-  document.head.appendChild(link);
-}
 
 export default preview;
