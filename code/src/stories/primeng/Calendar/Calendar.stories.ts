@@ -327,8 +327,8 @@ const meta: Meta<CalendarArgs> = {
 
       /* Time Picker */
       .p-datepicker .p-timepicker {
-        border-top: 1px solid var(--surface-400) !important;
-        background: var(--surface-50) !important;
+        border-top: 1px solid var(--palette-surface-400, #E2E6EB) !important;
+        background: var(--palette-surface-50, #FBFCFC) !important;
         padding: 1rem !important;
       }
 
@@ -336,61 +336,61 @@ const meta: Meta<CalendarArgs> = {
       .p-datepicker .p-timepicker .p-minute-picker,
       .p-datepicker .p-timepicker .p-second-picker,
       .p-datepicker .p-timepicker .p-ampm-picker {
-        color: var(--blue-700) !important;
+        color: var(--palette-blue-700, #1D5D96) !important;
         font-weight: 600 !important;
       }
 
       .p-datepicker .p-timepicker button {
         background: transparent !important;
-        border: 1px solid var(--surface-400) !important;
+        border: 1px solid var(--palette-surface-400, #E2E6EB) !important;
         border-radius: 6px !important;
-        color: var(--blue-500) !important;
+        color: var(--palette-primary, #2474BB) !important;
         transition: all 0.2s ease !important;
       }
 
       .p-datepicker .p-timepicker button:hover {
-        background: var(--blue-50) !important;
-        border-color: var(--blue-500) !important;
+        background: var(--palette-blue-50, #E9F1F8) !important;
+        border-color: var(--palette-primary, #2474BB) !important;
       }
 
       /* Inline Calendar */
       .token-calendar .p-datepicker-inline {
-        border: 1px solid var(--surface-400) !important;
+        border: 1px solid var(--palette-surface-400, #E2E6EB) !important;
         border-radius: 8px !important;
         box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
       }
 
       /* Week Numbers */
       .p-datepicker .p-datepicker-calendar .p-datepicker-weeknumber {
-        color: var(--surface-600) !important;
+        color: var(--palette-surface-600, #A9B3C2) !important;
         font-weight: 600 !important;
-        background: var(--surface-100) !important;
+        background: var(--palette-surface-100, #F7F8F9) !important;
         border-radius: 6px !important;
       }
 
       /* Range Selection */
       .p-datepicker .p-datepicker-calendar td > span.p-highlight.p-datepicker-range {
-        background: var(--blue-100) !important;
-        color: var(--blue-700) !important;
+        background: var(--palette-blue-100, #D3E3F1) !important;
+        color: var(--palette-blue-700, #1D5D96) !important;
       }
 
       .p-datepicker .p-datepicker-calendar td > span.p-highlight.p-datepicker-range-start,
       .p-datepicker .p-datepicker-calendar td > span.p-highlight.p-datepicker-range-end {
-        background: var(--blue-500) !important;
-        color: #ffffff !important;
+        background: var(--palette-primary, #2474BB) !important;
+        color: var(--palette-primary-contrast, #ffffff) !important;
       }
 
       /* Disabled State */
       .token-calendar .p-inputtext:disabled {
-        background: var(--surface-100) !important;
-        color: var(--surface-500) !important;
+        background: var(--palette-surface-100, #F7F8F9) !important;
+        color: var(--palette-surface-500, #C6CCD6) !important;
         opacity: 0.6 !important;
       }
 
       .token-calendar .p-datepicker-trigger:disabled {
-        background: var(--surface-200) !important;
-        border-color: var(--surface-200) !important;
-        color: var(--surface-500) !important;
+        background: var(--palette-surface-200, #F3F5F7) !important;
+        border-color: var(--palette-surface-200, #F3F5F7) !important;
+        color: var(--palette-surface-500, #C6CCD6) !important;
         opacity: 0.6 !important;
       }
 
