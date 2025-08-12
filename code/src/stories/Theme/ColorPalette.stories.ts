@@ -496,11 +496,11 @@ const meta: Meta<ColorPaletteArgs> = {
 export default meta;
 type Story = StoryObj<ColorPaletteArgs>;
 
-export const CompleteColorPalette: Story = {
+export const Interactive: Story = {
   args: {
     themeMode: 'light',
     primaryColor: '#2474BB',
-    successColor: '#00BF30', 
+    successColor: '#00BF30',
     warningColor: '#FFA300',
     dangerColor: '#DA1F2C'
   }
