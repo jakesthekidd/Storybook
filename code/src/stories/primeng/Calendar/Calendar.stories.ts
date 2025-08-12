@@ -415,6 +415,21 @@ const meta: Meta<CalendarArgs> = {
         color: var(--surface-500) !important;
         opacity: 0.6 !important;
       }
+
+      /* FINAL NUCLEAR OVERRIDE - Direct hex value enforcement */
+      .token-calendar .p-datepicker-trigger,
+      .token-calendar .p-button.p-datepicker-trigger,
+      .p-datepicker-trigger.p-button {
+        background-color: #2474BB !important;
+        border-color: #2474BB !important;
+      }
+
+      .token-calendar .p-datepicker-trigger:hover,
+      .token-calendar .p-button.p-datepicker-trigger:hover,
+      .p-datepicker-trigger.p-button:hover {
+        background-color: #2068A8 !important;
+        border-color: #2068A8 !important;
+      }
     `]
   }),
 };
