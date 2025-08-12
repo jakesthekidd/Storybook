@@ -234,26 +234,37 @@ const config: StorybookConfig = {
               }
 
               observe(target, options) {
+                if (this._isDestroyed || !target) return;
                 try {
-                  return this._observer.observe(target, options);
+                  if (this._observer) {
+                    return this._observer.observe(target, options);
+                  }
                 } catch (e) {
-                  // Silent failure
+                  // Ultra-silent failure
                 }
               }
 
               unobserve(target) {
+                if (this._isDestroyed || !target) return;
                 try {
-                  return this._observer.unobserve(target);
+                  if (this._observer) {
+                    return this._observer.unobserve(target);
+                  }
                 } catch (e) {
-                  // Silent failure
+                  // Ultra-silent failure
                 }
               }
 
               disconnect() {
+                this._isDestroyed = true;
+                this._callback = null;
                 try {
-                  return this._observer.disconnect();
+                  if (this._observer) {
+                    this._observer.disconnect();
+                    this._observer = null;
+                  }
                 } catch (e) {
-                  // Silent failure
+                  // Ultra-silent failure
                 }
               }
             };
