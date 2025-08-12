@@ -133,6 +133,7 @@ const meta: Meta<ThemeControlsArgs> = {
           font-weight: 500 !important;
           transition: all 0.2s ease !important;
           border: 1px solid transparent !important;
+          border-radius: 8px !important; /* Default 8px radius for all buttons */
         }
 
         .p-button.p-button-primary {
