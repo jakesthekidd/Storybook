@@ -236,50 +236,58 @@ const config: StorybookConfig = {
           };
         }
 
-        // Monkey patch setTimeout and setInterval to catch async errors
-        const originalSetTimeout = window.setTimeout;
-        const originalSetInterval = window.setInterval;
-
-        window.setTimeout = function(callback, delay, ...args) {
-          const wrappedCallback = function() {
-            try {
-              return callback.apply(this, arguments);
-            } catch (e) {
-              if (!isResizeObserverError(e.message)) {
-                throw e;
-              }
+        // Comprehensive async function wrapping
+        const wrapAsyncFunction = (fn, context) => {
+          return function(...args) {
+            const callback = args[0];
+            if (typeof callback === 'function') {
+              args[0] = function(...cbArgs) {
+                try {
+                  return callback.apply(this, cbArgs);
+                } catch (error) {
+                  if (!isResizeObserverError(error.message) && !isResizeObserverError(error.stack)) {
+                    throw error;
+                  }
+                  // Silent suppression for ResizeObserver errors
+                }
+              };
             }
+            return fn.apply(context, args);
           };
-          return originalSetTimeout.call(this, wrappedCallback, delay, ...args);
         };
 
-        window.setInterval = function(callback, delay, ...args) {
-          const wrappedCallback = function() {
-            try {
-              return callback.apply(this, arguments);
-            } catch (e) {
-              if (!isResizeObserverError(e.message)) {
-                throw e;
-              }
-            }
-          };
-          return originalSetInterval.call(this, wrappedCallback, delay, ...args);
-        };
+        // Wrap all async timing functions
+        if (window.setTimeout) {
+          window.setTimeout = wrapAsyncFunction(window.setTimeout, window);
+        }
+        if (window.setInterval) {
+          window.setInterval = wrapAsyncFunction(window.setInterval, window);
+        }
+        if (window.requestAnimationFrame) {
+          window.requestAnimationFrame = wrapAsyncFunction(window.requestAnimationFrame, window);
+        }
+        if (window.requestIdleCallback) {
+          window.requestIdleCallback = wrapAsyncFunction(window.requestIdleCallback, window);
+        }
 
-        // Additional protection for requestAnimationFrame
-        const originalRAF = window.requestAnimationFrame;
-        window.requestAnimationFrame = function(callback) {
-          const wrappedCallback = function(timestamp) {
-            try {
-              return callback(timestamp);
-            } catch (e) {
-              if (!isResizeObserverError(e.message)) {
-                throw e;
-              }
+        // Additional MutationObserver protection (often triggers ResizeObserver)
+        if (window.MutationObserver) {
+          const OriginalMutationObserver = window.MutationObserver;
+          window.MutationObserver = class extends OriginalMutationObserver {
+            constructor(callback) {
+              const wrappedCallback = function(mutations, observer) {
+                try {
+                  callback(mutations, observer);
+                } catch (error) {
+                  if (!isResizeObserverError(error.message)) {
+                    throw error;
+                  }
+                }
+              };
+              super(wrappedCallback);
             }
           };
-          return originalRAF.call(this, wrappedCallback);
-        };
+        }
 
       })();
     </script>
