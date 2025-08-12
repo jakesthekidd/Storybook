@@ -20,9 +20,9 @@ interface CalendarArgs {
   showWeek: boolean;
 }
 
-// Apply tokens when this story loads
+// Initialize color palette when this story loads
 if (typeof document !== 'undefined') {
-  applyTokens('light');
+  colorPaletteManager.setThemeMode('light');
 }
 
 const meta: Meta<CalendarArgs> = {
