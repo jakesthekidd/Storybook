@@ -109,64 +109,37 @@ function injectBasePrimeNGCSS() {
   document.head.appendChild(style);
 }
 
-// Function to apply tokens and update theme
-function applyTokenTheme(theme: ThemeMode) {
+// Enterprise theme application using design system orchestrator
+function applyEnterpriseTheme(theme: ThemeMode) {
   try {
-    // Inject base PrimeNG CSS first
-    injectBasePrimeNGCSS();
+    // Use enterprise design system for proper token propagation
+    enterpriseDesignSystem.updateTheme(theme, true);
 
-    // Load tokens for the specified theme
-    const { preset, cssVars } = loadTokens(theme);
-    currentTokens = preset;
-    currentCSSVars = cssVars;
-
-    // Apply CSS variables to document root
-    const root = document.documentElement;
-
-    // Clear previous token CSS variables
-    Array.from(root.style).forEach(property => {
-      if (property.startsWith('--tf-') || property.startsWith('--brand-') || property.startsWith('--p-')) {
-        root.style.removeProperty(property);
-      }
-    });
-
-    // Apply new CSS variables from tokens
-    Object.entries(cssVars).forEach(([property, value]) => {
-      root.style.setProperty(property, value);
-    });
-
-    // Apply semantic brand variables for backward compatibility
-    const primaryColor = cssVars['--p-primary-color'] || '#3b82f6';
-    const textColor = cssVars['--p-text-color'] || (theme === 'light' ? '#0f172a' : '#f1f5f9');
-    const surfaceColor = cssVars['--p-surface-0'] || (theme === 'light' ? '#ffffff' : '#0f172a');
-
-    root.style.setProperty('--brand-primary', primaryColor);
-    root.style.setProperty('--brand-text-primary', textColor);
-    root.style.setProperty('--brand-surface', surfaceColor);
-    root.style.setProperty('--brand-secondary', cssVars['--p-text-muted-color'] || '#64748b');
-
-    console.log(`✅ Applied ${theme} theme with ${Object.keys(cssVars).length} CSS variables`);
-    console.log(`🎨 PrimeNG variables applied: ${Object.keys(cssVars).filter(k => k.startsWith('--p-')).length}`);
+    // Get current state for compatibility
+    const state = enterpriseDesignSystem.getState();
+    currentTokens = {};
+    currentCSSVars = state.tokens;
 
     // Store theme in localStorage for persistence
     localStorage.setItem('storybook-theme-mode', theme);
 
-  } catch (error) {
-    console.error(`❌ Failed to apply ${theme} theme:`, error);
+    console.log(`🏢 Enterprise Design System: Applied ${theme} theme`);
+    console.log(`📊 Components tracked: ${state.components.size}`);
+    console.log(`🎨 Token variables: ${Object.keys(state.tokens).length}`);
 
-    // Fallback to basic theme variables
+  } catch (error) {
+    console.error(`❌ Enterprise theme application failed:`, error);
+
+    // Fallback to basic variables
     const root = document.documentElement;
     const fallbackVars = {
-      '--p-primary-color': '#3b82f6',
-      '--p-primary-contrast-color': '#ffffff',
-      '--p-surface-0': theme === 'dark' ? '#0f172a' : '#ffffff',
-      '--p-text-color': theme === 'dark' ? '#f1f5f9' : '#0f172a',
-      '--p-font-family': '"Inter", system-ui, sans-serif',
-      '--p-font-size': '14px',
-      '--p-border-radius': '6px',
-      '--brand-primary': '#3b82f6',
-      '--brand-surface': theme === 'dark' ? '#0f172a' : '#ffffff',
-      '--brand-text-primary': theme === 'dark' ? '#f1f5f9' : '#0f172a'
+      '--primary-color': '#3b82f6',
+      '--primary-color-text': '#ffffff',
+      '--surface-ground': theme === 'dark' ? '#0f172a' : '#ffffff',
+      '--text-color': theme === 'dark' ? '#f1f5f9' : '#0f172a',
+      '--font-family': '"Inter", system-ui, sans-serif',
+      '--font-size': '14px',
+      '--border-radius': '6px'
     };
 
     Object.entries(fallbackVars).forEach(([prop, value]) => {
