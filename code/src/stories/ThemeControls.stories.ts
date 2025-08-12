@@ -21,7 +21,10 @@ export const ThemeEditor: Story = {
   render: () => ({
     template: `
       <div class="theme-editor-container">
-        <p-toast></p-toast>
+        <div id="token-status" style="position: fixed; top: 10px; right: 10px; background: var(--p-surface-100, #f1f5f9); border: 1px solid var(--p-surface-300, #cbd5e1); border-radius: 8px; padding: 8px 12px; font-size: 12px; z-index: 1000;">
+          <div>🎨 <span id="theme-indicator">Loading...</span></div>
+          <div>📊 <span id="css-vars-count">0</span> vars</div>
+        </div>
 
         <div class="header-section">
           <h1 class="editor-title">🎨 Token Studio Theme Editor</h1>
