@@ -28,24 +28,90 @@ const meta: Meta<ButtonArgs> = {
   },
   render: (args) => ({
     template: `
-      <button
-        pButton
-        type="button"
-        [label]="label"
-        [disabled]="disabled"
-        [icon]="icon || null"
-        [styleClass]="[
-          'p-button',
-          severity ? 'p-button-' + severity : '',
-          outlined ? 'p-button-outlined' : '',
-          text ? 'p-button-text' : '',
-          raised ? 'p-button-raised' : '',
-          rounded ? 'p-button-rounded' : '',
-          size || ''
-        ].join(' ').trim()"
-      ></button>
+      <div class="enterprise-button-container">
+        <button
+          pButton
+          type="button"
+          [label]="label"
+          [disabled]="disabled"
+          [icon]="icon || null"
+          [class]="buttonClasses"
+          #buttonElement
+        ></button>
+        <div class="token-debug-info" *ngIf="showDebug">
+          <small>Theme: {{currentTheme}} | Severity: {{severity || 'default'}} | Tokens: {{tokenCount}}</small>
+        </div>
+      </div>
     `,
-    props: args,
+    props: {
+      ...args,
+      showDebug: false, // Set to true to see debug info
+      currentTheme: typeof window !== 'undefined' ? localStorage.getItem('storybook-theme-mode') || 'light' : 'light',
+      tokenCount: 0,
+      buttonClasses: [
+        'p-button',
+        'enterprise-button',
+        args.severity ? `p-button-${args.severity}` : '',
+        args.outlined ? 'p-button-outlined' : '',
+        args.text ? 'p-button-text' : '',
+        args.raised ? 'p-button-raised' : '',
+        args.rounded ? 'p-button-rounded' : '',
+        args.size || ''
+      ].filter(Boolean).join(' ').trim()
+    },
+    styles: [`
+      .enterprise-button-container {
+        padding: 1rem;
+        background: var(--surface-ground, #ffffff);
+        border-radius: var(--border-radius, 6px);
+        transition: all 0.2s ease;
+      }
+
+      .enterprise-button {
+        font-family: var(--font-family, "Inter", system-ui, sans-serif) !important;
+        transition: all 0.2s ease !important;
+      }
+
+      .token-debug-info {
+        margin-top: 0.5rem;
+        padding: 0.25rem 0.5rem;
+        background: var(--surface-overlay, #f1f5f9);
+        border-radius: 4px;
+        font-family: monospace;
+        font-size: 11px;
+        color: var(--text-color-secondary, #64748b);
+      }
+    `],
+    ngOnInit: () => {
+      // Subscribe to design system updates
+      if (typeof window !== 'undefined') {
+        const updateTokenCount = () => {
+          const root = document.documentElement;
+          const tokenCount = Array.from(root.style).filter(prop =>
+            prop.startsWith('--p-') || prop.startsWith('--primary-') || prop.startsWith('--surface-')
+          ).length;
+
+          // Update token count in component
+          const container = document.querySelector('.enterprise-button-container');
+          if (container) {
+            (container as any).tokenCount = tokenCount;
+          }
+        };
+
+        updateTokenCount();
+
+        // Listen for enterprise design system updates
+        const handleDesignSystemUpdate = () => {
+          updateTokenCount();
+          console.log('🎯 Button story: Design system updated');
+        };
+
+        window.addEventListener('storybook-controls-changed', handleDesignSystemUpdate);
+        window.addEventListener('storybook-story-rendered', handleDesignSystemUpdate);
+
+        // Cleanup function would go here in a real Angular component
+      }
+    }
   }),
 };
 export default meta;
