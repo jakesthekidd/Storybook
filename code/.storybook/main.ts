@@ -323,6 +323,44 @@ const config: StorybookConfig = {
 
       })();
     </script>
+    <script>
+      // Restore console functionality with targeted ResizeObserver suppression
+      (function() {
+        'use strict';
+
+        // Check if console was completely disabled and restore it properly
+        if (typeof console === 'undefined' || !console.error || console.error.toString().includes('function () {}')) {
+          // Create minimal console implementation that only suppresses ResizeObserver
+          window.console = window.console || {};
+
+          const nativeConsole = window.console;
+          const methods = ['error', 'warn', 'log', 'info', 'debug', 'trace'];
+
+          methods.forEach(method => {
+            // Store original or create fallback
+            const original = nativeConsole[method] || function() {};
+
+            nativeConsole[method] = function(...args) {
+              // Only suppress if it's specifically a ResizeObserver error
+              const isResizeObserverError = args.some(arg => {
+                const str = String(arg);
+                return str.includes('ResizeObserver') &&
+                       (str.includes('loop completed with undelivered notifications') ||
+                        str.includes('loop'));
+              });
+
+              if (!isResizeObserverError) {
+                // Let all other console messages through
+                if (typeof original === 'function') {
+                  return original.apply(this, args);
+                }
+              }
+              // Silently suppress only ResizeObserver errors
+            };
+          });
+        }
+      })();
+    </script>
     ${head}
     <!-- Only load PrimeIcons, PrimeNG theme will be token-driven -->
     <link rel="stylesheet" href="https://unpkg.com/primeicons@7.0.0/primeicons.css">
