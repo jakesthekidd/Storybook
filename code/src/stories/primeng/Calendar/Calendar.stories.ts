@@ -156,22 +156,7 @@ const meta: Meta<CalendarArgs> = {
         color: var(--palette-text-muted, #666);
       }
 
-      /* NUCLEAR CSS OVERRIDE - Force token colors */
-      :root {
-        --blue-500: #2474BB !important;
-        --blue-600: #2068A8 !important;
-        --blue-700: #1D5D96 !important;
-        --cyan-50: #F1FAFE !important;
-        --cyan-100: #E3F5FD !important;
-        --cyan-500: #72CDF4 !important;
-        --surface-50: #FBFCFC !important;
-        --surface-100: #F7F8F9 !important;
-        --surface-400: #E2E6EB !important;
-        --surface-500: #C6CCD6 !important;
-        --surface-ground: #EFF2F4 !important;
-      }
-
-      /* DIRECT TOKEN INTEGRATION FOR CALENDAR */
+      /* PALETTE-DRIVEN CALENDAR STYLES */
       
       /* Calendar Input Field */
       .token-calendar .p-inputtext {
