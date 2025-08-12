@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { addons, types } from '@storybook/addons';
 import { AddonPanel } from '@storybook/components';
-import { PRIMENG_THEMES, themeManager } from '../themes';
+// Use global variables set by themes.js
+const PRIMENG_THEMES = window.PRIMENG_THEMES;
+const themeManager = window.themeManager;
 
 const ADDON_ID = 'theme-controls';
 const PANEL_ID = `${ADDON_ID}/panel`;
