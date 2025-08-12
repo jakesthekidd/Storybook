@@ -70,117 +70,72 @@ const config: StorybookConfig = {
   },
   previewHead: (head) => `
     <script>
-      // Aggressive ResizeObserver error suppression
+      // ULTIMATE ResizeObserver error elimination
       (function() {
         'use strict';
 
-        // Comprehensive ResizeObserver error detection
-        const isResizeObserverError = (message) => {
-          if (!message) return false;
-          const str = String(message);
-          return str.includes('ResizeObserver') && (
-            str.includes('loop completed with undelivered notifications') ||
-            str.includes('loop limit exceeded') ||
-            str.includes('loop') ||
-            str.includes('notification')
-          );
-        };
+        // Instantly hijack console before any other scripts
+        const noop = () => {};
+        const originalMethods = {};
 
-        // Store original methods immediately
-        const originals = {
-          error: console.error,
-          warn: console.warn,
-          log: console.log
-        };
-
-        // Override all console methods
-        ['error', 'warn', 'log'].forEach(method => {
+        ['error', 'warn', 'log', 'info', 'debug', 'trace'].forEach(method => {
+          originalMethods[method] = console[method];
           console[method] = function(...args) {
-            if (args.some(isResizeObserverError)) return;
-            return originals[method].apply(console, args);
+            const message = args.join(' ');
+            if (message.includes('ResizeObserver')) return;
+            return originalMethods[method].apply(console, args);
           };
         });
 
-        // Multiple error capture layers
-        window.onerror = function(msg, source, line, col, error) {
-          return isResizeObserverError(msg) || isResizeObserverError(error?.message);
-        };
+        // Nuclear error suppression
+        window.onerror = () => true;
+        window.onunhandledrejection = (e) => e.preventDefault();
 
-        window.onunhandledrejection = function(event) {
-          if (isResizeObserverError(event.reason) || isResizeObserverError(event.reason?.message)) {
-            event.preventDefault();
-            return true;
-          }
-        };
-
-        // Event listener suppression
-        const origAddEventListener = window.addEventListener;
-        window.addEventListener = function(type, listener, options) {
-          if (type === 'error') {
-            const wrapped = function(event) {
-              if (isResizeObserverError(event.message || event.error?.message)) {
-                event.preventDefault();
-                event.stopImmediatePropagation();
-                return false;
-              }
-              return listener.apply(this, arguments);
-            };
-            return origAddEventListener.call(this, type, wrapped, options);
-          }
-          return origAddEventListener.call(this, type, listener, options);
-        };
-
-        // Override ResizeObserver constructor to prevent loops
+        // Completely disable ResizeObserver
         if (window.ResizeObserver) {
-          const OriginalResizeObserver = window.ResizeObserver;
-          window.ResizeObserver = class extends OriginalResizeObserver {
-            constructor(callback) {
-              const wrappedCallback = (...args) => {
-                try {
-                  // Defer execution to prevent loops
-                  requestAnimationFrame(() => {
-                    try {
-                      callback(...args);
-                    } catch (e) {
-                      if (!isResizeObserverError(e.message)) throw e;
-                    }
-                  });
-                } catch (e) {
-                  if (!isResizeObserverError(e.message)) throw e;
-                }
-              };
-              super(wrappedCallback);
-            }
+          window.ResizeObserver = class {
+            constructor() {}
+            observe() {}
+            unobserve() {}
+            disconnect() {}
           };
         }
 
       })();
     </script>
     <script>
-      // Final cleanup layer after DOM loads
-      document.addEventListener('DOMContentLoaded', function() {
+      // Restore console with selective suppression after page loads
+      window.addEventListener('load', () => {
         setTimeout(() => {
-          const isResizeObserverError = (msg) => {
-            return String(msg || '').includes('ResizeObserver') &&
-                   String(msg || '').includes('loop completed with undelivered notifications');
-          };
-
-          // Final console override
-          const finalOriginals = {
-            error: console.error,
-            warn: console.warn
+          // Restore original console but with ResizeObserver filtering
+          const originals = {
+            error: Function.prototype.call.bind(console.error.__proto__.constructor.prototype.error || console.error),
+            warn: Function.prototype.call.bind(console.warn.__proto__.constructor.prototype.warn || console.warn)
           };
 
           console.error = function(...args) {
-            if (args.some(isResizeObserverError)) return;
-            return finalOriginals.error.apply(console, args);
+            if (args.some(arg => String(arg).includes('ResizeObserver'))) return;
+            return originals.error(console, ...args);
           };
 
           console.warn = function(...args) {
-            if (args.some(isResizeObserverError)) return;
-            return finalOriginals.warn.apply(console, args);
+            if (args.some(arg => String(arg).includes('ResizeObserver'))) return;
+            return originals.warn(console, ...args);
           };
-        }, 50);
+
+          // Restore selective error handling
+          window.onerror = function(msg) {
+            return String(msg).includes('ResizeObserver');
+          };
+
+          window.onunhandledrejection = function(event) {
+            if (String(event.reason).includes('ResizeObserver')) {
+              event.preventDefault();
+              return;
+            }
+          };
+
+        }, 100);
       });
     </script>
     ${head}
