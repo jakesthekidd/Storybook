@@ -24,96 +24,184 @@ type Story = StoryObj;
 export const ThemeEditor: Story = {
   render: () => ({
     template: `
-      <div style="padding: 20px; font-family: system-ui, sans-serif;">
-        <h2 style="margin-bottom: 20px;">🎨 PrimeNG Theme Editor</h2>
-        
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
-          <div style="padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
-            <h3 style="margin-top: 0;">Brand Colors</h3>
-            <div class="color-control">
-              <label>Primary Color:</label>
-              <input type="color" value="#007acc" (input)="updateCSSVar('--brand-primary', $event.target.value)" />
-              <span id="primary-value">#007acc</span>
-            </div>
-            <div class="color-control">
-              <label>Secondary Color:</label>
-              <input type="color" value="#6c757d" (input)="updateCSSVar('--brand-secondary', $event.target.value)" />
-              <span id="secondary-value">#6c757d</span>
-            </div>
-            <div class="color-control">
-              <label>Success Color:</label>
-              <input type="color" value="#28a745" (input)="updateCSSVar('--brand-success', $event.target.value)" />
-              <span id="success-value">#28a745</span>
-            </div>
-            <div class="color-control">
-              <label>Warning Color:</label>
-              <input type="color" value="#ffc107" (input)="updateCSSVar('--brand-warning', $event.target.value)" />
-              <span id="warning-value">#ffc107</span>
-            </div>
-            <div class="color-control">
-              <label>Danger Color:</label>
-              <input type="color" value="#dc3545" (input)="updateCSSVar('--brand-danger', $event.target.value)" />
-              <span id="danger-value">#dc3545</span>
-            </div>
-          </div>
-          
-          <div style="padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
-            <h3 style="margin-top: 0;">Layout & Typography</h3>
-            <div class="range-control">
-              <label>Border Radius:</label>
-              <input type="range" min="0" max="20" value="6" (input)="updateCSSVar('--brand-border-radius', $event.target.value + 'px')" />
-              <span id="radius-value">6px</span>
-            </div>
-            <div class="text-control">
-              <label>Font Family:</label>
-              <select (change)="updateCSSVar('--brand-font-family', $event.target.value)">
-                <option value='"Inter var", sans-serif'>Inter</option>
-                <option value='"Roboto", sans-serif'>Roboto</option>
-                <option value='"Open Sans", sans-serif'>Open Sans</option>
-                <option value='system-ui, sans-serif'>System UI</option>
-              </select>
-            </div>
-            <div class="range-control">
-              <label>Base Font Size:</label>
-              <input type="range" min="12" max="18" value="14" (input)="updateCSSVar('--brand-font-size-base', $event.target.value + 'px')" />
-              <span id="fontsize-value">14px</span>
-            </div>
-          </div>
-        </div>
-        
-        <div style="padding: 20px; border: 1px solid #ddd; border-radius: 8px; background: #f8f9fa;">
-          <h3 style="margin-top: 0;">🎛️ Actions</h3>
-          <button 
-            style="padding: 10px 20px; margin-right: 10px; background: var(--brand-primary, #007acc); color: white; border: none; border-radius: 6px; cursor: pointer;"
-            (click)="exportTheme()"
-          >
-            Export Theme JSON
-          </button>
-          <button 
-            style="padding: 10px 20px; margin-right: 10px; background: var(--brand-secondary, #6c757d); color: white; border: none; border-radius: 6px; cursor: pointer;"
-            (click)="resetTheme()"
-          >
-            Reset to Default
-          </button>
-          <input 
-            type="file" 
-            accept=".json" 
-            (change)="importTheme($event)"
-            style="margin-left: 10px;"
-          />
+      <div class="theme-editor-container">
+        <p-toast></p-toast>
+
+        <div class="header-section">
+          <h1 class="editor-title">🎨 Token Studio Theme Editor</h1>
+          <p class="editor-subtitle">
+            Powered by Transflo Design Tokens • Real-time PrimeNG Integration
+          </p>
         </div>
 
-        <div style="margin-top: 30px; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
-          <h3 style="margin-top: 0;">🔍 Live Preview</h3>
-          <p>Use the <strong>Theme</strong> switcher in the toolbar above (🌞/🌙) to toggle between Light and Dark modes.</p>
-          <p>Then navigate to any PrimeNG component story to see your theme changes applied in real-time!</p>
-          
-          <div style="display: flex; gap: 10px; align-items: center; margin-top: 20px;">
-            <div style="width: 30px; height: 30px; background: var(--brand-primary, #007acc); border-radius: 4px;"></div>
-            <div style="width: 30px; height: 30px; background: var(--brand-secondary, #6c757d); border-radius: 4px;"></div>
-            <div style="width: 30px; height: 30px; background: var(--brand-success, #28a745); border-radius: 4px;"></div>
-            <div style="width: 30px; height: 30px; background: var(--brand-warning, #ffc107); border-radius: 4px;"></div>
-            <div style="width: 30px; height: 30px; background: var(--brand-danger, #dc3545); border-radius: 4px;"></div>
+        <div class="toolbar-section">
+          <div class="toolbar-card">
+            <h3>📦 Token Management</h3>
+            <div class="toolbar-actions">
+              <p-button
+                label="Import Tokens"
+                icon="pi pi-upload"
+                severity="secondary"
+                (click)="triggerFileInput()"
+                [outlined]="true">
+              </p-button>
+
+              <p-button
+                label="Export Current"
+                icon="pi pi-download"
+                severity="info"
+                (click)="exportCurrentTokens()"
+                [outlined]="true">
+              </p-button>
+
+              <p-button
+                label="Reset to Default"
+                icon="pi pi-refresh"
+                severity="warning"
+                (click)="resetToDefault()"
+                [outlined]="true">
+              </p-button>
+
+              <input
+                #fileInput
+                type="file"
+                accept=".json"
+                (change)="importTokenFile($event)"
+                style="display: none;"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div class="content-grid">
+          <div class="info-section">
+            <div class="info-card">
+              <h3>🎯 Current Theme Status</h3>
+              <div class="status-grid">
+                <div class="status-item">
+                  <span class="status-label">Active Mode:</span>
+                  <span class="status-value" id="current-mode">Light</span>
+                </div>
+                <div class="status-item">
+                  <span class="status-label">CSS Variables:</span>
+                  <span class="status-value" id="css-var-count">Loading...</span>
+                </div>
+                <div class="status-item">
+                  <span class="status-label">Token Source:</span>
+                  <span class="status-value">transflo.tokens.json</span>
+                </div>
+                <div class="status-item">
+                  <span class="status-label">PrimeNG Preset:</span>
+                  <span class="status-value status-active">✓ Active</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="preview-card">
+              <h3>🎨 Live Color Preview</h3>
+              <div class="color-swatches">
+                <div class="swatch-row">
+                  <div class="swatch primary" title="Primary"></div>
+                  <div class="swatch secondary" title="Secondary"></div>
+                  <div class="swatch success" title="Success"></div>
+                  <div class="swatch warning" title="Warning"></div>
+                  <div class="swatch danger" title="Danger"></div>
+                </div>
+                <div class="swatch-row">
+                  <div class="swatch surface-0" title="Surface 0"></div>
+                  <div class="swatch surface-100" title="Surface 100"></div>
+                  <div class="swatch surface-300" title="Surface 300"></div>
+                  <div class="swatch surface-600" title="Surface 600"></div>
+                  <div class="swatch surface-900" title="Surface 900"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="demo-section">
+            <div class="demo-card">
+              <h3>🚀 Component Showcase</h3>
+              <p class="demo-description">
+                These components use your Token Studio theme in real-time.
+                Switch between Light/Dark modes using the toolbar toggle.
+              </p>
+
+              <div class="demo-grid">
+                <div class="demo-group">
+                  <h4>Buttons</h4>
+                  <div class="button-showcase">
+                    <p-button label="Primary" severity="primary"></p-button>
+                    <p-button label="Secondary" severity="secondary"></p-button>
+                    <p-button label="Success" severity="success"></p-button>
+                    <p-button label="Warning" severity="warning"></p-button>
+                    <p-button label="Danger" severity="danger"></p-button>
+                  </div>
+                </div>
+
+                <div class="demo-group">
+                  <h4>Outlined Buttons</h4>
+                  <div class="button-showcase">
+                    <p-button label="Primary" severity="primary" [outlined]="true"></p-button>
+                    <p-button label="Secondary" severity="secondary" [outlined]="true"></p-button>
+                    <p-button label="Success" severity="success" [outlined]="true"></p-button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="token-info">
+                <h4>📋 Applied Token Mappings</h4>
+                <div class="token-mappings">
+                  <div class="mapping-item">
+                    <code>theme.primary.color</code> → Button Primary Background
+                  </div>
+                  <div class="mapping-item">
+                    <code>button.hover.background</code> → Button Hover States
+                  </div>
+                  <div class="mapping-item">
+                    <code>surface.*</code> → Background & Surface Colors
+                  </div>
+                  <div class="mapping-item">
+                    <code>global.textColor</code> → Text & Content Colors
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="instructions-section">
+          <div class="instructions-card">
+            <h3>💡 How to Use</h3>
+            <div class="instruction-grid">
+              <div class="instruction-item">
+                <span class="instruction-number">1</span>
+                <div class="instruction-content">
+                  <strong>Theme Switching:</strong>
+                  Use the Theme Mode toggle in the Storybook toolbar (🌞/🌙) to switch between Light and Dark variants instantly.
+                </div>
+              </div>
+              <div class="instruction-item">
+                <span class="instruction-number">2</span>
+                <div class="instruction-content">
+                  <strong>Import Custom Tokens:</strong>
+                  Click "Import Tokens" to upload your own Token Studio JSON file. The theme will update immediately across all stories.
+                </div>
+              </div>
+              <div class="instruction-item">
+                <span class="instruction-number">3</span>
+                <div class="instruction-content">
+                  <strong>Export & Share:</strong>
+                  Click "Export Current" to download the active theme tokens. Use this to share themes or create backups.
+                </div>
+              </div>
+              <div class="instruction-item">
+                <span class="instruction-number">4</span>
+                <div class="instruction-content">
+                  <strong>Live Preview:</strong>
+                  Navigate to any PrimeNG component story to see your token changes applied in real-time with full theme integration.
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
