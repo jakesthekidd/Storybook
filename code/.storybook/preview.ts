@@ -1,36 +1,26 @@
-// ResizeObserver fix is now loaded via previewHead in main.ts
-
 import type { Preview } from '@storybook/angular';
-import { setCompodocJson } from '@storybook/addon-docs/angular';
+import { applicationConfig } from '@storybook/angular';
 import { importProvidersFrom } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-// CSS will be loaded via previewHead in main.ts
+
+// Load PrimeNG CSS here so Storybook owns it
+import 'primeng/resources/themes/lara-light-blue/theme.css';
+import 'primeng/resources/primeng.min.css';
+import 'primeicons/primeicons.css';
+import '../src/styles/tokens.css';
 
 const preview: Preview = {
+  decorators: [
+    applicationConfig({
+      providers: [importProvidersFrom(BrowserAnimationsModule)],
+    }),
+  ],
   parameters: {
     actions: { argTypesRegex: '^on[A-Z].*' },
-    controls: {
-      matchers: {
-        color: /(background|color)$/i,
-        date: /Date$/,
-      },
-    },
-    docs: {
-      inlineStories: true,
-    },
+    controls: { matchers: { color: /(background|color)$/i, date: /Date$/ } },
+    docs: { inlineStories: true },
+    layout: 'padded',
   },
-  decorators: [
-    (story) => ({
-      template: `
-        <div class="storybook-wrapper">
-          <story></story>
-        </div>
-      `,
-      providers: [
-        importProvidersFrom(BrowserAnimationsModule)
-      ]
-    })
-  ]
 };
 
 export default preview;
