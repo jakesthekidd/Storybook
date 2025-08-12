@@ -70,68 +70,129 @@ const config: StorybookConfig = {
   },
   previewHead: (head) => `
     <script>
-      // Simple and effective ResizeObserver error suppression
+      // FOOLPROOF ResizeObserver error elimination
       (function() {
         'use strict';
 
-        // Store original console methods
-        const originalError = console.error;
+        // Immediately hijack all error reporting
+        const noop = () => {};
 
-        // Simple error detection
-        const isResizeObserverError = (msg) => {
-          return String(msg).includes('ResizeObserver loop completed with undelivered notifications');
+        // Store originals
+        const originals = {
+          error: console.error,
+          warn: console.warn,
+          onerror: window.onerror,
+          onunhandledrejection: window.onunhandledrejection
         };
 
-        // Override console.error to suppress ResizeObserver errors
+        // Comprehensive error detection
+        const isResizeObserverError = (message) => {
+          if (!message) return false;
+          const str = String(message).toLowerCase();
+          return str.includes('resizeobserver') && str.includes('loop');
+        };
+
+        // Override console methods
         console.error = function(...args) {
-          if (args.some(isResizeObserverError)) {
-            return; // Silent suppression
+          if (args.some(isResizeObserverError)) return;
+          return originals.error.apply(this, arguments);
+        };
+
+        console.warn = function(...args) {
+          if (args.some(isResizeObserverError)) return;
+          return originals.warn.apply(this, arguments);
+        };
+
+        // Global error suppression
+        window.onerror = function(msg, source, line, col, error) {
+          if (isResizeObserverError(msg) || isResizeObserverError(error?.message)) {
+            return true;
           }
-          return originalError.apply(console, args);
+          return originals.onerror ? originals.onerror.apply(this, arguments) : false;
         };
 
-        // Catch window errors
-        const originalOnError = window.onerror;
-        window.onerror = function(message, source, lineno, colno, error) {
-          if (isResizeObserverError(message)) {
-            return true; // Suppress
+        window.onunhandledrejection = function(event) {
+          if (isResizeObserverError(event.reason) || isResizeObserverError(event.reason?.message)) {
+            event.preventDefault();
+            return;
           }
-          return originalOnError ? originalOnError.apply(this, arguments) : false;
+          return originals.onunhandledrejection ? originals.onunhandledrejection.apply(this, arguments) : undefined;
         };
 
-      })();
-    </script>
-    <script>
-      // Debounced ResizeObserver to prevent loops
-      (function() {
-        if (!window.ResizeObserver) return;
+        // Nuclear ResizeObserver replacement
+        if (window.ResizeObserver) {
+          const OriginalResizeObserver = window.ResizeObserver;
 
-        const OriginalResizeObserver = window.ResizeObserver;
-        const debounce = (func, wait) => {
-          let timeout;
-          return function executedFunction(...args) {
-            const later = () => {
-              clearTimeout(timeout);
-              func(...args);
-            };
-            clearTimeout(timeout);
-            timeout = setTimeout(later, wait);
-          };
-        };
+          window.ResizeObserver = class SafeResizeObserver {
+            constructor(callback) {
+              this._callback = callback;
+              this._observer = null;
+              this._entries = [];
+              this._isObserving = false;
 
-        window.ResizeObserver = class extends OriginalResizeObserver {
-          constructor(callback) {
-            const debouncedCallback = debounce((entries, observer) => {
+              // Create observer with maximum safety
               try {
-                callback(entries, observer);
+                this._observer = new OriginalResizeObserver((entries) => {
+                  this._entries = entries;
+                  this._scheduleCallback();
+                });
               } catch (e) {
-                // Silent error handling
+                // Silent fallback
               }
-            }, 16); // ~60fps
+            }
 
-            super(debouncedCallback);
-          }
-        };
+            _scheduleCallback() {
+              if (!this._isObserving) return;
+
+              // Use multiple async layers to prevent loops
+              requestAnimationFrame(() => {
+                if (!this._isObserving) return;
+                setTimeout(() => {
+                  if (!this._isObserving) return;
+                  try {
+                    this._callback && this._callback(this._entries, this);
+                  } catch (e) {
+                    // Silent error handling
+                  }
+                }, 1);
+              });
+            }
+
+            observe(target, options) {
+              if (!target || !this._observer) return;
+              this._isObserving = true;
+              try {
+                this._observer.observe(target, options);
+              } catch (e) {
+                // Silent failure
+              }
+            }
+
+            unobserve(target) {
+              if (!target || !this._observer) return;
+              try {
+                this._observer.unobserve(target);
+              } catch (e) {
+                // Silent failure
+              }
+            }
+
+            disconnect() {
+              this._isObserving = false;
+              this._entries = [];
+              this._callback = null;
+              if (this._observer) {
+                try {
+                  this._observer.disconnect();
+                } catch (e) {
+                  // Silent failure
+                }
+                this._observer = null;
+              }
+            }
+          };
+        }
+
       })();
     </script>
     ${head}
