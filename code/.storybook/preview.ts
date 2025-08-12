@@ -3,7 +3,7 @@ import { applicationConfig } from '@storybook/angular';
 import { importProvidersFrom } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
-import { PRIMENG_THEMES, themeManager } from './themes';
+import { PRIMENG_THEMES, themeManager } from './themes.js';
 
 const preview: Preview = {
   decorators: [
