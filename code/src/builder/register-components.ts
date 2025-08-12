@@ -253,4 +253,5 @@ Builder.registerComponent(BuilderCalendarComponent, {
 export function registerBuilderComponents() {
   console.log('🎯 Builder.io components registered successfully!');
   console.log('📦 Available components: PrimeNG Button, PrimeNG Input, PrimeNG Calendar');
+  console.log('✅ Components are ready for drag-and-drop in Builder.io');
 }
