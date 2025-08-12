@@ -235,8 +235,8 @@ const meta: Meta<CalendarArgs> = {
 
       /* Day Headers */
       .p-datepicker .p-datepicker-calendar thead th {
-        background: var(--surface-100) !important;
-        color: var(--blue-700) !important;
+        background: var(--palette-surface-100, #F7F8F9) !important;
+        color: var(--palette-blue-700, #1D5D96) !important;
         font-weight: 600 !important;
         padding: 0.75rem !important;
         border-radius: 6px !important;
@@ -261,47 +261,47 @@ const meta: Meta<CalendarArgs> = {
 
       /* Regular days */
       .p-datepicker .p-datepicker-calendar td:not(.p-datepicker-other-month) > span {
-        color: var(--blue-700) !important;
+        color: var(--palette-blue-700, #1D5D96) !important;
         background: transparent !important;
       }
 
       .p-datepicker .p-datepicker-calendar td:not(.p-datepicker-other-month) > span:hover {
-        background: var(--blue-50) !important;
-        color: var(--blue-600) !important;
+        background: var(--palette-blue-50, #E9F1F8) !important;
+        color: var(--palette-blue-600, #2068A8) !important;
       }
 
       /* Today */
       .p-datepicker .p-datepicker-calendar td.p-datepicker-today > span {
-        background: var(--cyan-50) !important;
-        color: var(--blue-700) !important;
-        border: 1px solid var(--cyan-500) !important;
+        background: var(--palette-cyan-50, #F1FAFE) !important;
+        color: var(--palette-blue-700, #1D5D96) !important;
+        border: 1px solid var(--palette-cyan-500, #72CDF4) !important;
       }
 
       .p-datepicker .p-datepicker-calendar td.p-datepicker-today > span:hover {
-        background: var(--cyan-100) !important;
+        background: var(--palette-cyan-100, #E3F5FD) !important;
       }
 
       /* Selected date */
       .p-datepicker .p-datepicker-calendar td > span.p-highlight {
-        background: var(--blue-500) !important;
-        color: #ffffff !important;
+        background: var(--palette-primary, #2474BB) !important;
+        color: var(--palette-primary-contrast, #ffffff) !important;
         font-weight: 600 !important;
       }
 
       .p-datepicker .p-datepicker-calendar td > span.p-highlight:hover {
-        background: var(--blue-600) !important;
+        background: var(--palette-primary-hover, #2068A8) !important;
       }
 
       /* Other month days */
       .p-datepicker .p-datepicker-calendar td.p-datepicker-other-month > span {
-        color: var(--surface-500) !important;
+        color: var(--palette-surface-500, #C6CCD6) !important;
         opacity: 0.6 !important;
       }
 
       /* Button Bar */
       .p-datepicker .p-datepicker-buttonbar {
-        border-top: 1px solid var(--surface-400) !important;
-        background: var(--surface-50) !important;
+        border-top: 1px solid var(--palette-surface-400, #E2E6EB) !important;
+        background: var(--palette-surface-50, #FBFCFC) !important;
         padding: 1rem !important;
         border-radius: 0 0 8px 8px !important;
       }
@@ -317,12 +317,12 @@ const meta: Meta<CalendarArgs> = {
       .p-datepicker .p-datepicker-buttonbar .p-button.p-button-text {
         background: transparent !important;
         border: 1px solid transparent !important;
-        color: var(--blue-500) !important;
+        color: var(--palette-primary, #2474BB) !important;
       }
 
       .p-datepicker .p-datepicker-buttonbar .p-button.p-button-text:hover {
-        background: var(--blue-50) !important;
-        border-color: var(--blue-500) !important;
+        background: var(--palette-blue-50, #E9F1F8) !important;
+        border-color: var(--palette-primary, #2474BB) !important;
       }
 
       /* Time Picker */
