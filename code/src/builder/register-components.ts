@@ -90,8 +90,6 @@ Builder.registerComponent(BuilderButtonComponent, {
 // Register Input Component
 Builder.registerComponent(BuilderInputComponent, {
   name: 'PrimeNG Input',
-  group: 'Form Controls',
-  image: 'https://cdn.builder.io/api/v1/image/assets%2FYJIGb4i01jvw0SRdL5Bt%2Fd6d4c0e4e4f4a4c4e4f4e4f4e4f4e4f4',
   inputs: [
     {
       name: 'label',
