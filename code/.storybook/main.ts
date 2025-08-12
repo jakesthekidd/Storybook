@@ -183,54 +183,80 @@ const config: StorybookConfig = {
           };
         });
 
-        // Ultra-comprehensive error handling layers
+        // NUCLEAR error suppression - multiple layers of interception
 
-        // Error event listeners with highest priority
-        window.addEventListener('error', function(e) {
-          if (isResizeObserverError(e.message) || isResizeObserverError(e.error?.message) || isResizeObserverError(e.filename)) {
-            e.preventDefault();
-            e.stopPropagation();
-            e.stopImmediatePropagation();
-            return false;
-          }
-        }, { capture: true, passive: false });
-
-        window.addEventListener('unhandledrejection', function(e) {
-          if (isResizeObserverError(e.reason) || isResizeObserverError(e.reason?.message) || isResizeObserverError(e.reason?.stack)) {
-            e.preventDefault();
-            e.stopPropagation();
-            e.stopImmediatePropagation();
-            return false;
-          }
-        }, { capture: true, passive: false });
-
-        // Override window error handlers
-        const originalOnError = window.onerror;
+        // Immediate window error hijacking
         window.onerror = function(message, source, lineno, colno, error) {
-          if (isResizeObserverError(message) || isResizeObserverError(error?.message) || isResizeObserverError(source)) {
-            return true; // Prevent default error handling
+          if (isResizeObserverError(message) || isResizeObserverError(error?.message)) {
+            return true; // Completely suppress
           }
-          return originalOnError ? originalOnError.apply(this, arguments) : false;
+          return false; // Let other errors through
         };
 
-        const originalOnRejection = window.onunhandledrejection;
         window.onunhandledrejection = function(event) {
-          if (isResizeObserverError(event.reason) || isResizeObserverError(event.reason?.message) || isResizeObserverError(event.reason?.stack)) {
+          if (isResizeObserverError(event.reason) || isResizeObserverError(event.reason?.message)) {
             event.preventDefault();
-            return true;
+            event.stopPropagation();
+            return;
           }
-          return originalOnRejection ? originalOnRejection.apply(this, arguments) : false;
         };
 
-        // Override global error reporting methods
-        if (typeof reportError !== 'undefined') {
-          const originalReportError = reportError;
-          reportError = function(error) {
-            if (!isResizeObserverError(error.message) && !isResizeObserverError(error.stack)) {
-              originalReportError(error);
+        // Aggressive event listener suppression
+        const originalAddEventListener = window.addEventListener;
+        window.addEventListener = function(type, listener, options) {
+          if (type === 'error' || type === 'unhandledrejection') {
+            const wrappedListener = function(event) {
+              // Pre-filter ResizeObserver errors before they reach any listener
+              if (type === 'error' && isResizeObserverError(event.message || event.error?.message)) {
+                event.preventDefault();
+                event.stopPropagation();
+                event.stopImmediatePropagation();
+                return;
+              }
+              if (type === 'unhandledrejection' && isResizeObserverError(event.reason || event.reason?.message)) {
+                event.preventDefault();
+                event.stopPropagation();
+                event.stopImmediatePropagation();
+                return;
+              }
+              return listener.apply(this, arguments);
+            };
+            return originalAddEventListener.call(this, type, wrappedListener, options);
+          }
+          return originalAddEventListener.call(this, type, listener, options);
+        };
+
+        // Override setTimeout/setInterval to catch async ResizeObserver errors
+        const originalSetTimeout = window.setTimeout;
+        const originalSetInterval = window.setInterval;
+
+        window.setTimeout = function(callback, delay, ...args) {
+          const wrappedCallback = function() {
+            try {
+              return callback.apply(this, arguments);
+            } catch (e) {
+              if (!isResizeObserverError(e.message)) {
+                throw e;
+              }
+              // Silently suppress ResizeObserver errors
             }
           };
-        }
+          return originalSetTimeout.call(this, wrappedCallback, delay, ...args);
+        };
+
+        window.setInterval = function(callback, delay, ...args) {
+          const wrappedCallback = function() {
+            try {
+              return callback.apply(this, arguments);
+            } catch (e) {
+              if (!isResizeObserverError(e.message)) {
+                throw e;
+              }
+              // Silently suppress ResizeObserver errors
+            }
+          };
+          return originalSetInterval.call(this, wrappedCallback, delay, ...args);
+        };
 
         // Comprehensive async function wrapping
         const wrapAsyncFunction = (fn, context) => {
