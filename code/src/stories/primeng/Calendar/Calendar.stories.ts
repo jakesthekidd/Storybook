@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/angular';
 import { moduleMetadata } from '@storybook/angular';
 import { CalendarModule } from 'primeng/calendar';
 import { FormsModule } from '@angular/forms';
-import { applyTokens } from '../../../theme/simple-token-loader';
+import { colorPaletteManager } from '../../../theme/color-palette';
 
 interface CalendarArgs {
   selectedDate: Date | null;
