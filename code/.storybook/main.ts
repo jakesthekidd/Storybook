@@ -192,25 +192,45 @@ const config: StorybookConfig = {
           const OriginalResizeObserver = window.ResizeObserver;
 
           if (OriginalResizeObserver) {
-            // Override with silent, non-throwing implementation
-            window.ResizeObserver = class SilentResizeObserver {
+            // Override with ultra-silent, non-throwing implementation
+            window.ResizeObserver = class UltraSilentResizeObserver {
               constructor(callback) {
-                // Create instance but wrap all interactions
-                this._observer = new OriginalResizeObserver((entries, observer) => {
-                  // Execute callback in isolated context with complete error suppression
+                // Store callback but don't create observer immediately
+                this._callback = callback;
+                this._observer = null;
+                this._isDestroyed = false;
+
+                // Delay observer creation to avoid immediate loops
+                setTimeout(() => {
+                  if (this._isDestroyed) return;
                   try {
-                    // Use setTimeout to break execution context and prevent loops
-                    setTimeout(() => {
+                    this._observer = new OriginalResizeObserver((entries, observer) => {
+                      if (this._isDestroyed) return;
+
+                      // Multiple layers of protection
                       try {
-                        callback(entries, observer);
+                        // Defer execution to next tick to break potential loops
+                        Promise.resolve().then(() => {
+                          if (this._isDestroyed) return;
+                          setTimeout(() => {
+                            if (this._isDestroyed) return;
+                            try {
+                              this._callback && this._callback(entries, observer);
+                            } catch (e) {
+                              // Ultra-silent suppression
+                            }
+                          }, 1);
+                        }).catch(() => {
+                          // Silent promise rejection handling
+                        });
                       } catch (e) {
-                        // Completely silent - no logging, no throwing
+                        // Silent error handling
                       }
-                    }, 0);
+                    });
                   } catch (e) {
-                    // Completely silent
+                    // Silent observer creation failure
                   }
-                });
+                }, 10);
               }
 
               observe(target, options) {
