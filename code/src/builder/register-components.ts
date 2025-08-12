@@ -4,8 +4,6 @@ import { BuilderButtonComponent, BuilderInputComponent, BuilderCalendarComponent
 // Register Button Component
 Builder.registerComponent(BuilderButtonComponent, {
   name: 'PrimeNG Button',
-  group: 'Form Controls',
-  image: 'https://cdn.builder.io/api/v1/image/assets%2FYJIGb4i01jvw0SRdL5Bt%2F8e8c4e87e9b84c9fa5c5b2b7b8e9e2e9',
   inputs: [
     {
       name: 'label',
