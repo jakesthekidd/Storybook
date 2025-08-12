@@ -144,16 +144,16 @@ const meta: Meta<CalendarArgs> = {
         flex-direction: column;
         align-items: flex-start;
         gap: 1rem;
-        background: var(--surface-ground);
+        background: var(--palette-surface-ground, #EFF2F4);
         border-radius: 8px;
         min-height: 120px;
       }
 
-      .token-info {
+      .palette-info {
         opacity: 0.7;
         font-family: 'Inter', system-ui, sans-serif;
         font-size: 12px;
-        color: #666;
+        color: var(--palette-text-muted, #666);
       }
 
       /* NUCLEAR CSS OVERRIDE - Force token colors */
