@@ -52,17 +52,7 @@ const config: StorybookConfig = {
       });
     }
 
-    // Add webpack plugin to replace ResizeObserver globally
-    if (!config.plugins) config.plugins = [];
-
-    const webpack = require('webpack');
-    config.plugins.push(
-      new webpack.DefinePlugin({
-        'window.ResizeObserver': 'class DeadResizeObserver { observe(){} unobserve(){} disconnect(){} }',
-        'global.ResizeObserver': 'class DeadResizeObserver { observe(){} unobserve(){} disconnect(){} }',
-        'ResizeObserver': 'class DeadResizeObserver { observe(){} unobserve(){} disconnect(){} }'
-      })
-    );
+    // Webpack optimizations removed to prevent interference
 
     return config;
   },
