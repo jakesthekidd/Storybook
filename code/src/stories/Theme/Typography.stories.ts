@@ -126,7 +126,7 @@ const meta: Meta<TypographyArgs> = {
               </div>
               <div class="font-sample" [style.font-family]="font.family">
                 <div class="font-alphabet">Aa Bb Cc Dd Ee Ff Gg Hh Ii Jj Kk Ll Mm</div>
-                <div class="font-numbers">1234567890 !@#$%^&*()</div>
+                <div class="font-numbers">1234567890 !&#64;#$%^&amp;*()</div>
                 <div class="font-text">{{sampleText}}</div>
               </div>
               <div class="font-weights">
