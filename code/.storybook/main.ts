@@ -22,49 +22,104 @@ const config: StorybookConfig = {
     options: {},
   },
   previewHead: (head) => `
-    <!-- IMMEDIATE ResizeObserver elimination executed before anything else -->
+    <!-- Surgical ResizeObserver loop prevention -->
     <script>
-      // Nuclear ResizeObserver elimination with monitoring
-      window.ResizeObserver = undefined;
-      delete window.ResizeObserver;
+      (function() {
+        'use strict';
 
-      // Immediately kill any console errors
-      const origError = console.error;
-      console.error = function() {
-        const msg = String(arguments[0] || '');
-        if (msg.includes('ResizeObserver') || msg.includes('loop completed') || msg.includes('undelivered notifications')) {
-          return; // Completely silent
-        }
-        return origError.apply(this, arguments);
-      };
-
-      // Prevent any ResizeObserver creation
-      Object.defineProperty(window, 'ResizeObserver', {
-        get: () => class NoOpResizeObserver { observe(){} unobserve(){} disconnect(){} },
-        set: () => {},
-        configurable: false,
-        enumerable: false
-      });
-
-      // Monitor for any script injections trying to create ResizeObserver
-      if (window.MutationObserver) {
-        const observer = new MutationObserver(() => {
-          if (window.ResizeObserver && window.ResizeObserver.name !== 'NoOpResizeObserver') {
-            window.ResizeObserver = class NoOpResizeObserver { observe(){} unobserve(){} disconnect(){} };
+        // 1. Immediate error suppression
+        const originalError = console.error;
+        console.error = function(...args) {
+          const message = String(args[0] || '');
+          if (message.includes('ResizeObserver loop completed with undelivered notifications')) {
+            return; // Silent suppression
           }
-        });
-        observer.observe(document, { childList: true, subtree: true });
-      }
+          return originalError.apply(this, args);
+        };
 
-      // Global error elimination
-      window.onerror = (msg) => String(msg).includes('ResizeObserver');
-      window.addEventListener('error', e => {
-        if (String(e.message || '').includes('ResizeObserver')) {
-          e.preventDefault();
-          e.stopPropagation();
-          return false;
+        // 2. Monkey-patch ResizeObserver to prevent loops
+        if (typeof window !== 'undefined' && window.ResizeObserver) {
+          const OriginalResizeObserver = window.ResizeObserver;
+
+          window.ResizeObserver = class LoopPreventingResizeObserver {
+            constructor(callback) {
+              this.callback = callback;
+              this.observedElements = new WeakSet();
+              this.processing = false;
+              this.animationFrame = null;
+
+              this.observer = new OriginalResizeObserver((entries) => {
+                // Prevent recursive calls
+                if (this.processing) return;
+
+                // Cancel any pending animation frame
+                if (this.animationFrame) {
+                  cancelAnimationFrame(this.animationFrame);
+                }
+
+                // Schedule callback in next animation frame to prevent loops
+                this.animationFrame = requestAnimationFrame(() => {
+                  this.processing = true;
+                  try {
+                    // Filter entries to only include elements we're actually observing
+                    const validEntries = entries.filter(entry =>
+                      entry.target &&
+                      entry.target.isConnected &&
+                      this.observedElements.has(entry.target)
+                    );
+
+                    if (validEntries.length > 0) {
+                      this.callback(validEntries);
+                    }
+                  } catch (error) {
+                    // Swallow ResizeObserver errors but log others
+                    if (!error.message.includes('ResizeObserver')) {
+                      console.error(error);
+                    }
+                  } finally {
+                    this.processing = false;
+                    this.animationFrame = null;
+                  }
+                });
+              });
+            }
+
+            observe(target, options) {
+              if (target && target.nodeType === 1) {
+                this.observedElements.add(target);
+                this.observer.observe(target, options);
+              }
+            }
+
+            unobserve(target) {
+              if (target) {
+                this.observedElements.delete(target);
+                this.observer.unobserve(target);
+              }
+            }
+
+            disconnect() {
+              this.observedElements = new WeakSet();
+              if (this.animationFrame) {
+                cancelAnimationFrame(this.animationFrame);
+                this.animationFrame = null;
+              }
+              this.observer.disconnect();
+            }
+          };
         }
-      }, true);
+
+        // 3. Global error handling as backup
+        window.addEventListener('error', function(event) {
+          if (event.message && event.message.includes('ResizeObserver loop completed with undelivered notifications')) {
+            event.preventDefault();
+            event.stopPropagation();
+            return false;
+          }
+        }, { capture: true });
+
+        console.log('✅ ResizeObserver loop prevention active');
+      })();
     </script>
     ${head}
     <!-- Only load PrimeIcons, PrimeNG theme will be token-driven -->
