@@ -22,78 +22,65 @@ const config: StorybookConfig = {
     options: {},
   },
   previewHead: (head) => `
-    <!-- Comprehensive ResizeObserver error suppression -->
     <script>
+      // IMMEDIATE ResizeObserver suppression - runs first
       (function() {
         'use strict';
 
-        // Multiple error patterns to catch
-        const resizeObserverErrors = [
-          'ResizeObserver loop completed with undelivered notifications',
-          'ResizeObserver loop completed with undelivered notifications.',
-          'ResizeObserver loop limit exceeded',
-          'Non-finite floating-point result'
-        ];
+        // Store original console.error
+        const originalError = console.error;
 
-        const isResizeObserverError = (message) => {
-          if (!message) return false;
-          const msg = String(message).trim();
-          return resizeObserverErrors.some(pattern =>
-            msg.includes(pattern) || msg === pattern
-          );
+        // Override console.error immediately
+        console.error = function() {
+          const message = String(arguments[0] || '');
+
+          // Exact matches for the ResizeObserver error
+          if (message === 'ResizeObserver loop completed with undelivered notifications.' ||
+              message === 'ResizeObserver loop completed with undelivered notifications' ||
+              message.indexOf('ResizeObserver loop completed') !== -1 ||
+              message.indexOf('ResizeObserver') !== -1) {
+            return; // Completely silent
+          }
+
+          // Call original for all other errors
+          return originalError.apply(this, arguments);
         };
 
-        // Override console methods
-        ['error', 'warn'].forEach(method => {
-          const original = console[method];
-          console[method] = function(...args) {
-            // Check first argument (main message)
-            if (isResizeObserverError(args[0])) {
-              return; // Silent suppression
-            }
+        // Also override warn just in case
+        const originalWarn = console.warn;
+        console.warn = function() {
+          const message = String(arguments[0] || '');
+          if (message.indexOf('ResizeObserver') !== -1) {
+            return; // Silent
+          }
+          return originalWarn.apply(this, arguments);
+        };
 
-            // Check if any argument contains ResizeObserver error
-            const hasResizeObserverError = args.some(arg =>
-              isResizeObserverError(arg) ||
-              (arg && arg.message && isResizeObserverError(arg.message))
-            );
-
-            if (hasResizeObserverError) {
-              return; // Silent suppression
-            }
-
-            return original.apply(this, args);
-          };
-        });
-
-        // Global error handlers
-        window.addEventListener('error', function(event) {
-          if (isResizeObserverError(event.message) ||
-              isResizeObserverError(event.error?.message)) {
-            event.preventDefault();
-            event.stopPropagation();
+        // Catch any global errors
+        window.addEventListener('error', function(e) {
+          if (e.message && e.message.indexOf('ResizeObserver') !== -1) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
             return false;
           }
         }, true);
 
-        window.addEventListener('unhandledrejection', function(event) {
-          if (isResizeObserverError(event.reason) ||
-              isResizeObserverError(event.reason?.message)) {
-            event.preventDefault();
+        // Handle promises
+        window.addEventListener('unhandledrejection', function(e) {
+          if (e.reason && String(e.reason).indexOf('ResizeObserver') !== -1) {
+            e.preventDefault();
             return true;
           }
         });
 
-        // Override window.onerror
-        const originalOnError = window.onerror;
-        window.onerror = function(message, source, lineno, colno, error) {
-          if (isResizeObserverError(message) || isResizeObserverError(error?.message)) {
-            return true; // Prevent default handling
+        // Nuclear option - override window.onerror completely
+        window.onerror = function(msg) {
+          if (String(msg).indexOf('ResizeObserver') !== -1) {
+            return true;
           }
-          return originalOnError ? originalOnError.apply(this, arguments) : false;
+          return false;
         };
 
-        console.log('✅ ResizeObserver error suppression active');
       })();
     </script>
     ${head}
