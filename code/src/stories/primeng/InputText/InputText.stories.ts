@@ -377,6 +377,17 @@ const meta: Meta<InputTextArgs> = {
 export default meta;
 type Story = StoryObj<InputTextArgs>;
 
+// Default Story
+export const Default: Story = {
+  args: {
+    value: '',
+    label: 'Username',
+    placeholder: 'Enter your username',
+    showFloatLabel: true,
+    type: 'text'
+  }
+};
+
 // Main Interactive Story with all controls
 export const Interactive: Story = {
   args: {
