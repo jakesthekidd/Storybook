@@ -327,6 +327,13 @@ const meta: Meta<InputTextArgs> = {
         p-floatlabel {
           position: relative !important;
           display: block !important;
+          margin-top: 0.5rem !important;
+        }
+
+        /* Ensure proper stacking and smooth transitions */
+        p-floatlabel .palette-input.p-inputtext {
+          position: relative !important;
+          z-index: 0 !important;
         }
 
         p-floatlabel label {
