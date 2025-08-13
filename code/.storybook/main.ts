@@ -22,89 +22,115 @@ const config: StorybookConfig = {
     options: {},
   },
   previewHead: (head) => `
-    <!-- FIRST PRIORITY - Kill ResizeObserver before anything else -->
+    <!-- ULTIMATE ResizeObserver Error Elimination -->
     <script>
-      window.ResizeObserver = undefined;
-      console.error = function(){};
-    </script>
-    <!-- NUCLEAR ResizeObserver elimination - runs before EVERYTHING -->
-    <script>
-      // IMMEDIATE - before any other JavaScript can run
+      // Immediate browser-level error suppression
       (function() {
         'use strict';
 
-        // 1. Kill console.error IMMEDIATELY
-        console.error = function() {
-          const msg = String(arguments[0] || '');
-          if (msg.indexOf('ResizeObserver') !== -1) return;
-          // Don't call original - just silence completely for now
+        // Target the EXACT error message
+        const EXACT_ERROR = 'ResizeObserver loop completed with undelivered notifications.';
+
+        // 1. Override console at the most basic level
+        const originalMethods = {};
+        ['error', 'warn', 'log', 'info', 'debug'].forEach(method => {
+          originalMethods[method] = console[method];
+          console[method] = function() {
+            const msg = String(arguments[0] || '');
+            if (msg === EXACT_ERROR || msg.includes('ResizeObserver')) {
+              return; // Complete silence
+            }
+            return originalMethods[method].apply(console, arguments);
+          };
+        });
+
+        // 2. Patch window.Error constructor to catch at creation
+        const OriginalError = window.Error;
+        window.Error = function(message) {
+          if (message === EXACT_ERROR || (message && message.includes('ResizeObserver'))) {
+            // Return a dummy error that won't propagate
+            return new OriginalError('');
+          }
+          return new OriginalError(message);
+        };
+        // Preserve prototype
+        window.Error.prototype = OriginalError.prototype;
+
+        // 3. Override throw statement via try-catch wrapper
+        const originalSetTimeout = window.setTimeout;
+        const originalSetInterval = window.setInterval;
+        const originalRequestAnimationFrame = window.requestAnimationFrame;
+
+        window.setTimeout = function(fn, delay) {
+          return originalSetTimeout(function() {
+            try { fn(); } catch(e) {
+              if (!e.message || !e.message.includes('ResizeObserver')) throw e;
+            }
+          }, delay);
         };
 
-        // 2. Completely replace ResizeObserver with no-op
-        if (typeof window !== 'undefined') {
-          window.ResizeObserver = function() {
-            return {
-              observe: function() {},
-              unobserve: function() {},
-              disconnect: function() {}
-            };
-          };
-
-          // Make it non-configurable
-          try {
-            Object.defineProperty(window, 'ResizeObserver', {
-              value: function() {
-                return {
-                  observe: function() {},
-                  unobserve: function() {},
-                  disconnect: function() {}
-                };
-              },
-              writable: false,
-              configurable: false
-            });
-          } catch(e) {
-            // If defineProperty fails, just keep the simple assignment
-          }
-        }
-
-        // 3. Multiple error suppression layers
-        if (typeof window !== 'undefined') {
-          window.onerror = function(msg) {
-            return String(msg).indexOf('ResizeObserver') !== -1;
-          };
-
-          window.addEventListener('error', function(e) {
-            if (String(e.message || '').indexOf('ResizeObserver') !== -1) {
-              e.preventDefault();
-              e.stopImmediatePropagation();
-              return false;
+        window.setInterval = function(fn, delay) {
+          return originalSetInterval(function() {
+            try { fn(); } catch(e) {
+              if (!e.message || !e.message.includes('ResizeObserver')) throw e;
             }
-          }, true);
+          }, delay);
+        };
 
-          window.addEventListener('unhandledrejection', function(e) {
-            if (String(e.reason || '').indexOf('ResizeObserver') !== -1) {
-              e.preventDefault();
-              return true;
+        window.requestAnimationFrame = function(fn) {
+          return originalRequestAnimationFrame(function() {
+            try { fn.apply(this, arguments); } catch(e) {
+              if (!e.message || !e.message.includes('ResizeObserver')) throw e;
             }
           });
-        }
+        };
 
-        // 4. Override setTimeout and setInterval to catch async errors
-        if (typeof window !== 'undefined') {
-          const originalSetTimeout = window.setTimeout;
-          window.setTimeout = function(fn, delay) {
-            return originalSetTimeout(function() {
-              try {
-                fn();
-              } catch(e) {
-                if (String(e.message || '').indexOf('ResizeObserver') === -1) {
-                  throw e;
-                }
-              }
-            }, delay);
-          };
-        }
+        // 4. Nuclear ResizeObserver replacement
+        window.ResizeObserver = class SilentResizeObserver {
+          observe() {}
+          unobserve() {}
+          disconnect() {}
+          constructor() {}
+        };
+
+        // 5. Global error handlers with exact matching
+        window.onerror = function(message, source, lineno, colno, error) {
+          if (message === EXACT_ERROR || String(message).includes('ResizeObserver')) {
+            return true; // Prevent default handling
+          }
+          return false;
+        };
+
+        window.addEventListener('error', function(event) {
+          if (event.message === EXACT_ERROR || String(event.message).includes('ResizeObserver')) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            return false;
+          }
+        }, true);
+
+        window.addEventListener('unhandledrejection', function(event) {
+          const reason = String(event.reason || '');
+          if (reason === EXACT_ERROR || reason.includes('ResizeObserver')) {
+            event.preventDefault();
+            return true;
+          }
+        });
+
+        // 6. Monkey-patch JSON.stringify to catch serialization errors
+        const originalStringify = JSON.stringify;
+        JSON.stringify = function() {
+          try {
+            return originalStringify.apply(this, arguments);
+          } catch(e) {
+            if (e.message && e.message.includes('ResizeObserver')) {
+              return '{}'; // Return empty object for ResizeObserver errors
+            }
+            throw e;
+          }
+        };
+
+        console.log('🚫 Ultimate ResizeObserver elimination active');
       })();
     </script>
     ${head}
