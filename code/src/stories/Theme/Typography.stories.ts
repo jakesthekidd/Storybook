@@ -529,6 +529,20 @@ export const TypographyScale: Story = {
   }
 };
 
+// Font Families (Roboto variants)
+export const FontFamilies: Story = {
+  args: {
+    fontFamily: 'Roboto',
+    fontSize: 16,
+    fontWeight: '400',
+    lineHeight: 1.5,
+    letterSpacing: 0,
+    textColor: '#3D3D3D',
+    showAllFonts: true,
+    sampleText: 'Exploring Roboto font weights and styles'
+  }
+};
+
 // Roboto Weight Showcase
 export const RobotoWeights: Story = {
   args: {
