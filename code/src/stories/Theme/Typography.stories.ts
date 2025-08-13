@@ -215,23 +215,8 @@ const meta: Meta<TypographyArgs> = {
         { name: 'Caption', size: 11, weight: '400', lineHeight: 1.3, example: 'Caption text for images and fine print' }
       ],
       getFontFamily: (family: string) => {
-        const fontMap: { [key: string]: string } = {
-          'Inter': "'Inter', system-ui, sans-serif",
-          'System UI': "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-          'Helvetica': "'Helvetica Neue', Helvetica, Arial, sans-serif",
-          'Arial': "Arial, sans-serif",
-          'Georgia': "Georgia, 'Times New Roman', serif",
-          'Times': "'Times New Roman', Times, serif",
-          'Courier': "'Courier New', Courier, monospace",
-          'Monaco': "Monaco, 'Courier New', monospace",
-          'Roboto': "'Roboto', sans-serif",
-          'Open Sans': "'Open Sans', sans-serif",
-          'Lato': "'Lato', sans-serif",
-          'Montserrat': "'Montserrat', sans-serif",
-          'Poppins': "'Poppins', sans-serif",
-          'Source Sans Pro': "'Source Sans Pro', sans-serif"
-        };
-        return fontMap[family] || family;
+        // Always return Roboto with system fallbacks
+        return "'Roboto', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
       }
     },
     ngOnInit: () => {
