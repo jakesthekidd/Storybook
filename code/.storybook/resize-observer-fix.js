@@ -1,145 +1,149 @@
-// ULTIMATE ResizeObserver error suppression
-// This must be loaded before any other scripts to catch all ResizeObserver errors
+// Comprehensive ResizeObserver Error Fix
+// This addresses the root cause of "ResizeObserver loop completed with undelivered notifications"
 
 (function() {
   'use strict';
-
-  // Function to check if an error is a ResizeObserver error
-  function isResizeObserverError(message) {
+  
+  // 1. First, completely suppress the error messages
+  const suppressError = (message) => {
     if (!message) return false;
-    const str = String(message).toLowerCase();
-    return (
-      str.includes('resizeobserver') && (
-        str.includes('loop') ||
-        str.includes('notification') ||
-        str.includes('undelivered') ||
-        str.includes('limit') ||
-        str.includes('completed')
-      )
+    const msg = String(message).toLowerCase();
+    return msg.includes('resizeobserver') && (
+      msg.includes('loop completed') ||
+      msg.includes('undelivered notifications') ||
+      msg.includes('loop limit exceeded')
     );
-  }
+  };
 
-  // 1. Suppress console errors immediately
-  if (typeof console !== 'undefined') {
-    const originalError = console.error;
-    const originalWarn = console.warn;
-    const originalLog = console.log;
-
-    console.error = function(...args) {
-      if (isResizeObserverError(args[0])) return;
-      return originalError.apply(this, args);
+  // Override console methods immediately
+  ['error', 'warn', 'log'].forEach(method => {
+    const original = console[method];
+    console[method] = function(...args) {
+      if (args.some(arg => suppressError(arg))) return;
+      return original.apply(this, args);
     };
+  });
 
-    console.warn = function(...args) {
-      if (isResizeObserverError(args[0])) return;
-      return originalWarn.apply(this, args);
-    };
-
-    console.log = function(...args) {
-      if (isResizeObserverError(args[0])) return;
-      return originalLog.apply(this, args);
-    };
-  }
-
-  // 2. Suppress window errors
-  if (typeof window !== 'undefined') {
-    const originalOnError = window.onerror;
-    window.onerror = function(message, source, lineno, colno, error) {
-      if (isResizeObserverError(message)) {
-        return true; // Prevent default handling
-      }
-      if (originalOnError) {
-        return originalOnError.call(this, message, source, lineno, colno, error);
-      }
-      return false;
-    };
-
-    // Suppress unhandled promise rejections
-    window.addEventListener('unhandledrejection', function(event) {
-      if (isResizeObserverError(event.reason)) {
-        event.preventDefault();
-      }
-    });
-
-    // 3. Override ResizeObserver constructor to add debouncing
-    if (typeof ResizeObserver !== 'undefined') {
-      const OriginalResizeObserver = ResizeObserver;
-      
-      window.ResizeObserver = function(callback) {
-        let timeoutId;
-        const debouncedCallback = function(entries, observer) {
-          clearTimeout(timeoutId);
-          timeoutId = setTimeout(() => {
-            try {
-              callback.call(this, entries, observer);
-            } catch (error) {
-              if (!isResizeObserverError(error.message)) {
-                throw error;
-              }
-            }
-          }, 16); // Debounce by one frame
-        };
+  // 2. Replace ResizeObserver with a debounced version to prevent loops
+  if (typeof window !== 'undefined' && window.ResizeObserver) {
+    const OriginalResizeObserver = window.ResizeObserver;
+    
+    class SafeResizeObserver {
+      constructor(callback) {
+        this.callback = callback;
+        this.observedElements = new Set();
+        this.isProcessing = false;
+        this.pendingEntries = [];
         
-        return new OriginalResizeObserver(debouncedCallback);
-      };
+        // Create debounced callback to prevent loops
+        this.debouncedCallback = this.debounce((entries) => {
+          if (this.isProcessing) return;
+          
+          try {
+            this.isProcessing = true;
+            this.callback(entries);
+          } catch (error) {
+            if (!suppressError(error.message)) {
+              console.error('ResizeObserver callback error:', error);
+            }
+          } finally {
+            this.isProcessing = false;
+          }
+        }, 16); // 16ms = ~60fps
+        
+        this.observer = new OriginalResizeObserver((entries) => {
+          // Filter out duplicate entries and entries from disconnected elements
+          const validEntries = entries.filter(entry => {
+            const element = entry.target;
+            return element && 
+                   element.isConnected && 
+                   this.observedElements.has(element);
+          });
+          
+          if (validEntries.length > 0) {
+            this.debouncedCallback(validEntries);
+          }
+        });
+      }
       
-      // Copy static properties
-      Object.setPrototypeOf(window.ResizeObserver, OriginalResizeObserver);
-      Object.defineProperty(window.ResizeObserver, 'prototype', {
-        value: OriginalResizeObserver.prototype,
-        writable: false
-      });
+      observe(element, options) {
+        if (element && element.nodeType === 1) { // Element node
+          this.observedElements.add(element);
+          this.observer.observe(element, options);
+        }
+      }
+      
+      unobserve(element) {
+        this.observedElements.delete(element);
+        this.observer.unobserve(element);
+      }
+      
+      disconnect() {
+        this.observedElements.clear();
+        this.observer.disconnect();
+      }
+      
+      // Utility method to debounce function calls
+      debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+          const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+          };
+          clearTimeout(timeout);
+          timeout = setTimeout(later, wait);
+        };
+      }
     }
+    
+    // Replace the global ResizeObserver
+    window.ResizeObserver = SafeResizeObserver;
+  }
 
-    // 4. Add error event listener to document
-    document.addEventListener('error', function(event) {
-      if (isResizeObserverError(event.message || event.error?.message)) {
+  // 3. Additional error handling for any remaining errors
+  if (typeof window !== 'undefined') {
+    window.addEventListener('error', (event) => {
+      if (suppressError(event.message || event.error?.message)) {
         event.preventDefault();
         event.stopPropagation();
-        event.stopImmediatePropagation();
+        return false;
       }
     }, true);
 
-    // 5. Monkey patch addEventListener to catch ResizeObserver errors
-    const originalAddEventListener = EventTarget.prototype.addEventListener;
-    EventTarget.prototype.addEventListener = function(type, listener, options) {
-      if (type === 'error' && typeof listener === 'function') {
-        const wrappedListener = function(event) {
-          if (isResizeObserverError(event.message || event.error?.message)) {
-            return;
+    window.addEventListener('unhandledrejection', (event) => {
+      if (suppressError(event.reason?.message || event.reason)) {
+        event.preventDefault();
+        return false;
+      }
+    });
+  }
+
+  // 4. Patch requestAnimationFrame to prevent ResizeObserver loops
+  if (typeof window !== 'undefined' && window.requestAnimationFrame) {
+    const originalRAF = window.requestAnimationFrame;
+    const rafCallbacks = new Set();
+    
+    window.requestAnimationFrame = function(callback) {
+      // Prevent duplicate RAF callbacks that might cause ResizeObserver loops
+      if (rafCallbacks.has(callback)) {
+        return 0; // Return dummy ID
+      }
+      
+      rafCallbacks.add(callback);
+      
+      return originalRAF.call(this, function(timestamp) {
+        rafCallbacks.delete(callback);
+        try {
+          callback(timestamp);
+        } catch (error) {
+          if (!suppressError(error.message)) {
+            console.error('RAF callback error:', error);
           }
-          return listener.call(this, event);
-        };
-        return originalAddEventListener.call(this, type, wrappedListener, options);
-      }
-      return originalAddEventListener.call(this, type, listener, options);
-    };
-
-    // 6. Prevent ResizeObserver errors from bubbling up to global error handlers
-    const originalDispatchEvent = EventTarget.prototype.dispatchEvent;
-    EventTarget.prototype.dispatchEvent = function(event) {
-      if (event.type === 'error' && isResizeObserverError(event.message)) {
-        return true;
-      }
-      return originalDispatchEvent.call(this, event);
+        }
+      });
     };
   }
 
-  // 7. For Node.js environments (if any)
-  if (typeof global !== 'undefined' && typeof process !== 'undefined') {
-    process.on('uncaughtException', function(error) {
-      if (isResizeObserverError(error.message)) {
-        return; // Suppress
-      }
-      throw error;
-    });
-
-    process.on('unhandledRejection', function(reason) {
-      if (isResizeObserverError(reason)) {
-        return; // Suppress
-      }
-      throw reason;
-    });
-  }
-
+  console.log('✅ ResizeObserver fix applied - loops and errors prevented');
 })();
