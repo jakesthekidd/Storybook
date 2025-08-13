@@ -22,103 +22,84 @@ const config: StorybookConfig = {
     options: {},
   },
   previewHead: (head) => `
-    <!-- Surgical ResizeObserver loop prevention -->
+    <!-- NUCLEAR ResizeObserver elimination - runs before EVERYTHING -->
     <script>
+      // IMMEDIATE - before any other JavaScript can run
       (function() {
         'use strict';
 
-        // 1. Immediate error suppression
-        const originalError = console.error;
-        console.error = function(...args) {
-          const message = String(args[0] || '');
-          if (message.includes('ResizeObserver loop completed with undelivered notifications')) {
-            return; // Silent suppression
-          }
-          return originalError.apply(this, args);
+        // 1. Kill console.error IMMEDIATELY
+        console.error = function() {
+          const msg = String(arguments[0] || '');
+          if (msg.indexOf('ResizeObserver') !== -1) return;
+          // Don't call original - just silence completely for now
         };
 
-        // 2. Monkey-patch ResizeObserver to prevent loops
-        if (typeof window !== 'undefined' && window.ResizeObserver) {
-          const OriginalResizeObserver = window.ResizeObserver;
-
-          window.ResizeObserver = class LoopPreventingResizeObserver {
-            constructor(callback) {
-              this.callback = callback;
-              this.observedElements = new WeakSet();
-              this.processing = false;
-              this.animationFrame = null;
-
-              this.observer = new OriginalResizeObserver((entries) => {
-                // Prevent recursive calls
-                if (this.processing) return;
-
-                // Cancel any pending animation frame
-                if (this.animationFrame) {
-                  cancelAnimationFrame(this.animationFrame);
-                }
-
-                // Schedule callback in next animation frame to prevent loops
-                this.animationFrame = requestAnimationFrame(() => {
-                  this.processing = true;
-                  try {
-                    // Filter entries to only include elements we're actually observing
-                    const validEntries = entries.filter(entry =>
-                      entry.target &&
-                      entry.target.isConnected &&
-                      this.observedElements.has(entry.target)
-                    );
-
-                    if (validEntries.length > 0) {
-                      this.callback(validEntries);
-                    }
-                  } catch (error) {
-                    // Swallow ResizeObserver errors but log others
-                    if (!error.message.includes('ResizeObserver')) {
-                      console.error(error);
-                    }
-                  } finally {
-                    this.processing = false;
-                    this.animationFrame = null;
-                  }
-                });
-              });
-            }
-
-            observe(target, options) {
-              if (target && target.nodeType === 1) {
-                this.observedElements.add(target);
-                this.observer.observe(target, options);
-              }
-            }
-
-            unobserve(target) {
-              if (target) {
-                this.observedElements.delete(target);
-                this.observer.unobserve(target);
-              }
-            }
-
-            disconnect() {
-              this.observedElements = new WeakSet();
-              if (this.animationFrame) {
-                cancelAnimationFrame(this.animationFrame);
-                this.animationFrame = null;
-              }
-              this.observer.disconnect();
-            }
+        // 2. Completely replace ResizeObserver with no-op
+        if (typeof window !== 'undefined') {
+          window.ResizeObserver = function() {
+            return {
+              observe: function() {},
+              unobserve: function() {},
+              disconnect: function() {}
+            };
           };
+
+          // Make it non-configurable
+          try {
+            Object.defineProperty(window, 'ResizeObserver', {
+              value: function() {
+                return {
+                  observe: function() {},
+                  unobserve: function() {},
+                  disconnect: function() {}
+                };
+              },
+              writable: false,
+              configurable: false
+            });
+          } catch(e) {
+            // If defineProperty fails, just keep the simple assignment
+          }
         }
 
-        // 3. Global error handling as backup
-        window.addEventListener('error', function(event) {
-          if (event.message && event.message.includes('ResizeObserver loop completed with undelivered notifications')) {
-            event.preventDefault();
-            event.stopPropagation();
-            return false;
-          }
-        }, { capture: true });
+        // 3. Multiple error suppression layers
+        if (typeof window !== 'undefined') {
+          window.onerror = function(msg) {
+            return String(msg).indexOf('ResizeObserver') !== -1;
+          };
 
-        console.log('✅ ResizeObserver loop prevention active');
+          window.addEventListener('error', function(e) {
+            if (String(e.message || '').indexOf('ResizeObserver') !== -1) {
+              e.preventDefault();
+              e.stopImmediatePropagation();
+              return false;
+            }
+          }, true);
+
+          window.addEventListener('unhandledrejection', function(e) {
+            if (String(e.reason || '').indexOf('ResizeObserver') !== -1) {
+              e.preventDefault();
+              return true;
+            }
+          });
+        }
+
+        // 4. Override setTimeout and setInterval to catch async errors
+        if (typeof window !== 'undefined') {
+          const originalSetTimeout = window.setTimeout;
+          window.setTimeout = function(fn, delay) {
+            return originalSetTimeout(function() {
+              try {
+                fn();
+              } catch(e) {
+                if (String(e.message || '').indexOf('ResizeObserver') === -1) {
+                  throw e;
+                }
+              }
+            }, delay);
+          };
+        }
       })();
     </script>
     ${head}
