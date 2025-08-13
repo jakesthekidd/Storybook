@@ -152,13 +152,13 @@ const meta: Meta<TypographyArgs> = {
           <div class="guidelines-grid">
             <div class="guideline-card">
               <h3>🎯 Primary Font</h3>
-              <p><strong>Inter</strong> - Used for UI elements, body text, and most interface components</p>
-              <div class="code-example">font-family: 'Inter', system-ui, sans-serif;</div>
+              <p><strong>Roboto</strong> - Used for ALL UI elements, body text, headings, and interface components</p>
+              <div class="code-example">font-family: 'Roboto', system-ui, sans-serif;</div>
             </div>
             <div class="guideline-card">
               <h3>📱 System Fallbacks</h3>
-              <p><strong>System UI</strong> - Graceful fallback that uses the operating system's default font</p>
-              <div class="code-example">font-family: system-ui, -apple-system, BlinkMacSystemFont;</div>
+              <p><strong>System UI</strong> - Fallback when Roboto isn't available</p>
+              <div class="code-example">font-family: 'Roboto', system-ui, -apple-system, BlinkMacSystemFont;</div>
             </div>
             <div class="guideline-card">
               <h3>⚡ Performance</h3>
