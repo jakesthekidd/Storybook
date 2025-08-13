@@ -263,6 +263,12 @@ const meta: Meta<InputTextArgs> = {
           opacity: 1 !important;
         }
 
+        /* Hide placeholder for float label inputs - label acts as placeholder */
+        .palette-input.p-inputtext.float-label-input::placeholder {
+          color: transparent !important;
+          opacity: 0 !important;
+        }
+
         /* Disabled State */
         .palette-input.p-inputtext:disabled {
           background: var(--palette-surface-100, #F7F8F9) !important;
