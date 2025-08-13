@@ -30,7 +30,7 @@ const meta: Meta<TypographyArgs> = {
     }),
   ],
   args: {
-    fontFamily: 'Inter',
+    fontFamily: 'Roboto',
     fontSize: 16,
     fontWeight: '400',
     lineHeight: 1.5,
@@ -43,22 +43,9 @@ const meta: Meta<TypographyArgs> = {
     fontFamily: {
       control: 'select',
       options: [
-        'Inter',
-        'System UI',
-        'Helvetica',
-        'Arial',
-        'Georgia', 
-        'Times',
-        'Courier',
-        'Monaco',
-        'Roboto',
-        'Open Sans',
-        'Lato',
-        'Montserrat',
-        'Poppins',
-        'Source Sans Pro'
+        'Roboto'
       ],
-      description: 'Font family to display'
+      description: 'Font family - Roboto only'
     },
     fontSize: {
       control: { type: 'range', min: 8, max: 72, step: 1 },
