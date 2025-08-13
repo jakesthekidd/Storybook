@@ -1,23 +1,71 @@
 import type { Meta, StoryObj } from '@storybook/angular';
 import { moduleMetadata } from '@storybook/angular';
 import { InputTextModule } from 'primeng/inputtext';
+import { FloatLabelModule } from 'primeng/floatlabel';
 import { FormsModule } from '@angular/forms';
+import { colorPaletteManager } from '../../../theme/color-palette';
 
-const meta: Meta = {
+interface InputTextArgs {
+  value: string;
+  label: string;
+  placeholder: string;
+  disabled: boolean;
+  readonly: boolean;
+  required: boolean;
+  autofocus: boolean;
+  size: 'small' | 'large' | undefined;
+  variant: 'outlined' | 'filled';
+  invalid: boolean;
+  showFloatLabel: boolean;
+  type: 'text' | 'password' | 'email' | 'number' | 'tel' | 'url' | 'search';
+  maxlength: number | undefined;
+  minlength: number | undefined;
+  autocomplete: string;
+  spellcheck: boolean;
+}
+
+// Initialize color palette when this story loads
+if (typeof document !== 'undefined') {
+  colorPaletteManager.setThemeMode('light');
+}
+
+const meta: Meta<InputTextArgs> = {
   title: 'PrimeNG/InputText',
   decorators: [
     moduleMetadata({
-      imports: [InputTextModule, FormsModule],
+      imports: [InputTextModule, FloatLabelModule, FormsModule],
     }),
   ],
+  args: {
+    value: '',
+    label: 'Username',
+    placeholder: 'Enter your username',
+    disabled: false,
+    readonly: false,
+    required: false,
+    autofocus: false,
+    size: undefined,
+    variant: 'outlined',
+    invalid: false,
+    showFloatLabel: true,
+    type: 'text',
+    maxlength: undefined,
+    minlength: undefined,
+    autocomplete: 'off',
+    spellcheck: true
+  },
   argTypes: {
     value: {
       control: 'text',
-      description: 'Input value'
+      description: 'Current input value'
+    },
+    label: {
+      control: 'text',
+      description: 'Float label text'
     },
     placeholder: {
       control: 'text',
-      description: 'Placeholder text'
+      description: 'Placeholder text when no float label'
     },
     disabled: {
       control: 'boolean',
@@ -27,121 +75,435 @@ const meta: Meta = {
       control: 'boolean',
       description: 'Readonly state'
     },
+    required: {
+      control: 'boolean',
+      description: 'Required field'
+    },
+    autofocus: {
+      control: 'boolean',
+      description: 'Automatically focus on load'
+    },
     size: {
       control: 'select',
-      options: ['small', 'large'],
-      description: 'Size of the input'
+      options: [undefined, 'small', 'large'],
+      description: 'Input size'
     },
     variant: {
       control: 'select',
       options: ['outlined', 'filled'],
-      description: 'Variant of the input'
+      description: 'Input variant style'
+    },
+    invalid: {
+      control: 'boolean',
+      description: 'Invalid/error state'
+    },
+    showFloatLabel: {
+      control: 'boolean',
+      description: 'Show floating label'
+    },
+    type: {
+      control: 'select',
+      options: ['text', 'password', 'email', 'number', 'tel', 'url', 'search'],
+      description: 'Input type'
+    },
+    maxlength: {
+      control: 'number',
+      description: 'Maximum character length'
+    },
+    minlength: {
+      control: 'number',
+      description: 'Minimum character length'
+    },
+    autocomplete: {
+      control: 'text',
+      description: 'HTML autocomplete attribute'
+    },
+    spellcheck: {
+      control: 'boolean',
+      description: 'Enable spellcheck'
     }
   },
-  args: {
-    value: '',
-    placeholder: 'Enter text...',
-    disabled: false,
-    readonly: false,
-    size: undefined,
-    variant: 'outlined'
-  }
+  render: (args) => ({
+    template: `
+      <div class="input-demo-container">
+        <div class="input-wrapper">
+          ${args.showFloatLabel ? `
+            <p-floatlabel>
+              <input 
+                pInputText 
+                id="input-${args.type}"
+                [(ngModel)]="value"
+                [type]="type"
+                [disabled]="disabled"
+                [readonly]="readonly"
+                [required]="required"
+                [autofocus]="autofocus"
+                [maxlength]="maxlength || undefined"
+                [minlength]="minlength || undefined"
+                [autocomplete]="autocomplete"
+                [spellcheck]="spellcheck"
+                [class.p-inputtext-sm]="size === 'small'"
+                [class.p-inputtext-lg]="size === 'large'"
+                [class.p-invalid]="invalid"
+                [attr.data-variant]="variant"
+                class="palette-input" />
+              <label for="input-${args.type}">{{label}}${args.required ? ' *' : ''}}</label>
+            </p-floatlabel>
+          ` : `
+            <input 
+              pInputText 
+              [(ngModel)]="value"
+              [type]="type"
+              [placeholder]="placeholder"
+              [disabled]="disabled"
+              [readonly]="readonly"
+              [required]="required"
+              [autofocus]="autofocus"
+              [maxlength]="maxlength || undefined"
+              [minlength]="minlength || undefined"
+              [autocomplete]="autocomplete"
+              [spellcheck]="spellcheck"
+              [class.p-inputtext-sm]="size === 'small'"
+              [class.p-inputtext-lg]="size === 'large'"
+              [class.p-invalid]="invalid"
+              [attr.data-variant]="variant"
+              class="palette-input" />
+          `}
+        </div>
+        <div class="input-info">
+          <small>🎨 Using Color Palette Manager</small>
+          ${args.required ? '<small class="required-note">* Required field</small>' : ''}
+          ${args.invalid ? '<small class="error-note">⚠️ Invalid input</small>' : ''}
+        </div>
+      </div>
+    `,
+    props: args,
+    ngOnInit: () => {
+      // Initialize color palette when component loads
+      if (typeof document !== 'undefined') {
+        colorPaletteManager.setThemeMode('light');
+        console.log('✅ InputText: Initialized Color Palette Manager');
+      }
+    },
+    styles: [`
+      .input-demo-container {
+        padding: 2rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        background: var(--palette-surface-ground, #EFF2F4);
+        border-radius: 12px;
+        min-height: 120px;
+        font-family: 'Inter', system-ui, sans-serif;
+      }
+
+      .input-wrapper {
+        width: 100%;
+        max-width: 400px;
+      }
+
+      .input-info {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        opacity: 0.7;
+        font-size: 12px;
+        color: var(--palette-text-muted, #666);
+      }
+
+      .required-note {
+        color: var(--palette-danger, #DA1F2C) !important;
+        font-weight: 500;
+      }
+
+      .error-note {
+        color: var(--palette-danger, #DA1F2C) !important;
+        font-weight: 500;
+      }
+
+      /* PALETTE-DRIVEN INPUT STYLES */
+      
+      .palette-input.p-inputtext {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+        border: 2px solid var(--palette-surface-border, #E2E6EB) !important;
+        border-radius: 8px !important;
+        background: var(--palette-surface, #ffffff) !important;
+        color: var(--palette-text-primary, #3D3D3D) !important;
+        padding: 0.875rem 1rem !important;
+        font-size: 14px !important;
+        font-weight: 400 !important;
+        transition: all 0.2s ease !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+      }
+
+      /* Focus State */
+      .palette-input.p-inputtext:focus {
+        border-color: var(--palette-primary, #2474BB) !important;
+        box-shadow: 0 0 0 3px var(--palette-primary)20 !important;
+        outline: none !important;
+        background: var(--palette-surface, #ffffff) !important;
+      }
+
+      /* Hover State */
+      .palette-input.p-inputtext:hover:not(:disabled):not(:focus) {
+        border-color: var(--palette-primary, #2474BB) !important;
+      }
+
+      /* Placeholder */
+      .palette-input.p-inputtext::placeholder {
+        color: var(--palette-text-muted, #A9B3C2) !important;
+        opacity: 1 !important;
+      }
+
+      /* Disabled State */
+      .palette-input.p-inputtext:disabled {
+        background: var(--palette-surface-100, #F7F8F9) !important;
+        border-color: var(--palette-surface-300, #EFF2F4) !important;
+        color: var(--palette-surface-500, #C6CCD6) !important;
+        cursor: not-allowed !important;
+        opacity: 0.6 !important;
+      }
+
+      /* Readonly State */
+      .palette-input.p-inputtext:read-only {
+        background: var(--palette-surface-50, #FBFCFC) !important;
+        border-color: var(--palette-surface-300, #EFF2F4) !important;
+        cursor: default !important;
+      }
+
+      /* Invalid State */
+      .palette-input.p-inputtext.p-invalid {
+        border-color: var(--palette-danger, #DA1F2C) !important;
+        background: var(--palette-red-50, #FBE9EA) !important;
+      }
+
+      .palette-input.p-inputtext.p-invalid:focus {
+        border-color: var(--palette-danger, #DA1F2C) !important;
+        box-shadow: 0 0 0 3px var(--palette-danger)20 !important;
+      }
+
+      /* Size Variants */
+      .palette-input.p-inputtext.p-inputtext-sm {
+        padding: 0.625rem 0.75rem !important;
+        font-size: 13px !important;
+      }
+
+      .palette-input.p-inputtext.p-inputtext-lg {
+        padding: 1.125rem 1.25rem !important;
+        font-size: 16px !important;
+      }
+
+      /* Filled Variant */
+      .palette-input.p-inputtext[data-variant="filled"] {
+        background: var(--palette-surface-100, #F7F8F9) !important;
+        border: 2px solid transparent !important;
+      }
+
+      .palette-input.p-inputtext[data-variant="filled"]:focus {
+        background: var(--palette-surface, #ffffff) !important;
+        border-color: var(--palette-primary, #2474BB) !important;
+      }
+
+      .palette-input.p-inputtext[data-variant="filled"]:hover:not(:disabled):not(:focus) {
+        background: var(--palette-surface-50, #FBFCFC) !important;
+      }
+
+      /* FLOAT LABEL STYLES */
+      
+      p-floatlabel label {
+        font-family: 'Inter', system-ui, sans-serif !important;
+        color: var(--palette-text-muted, #A9B3C2) !important;
+        font-size: 14px !important;
+        font-weight: 500 !important;
+        transition: all 0.2s ease !important;
+        pointer-events: none !important;
+        transform-origin: top left !important;
+      }
+
+      /* Float label when focused or has value */
+      p-floatlabel label.p-float-label-active {
+        color: var(--palette-primary, #2474BB) !important;
+        font-size: 12px !important;
+        font-weight: 600 !important;
+        transform: translateY(-1.25rem) scale(0.85) !important;
+      }
+
+      /* Float label when input is focused */
+      p-floatlabel .palette-input.p-inputtext:focus + label {
+        color: var(--palette-primary, #2474BB) !important;
+      }
+
+      /* Float label for invalid state */
+      p-floatlabel .palette-input.p-inputtext.p-invalid + label,
+      p-floatlabel .palette-input.p-inputtext.p-invalid:focus + label {
+        color: var(--palette-danger, #DA1F2C) !important;
+      }
+
+      /* Required field asterisk */
+      p-floatlabel label:has-text("*") {
+        position: relative;
+      }
+
+      /* Custom styles for different input types */
+      .palette-input.p-inputtext[type="email"] {
+        text-transform: lowercase;
+      }
+
+      .palette-input.p-inputtext[type="number"] {
+        text-align: right;
+      }
+
+      .palette-input.p-inputtext[type="search"] {
+        border-radius: 20px !important;
+      }
+
+      .palette-input.p-inputtext[type="password"] {
+        font-family: text-security-disc !important;
+      }
+
+      /* Webkit autofill override */
+      .palette-input.p-inputtext:-webkit-autofill,
+      .palette-input.p-inputtext:-webkit-autofill:focus,
+      .palette-input.p-inputtext:-webkit-autofill:hover {
+        -webkit-box-shadow: 0 0 0 1000px var(--palette-surface, #ffffff) inset !important;
+        -webkit-text-fill-color: var(--palette-text-primary, #3D3D3D) !important;
+        border-color: var(--palette-primary, #2474BB) !important;
+      }
+    `]
+  }),
 };
 
 export default meta;
-type Story = StoryObj;
+type Story = StoryObj<InputTextArgs>;
 
-export const Default: Story = {
-  render: (args) => ({
-    props: args,
-    template: `
-      <input 
-        pInputText 
-        [(ngModel)]="value"
-        [placeholder]="placeholder"
-        [disabled]="disabled"
-        [readonly]="readonly"
-        [class]="'p-inputtext-' + size"
-        [attr.data-variant]="variant" />
-    `
-  })
+// Main Interactive Story with all controls
+export const Interactive: Story = {
+  args: {
+    value: '',
+    label: 'Username',
+    placeholder: 'Enter your username',
+    disabled: false,
+    readonly: false,
+    required: false,
+    autofocus: false,
+    size: undefined,
+    variant: 'outlined',
+    invalid: false,
+    showFloatLabel: true,
+    type: 'text',
+    maxlength: undefined,
+    minlength: undefined,
+    autocomplete: 'username',
+    spellcheck: false
+  }
+};
+
+// Quick Examples
+export const FloatLabel: Story = {
+  args: {
+    label: 'Email Address',
+    placeholder: 'Enter email',
+    type: 'email',
+    required: true,
+    autocomplete: 'email'
+  }
+};
+
+export const BasicInput: Story = {
+  args: {
+    showFloatLabel: false,
+    placeholder: 'Basic input without float label',
+    type: 'text'
+  }
+};
+
+export const Password: Story = {
+  args: {
+    label: 'Password',
+    type: 'password',
+    required: true,
+    autocomplete: 'current-password',
+    showFloatLabel: true
+  }
 };
 
 export const WithValue: Story = {
   args: {
-    value: 'Sample text input'
+    value: 'john@example.com',
+    label: 'Email',
+    type: 'email',
+    readonly: true
   }
 };
 
-export const WithPlaceholder: Story = {
+export const InvalidState: Story = {
   args: {
-    placeholder: 'Type something here...'
+    label: 'Email Address',
+    value: 'invalid-email',
+    type: 'email',
+    invalid: true,
+    required: true
   }
 };
 
 export const Disabled: Story = {
   args: {
-    value: 'Disabled input',
+    label: 'Username',
+    value: 'john_doe',
     disabled: true
   }
 };
 
-export const Readonly: Story = {
+export const SmallSize: Story = {
   args: {
-    value: 'Readonly input',
-    readonly: true
-  }
-};
-
-export const Small: Story = {
-  args: {
+    label: 'Search',
+    type: 'search',
     size: 'small',
-    placeholder: 'Small input'
+    placeholder: 'Search...'
   }
 };
 
-export const Large: Story = {
+export const LargeSize: Story = {
   args: {
+    label: 'Title',
     size: 'large',
-    placeholder: 'Large input'
+    maxlength: 100
   }
 };
 
-export const Filled: Story = {
+export const FilledVariant: Story = {
   args: {
+    label: 'Description',
     variant: 'filled',
-    placeholder: 'Filled variant'
+    maxlength: 500
   }
 };
 
-export const Invalid: Story = {
-  render: (args) => ({
-    props: args,
-    template: `
-      <input 
-        pInputText 
-        [(ngModel)]="value"
-        [placeholder]="placeholder"
-        class="ng-invalid ng-dirty" />
-    `
-  }),
+export const NumberInput: Story = {
   args: {
-    placeholder: 'Invalid input state'
+    label: 'Age',
+    type: 'number',
+    placeholder: '18',
+    minlength: 1,
+    maxlength: 3
   }
 };
 
-export const Focus: Story = {
-  render: (args) => ({
-    props: args,
-    template: `
-      <input 
-        pInputText 
-        [(ngModel)]="value"
-        [placeholder]="placeholder"
-        class="p-focus" />
-    `
-  }),
+export const PhoneInput: Story = {
   args: {
-    placeholder: 'Focused input state'
+    label: 'Phone Number',
+    type: 'tel',
+    placeholder: '+1 (555) 123-4567',
+    autocomplete: 'tel'
+  }
+};
+
+export const URLInput: Story = {
+  args: {
+    label: 'Website',
+    type: 'url',
+    placeholder: 'https://example.com',
+    autocomplete: 'url'
   }
 };
