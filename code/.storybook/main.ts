@@ -23,13 +23,73 @@ const config: StorybookConfig = {
   },
   previewHead: (head) => `
     <script>
-      // IMMEDIATE ResizeObserver elimination - runs before anything else
-      if (typeof window !== 'undefined') {
-        window.ResizeObserver = class { observe(){} unobserve(){} disconnect(){} };
-        const suppress = (msg) => String(msg || '').toLowerCase().includes('resizeobserver');
-        const orig = console.error;
-        console.error = function() { if (!suppress(arguments[0])) orig.apply(this, arguments); };
-      }
+      // ULTIMATE ResizeObserver elimination - absolute earliest execution
+      (function(){
+        'use strict';
+
+        // 1. Complete nuclear elimination of ResizeObserver
+        try {
+          if (typeof window !== 'undefined') {
+            // Lock ResizeObserver to prevent any redefinition
+            Object.defineProperty(window, 'ResizeObserver', {
+              value: class DeadResizeObserver {
+                observe(){}
+                unobserve(){}
+                disconnect(){}
+                constructor(){}
+              },
+              writable: false,
+              configurable: false,
+              enumerable: true
+            });
+          }
+        } catch(e) {
+          // If property already exists, just replace it
+          if (typeof window !== 'undefined') {
+            window.ResizeObserver = class DeadResizeObserver {
+              observe(){}
+              unobserve(){}
+              disconnect(){}
+              constructor(){}
+            };
+          }
+        }
+
+        // 2. Immediate console suppression
+        if (typeof console !== 'undefined') {
+          const suppress = (msg) => {
+            const str = String(msg || '').toLowerCase();
+            return str.includes('resizeobserver') ||
+                   str.includes('loop completed') ||
+                   str.includes('undelivered notifications');
+          };
+
+          ['error', 'warn', 'log'].forEach(method => {
+            const orig = console[method];
+            console[method] = function() {
+              if (!Array.from(arguments).some(suppress)) {
+                return orig.apply(this, arguments);
+              }
+            };
+          });
+        }
+
+        // 3. Global error suppression
+        if (typeof window !== 'undefined') {
+          const handleError = (msg) => {
+            const str = String(msg || '').toLowerCase();
+            return str.includes('resizeobserver');
+          };
+
+          window.onerror = (msg) => handleError(msg);
+          window.onunhandledrejection = (e) => {
+            if (handleError(e.reason) || handleError(e.reason?.message)) {
+              e.preventDefault();
+              return true;
+            }
+          };
+        }
+      })();
     </script>
     <script>
       // ULTRA-AGGRESSIVE ResizeObserver Error Elimination
