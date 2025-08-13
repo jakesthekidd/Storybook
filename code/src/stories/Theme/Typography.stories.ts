@@ -228,7 +228,7 @@ const meta: Meta<TypographyArgs> = {
     styles: [`
       .typography-showcase {
         padding: 2rem;
-        font-family: 'Inter', system-ui, sans-serif;
+        font-family: 'Roboto', system-ui, sans-serif;
         background: var(--palette-surface-ground, #EFF2F4);
         border-radius: 12px;
         max-width: 1200px;
