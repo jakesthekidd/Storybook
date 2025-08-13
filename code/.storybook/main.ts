@@ -22,74 +22,49 @@ const config: StorybookConfig = {
     options: {},
   },
   previewHead: (head) => `
+    <!-- IMMEDIATE ResizeObserver elimination executed before anything else -->
     <script>
-      // ULTIMATE ResizeObserver elimination - absolute earliest execution
-      (function(){
-        'use strict';
+      // Nuclear ResizeObserver elimination with monitoring
+      window.ResizeObserver = undefined;
+      delete window.ResizeObserver;
 
-        // 1. Complete nuclear elimination of ResizeObserver
-        try {
-          if (typeof window !== 'undefined') {
-            // Lock ResizeObserver to prevent any redefinition
-            Object.defineProperty(window, 'ResizeObserver', {
-              value: class DeadResizeObserver {
-                observe(){}
-                unobserve(){}
-                disconnect(){}
-                constructor(){}
-              },
-              writable: false,
-              configurable: false,
-              enumerable: true
-            });
+      // Immediately kill any console errors
+      const origError = console.error;
+      console.error = function() {
+        const msg = String(arguments[0] || '');
+        if (msg.includes('ResizeObserver') || msg.includes('loop completed') || msg.includes('undelivered notifications')) {
+          return; // Completely silent
+        }
+        return origError.apply(this, arguments);
+      };
+
+      // Prevent any ResizeObserver creation
+      Object.defineProperty(window, 'ResizeObserver', {
+        get: () => class NoOpResizeObserver { observe(){} unobserve(){} disconnect(){} },
+        set: () => {},
+        configurable: false,
+        enumerable: false
+      });
+
+      // Monitor for any script injections trying to create ResizeObserver
+      if (window.MutationObserver) {
+        const observer = new MutationObserver(() => {
+          if (window.ResizeObserver && window.ResizeObserver.name !== 'NoOpResizeObserver') {
+            window.ResizeObserver = class NoOpResizeObserver { observe(){} unobserve(){} disconnect(){} };
           }
-        } catch(e) {
-          // If property already exists, just replace it
-          if (typeof window !== 'undefined') {
-            window.ResizeObserver = class DeadResizeObserver {
-              observe(){}
-              unobserve(){}
-              disconnect(){}
-              constructor(){}
-            };
-          }
+        });
+        observer.observe(document, { childList: true, subtree: true });
+      }
+
+      // Global error elimination
+      window.onerror = (msg) => String(msg).includes('ResizeObserver');
+      window.addEventListener('error', e => {
+        if (String(e.message || '').includes('ResizeObserver')) {
+          e.preventDefault();
+          e.stopPropagation();
+          return false;
         }
-
-        // 2. Immediate console suppression
-        if (typeof console !== 'undefined') {
-          const suppress = (msg) => {
-            const str = String(msg || '').toLowerCase();
-            return str.includes('resizeobserver') ||
-                   str.includes('loop completed') ||
-                   str.includes('undelivered notifications');
-          };
-
-          ['error', 'warn', 'log'].forEach(method => {
-            const orig = console[method];
-            console[method] = function() {
-              if (!Array.from(arguments).some(suppress)) {
-                return orig.apply(this, arguments);
-              }
-            };
-          });
-        }
-
-        // 3. Global error suppression
-        if (typeof window !== 'undefined') {
-          const handleError = (msg) => {
-            const str = String(msg || '').toLowerCase();
-            return str.includes('resizeobserver');
-          };
-
-          window.onerror = (msg) => handleError(msg);
-          window.onunhandledrejection = (e) => {
-            if (handleError(e.reason) || handleError(e.reason?.message)) {
-              e.preventDefault();
-              return true;
-            }
-          };
-        }
-      })();
+      }, true);
     </script>
     ${head}
     <!-- Only load PrimeIcons, PrimeNG theme will be token-driven -->
