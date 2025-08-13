@@ -22,6 +22,11 @@ const config: StorybookConfig = {
     options: {},
   },
   previewHead: (head) => `
+    <!-- FIRST PRIORITY - Kill ResizeObserver before anything else -->
+    <script>
+      window.ResizeObserver = undefined;
+      console.error = function(){};
+    </script>
     <!-- NUCLEAR ResizeObserver elimination - runs before EVERYTHING -->
     <script>
       // IMMEDIATE - before any other JavaScript can run
