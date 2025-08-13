@@ -504,7 +504,7 @@ type Story = StoryObj<TypographyArgs>;
 // Main Interactive Story
 export const Interactive: Story = {
   args: {
-    fontFamily: 'Inter',
+    fontFamily: 'Roboto',
     fontSize: 24,
     fontWeight: '500',
     lineHeight: 1.4,
@@ -518,7 +518,7 @@ export const Interactive: Story = {
 // Typography Scale Examples
 export const TypographyScale: Story = {
   args: {
-    fontFamily: 'Inter',
+    fontFamily: 'Roboto',
     fontSize: 16,
     fontWeight: '400',
     lineHeight: 1.5,
@@ -529,24 +529,24 @@ export const TypographyScale: Story = {
   }
 };
 
-// Font Family Showcase
-export const FontFamilies: Story = {
+// Roboto Weight Showcase
+export const RobotoWeights: Story = {
   args: {
-    fontFamily: 'Inter',
+    fontFamily: 'Roboto',
     fontSize: 16,
     fontWeight: '400',
     lineHeight: 1.5,
     letterSpacing: 0,
     textColor: '#3D3D3D',
     showAllFonts: true,
-    sampleText: 'Exploring different font families'
+    sampleText: 'Exploring Roboto font weights'
   }
 };
 
 // Large Display Text
 export const DisplayText: Story = {
   args: {
-    fontFamily: 'Inter',
+    fontFamily: 'Roboto',
     fontSize: 48,
     fontWeight: '700',
     lineHeight: 1.2,
@@ -560,7 +560,7 @@ export const DisplayText: Story = {
 // Body Text Examples
 export const BodyText: Story = {
   args: {
-    fontFamily: 'Inter',
+    fontFamily: 'Roboto',
     fontSize: 16,
     fontWeight: '400',
     lineHeight: 1.6,
@@ -571,16 +571,16 @@ export const BodyText: Story = {
   }
 };
 
-// Monospace Code Text
-export const CodeText: Story = {
+// Roboto Light
+export const RobotoLight: Story = {
   args: {
-    fontFamily: 'Monaco',
-    fontSize: 14,
-    fontWeight: '400',
-    lineHeight: 1.4,
-    letterSpacing: 0,
+    fontFamily: 'Roboto',
+    fontSize: 18,
+    fontWeight: '300',
+    lineHeight: 1.5,
+    letterSpacing: 0.5,
     textColor: '#2474BB',
     showAllFonts: false,
-    sampleText: 'const example = "Hello World"; // Code example'
+    sampleText: 'Roboto Light for elegant, minimal text'
   }
 };
