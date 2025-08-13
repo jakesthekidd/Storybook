@@ -286,7 +286,7 @@ const meta: Meta<InputTextArgs> = {
 
         .palette-input.p-inputtext.p-invalid:focus {
           border-color: var(--palette-danger, #DA1F2C) !important;
-          box-shadow: 0 0 0 3px var(--palette-danger)20 !important;
+          box-shadow: 0 0 0 3px var(--palette-red-100, #F8D2D5) !important;
         }
 
         /* Size Variants */
