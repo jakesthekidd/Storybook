@@ -246,7 +246,7 @@ const meta: Meta<InputTextArgs> = {
         /* Focus State */
         .palette-input.p-inputtext:focus {
           border-color: var(--palette-primary, #2474BB) !important;
-          box-shadow: 0 0 0 3px var(--palette-primary)20 !important;
+          box-shadow: 0 0 0 3px var(--palette-blue-100, #D3E3F1) !important;
           outline: none !important;
           background: var(--palette-surface, #ffffff) !important;
         }
