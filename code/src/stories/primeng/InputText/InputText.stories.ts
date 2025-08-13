@@ -123,17 +123,44 @@ const meta: Meta<InputTextArgs> = {
       description: 'Enable spellcheck'
     }
   },
-  render: (args) => ({
-    template: `
-      <div class="input-demo-container">
-        <div class="input-wrapper">
-          ${args.showFloatLabel ? `
-            <p-floatlabel>
+  render: (args) => {
+    const requiredAsterisk = args.required ? ' *' : '';
+    const labelText = args.label + requiredAsterisk;
+    
+    return {
+      template: `
+        <div class="input-demo-container">
+          <div class="input-wrapper">
+            <div *ngIf="showFloatLabel; else noFloatLabel">
+              <p-floatlabel>
+                <input 
+                  pInputText 
+                  [id]="'input-' + type"
+                  [(ngModel)]="value"
+                  [type]="type"
+                  [disabled]="disabled"
+                  [readonly]="readonly"
+                  [required]="required"
+                  [autofocus]="autofocus"
+                  [maxlength]="maxlength || undefined"
+                  [minlength]="minlength || undefined"
+                  [autocomplete]="autocomplete"
+                  [spellcheck]="spellcheck"
+                  [class.p-inputtext-sm]="size === 'small'"
+                  [class.p-inputtext-lg]="size === 'large'"
+                  [class.p-invalid]="invalid"
+                  [attr.data-variant]="variant"
+                  class="palette-input" />
+                <label [for]="'input-' + type">{{labelText}}</label>
+              </p-floatlabel>
+            </div>
+            
+            <ng-template #noFloatLabel>
               <input 
                 pInputText 
-                id="input-${args.type}"
                 [(ngModel)]="value"
                 [type]="type"
+                [placeholder]="placeholder"
                 [disabled]="disabled"
                 [readonly]="readonly"
                 [required]="required"
@@ -147,231 +174,202 @@ const meta: Meta<InputTextArgs> = {
                 [class.p-invalid]="invalid"
                 [attr.data-variant]="variant"
                 class="palette-input" />
-              <label for="input-${args.type}">{{label}}${args.required ? ' *' : ''}}</label>
-            </p-floatlabel>
-          ` : `
-            <input 
-              pInputText 
-              [(ngModel)]="value"
-              [type]="type"
-              [placeholder]="placeholder"
-              [disabled]="disabled"
-              [readonly]="readonly"
-              [required]="required"
-              [autofocus]="autofocus"
-              [maxlength]="maxlength || undefined"
-              [minlength]="minlength || undefined"
-              [autocomplete]="autocomplete"
-              [spellcheck]="spellcheck"
-              [class.p-inputtext-sm]="size === 'small'"
-              [class.p-inputtext-lg]="size === 'large'"
-              [class.p-invalid]="invalid"
-              [attr.data-variant]="variant"
-              class="palette-input" />
-          `}
+            </ng-template>
+          </div>
+          <div class="input-info">
+            <small>🎨 Using Color Palette Manager</small>
+            <small *ngIf="required" class="required-note">* Required field</small>
+            <small *ngIf="invalid" class="error-note">⚠️ Invalid input</small>
+          </div>
         </div>
-        <div class="input-info">
-          <small>🎨 Using Color Palette Manager</small>
-          ${args.required ? '<small class="required-note">* Required field</small>' : ''}
-          ${args.invalid ? '<small class="error-note">⚠️ Invalid input</small>' : ''}
-        </div>
-      </div>
-    `,
-    props: args,
-    ngOnInit: () => {
-      // Initialize color palette when component loads
-      if (typeof document !== 'undefined') {
-        colorPaletteManager.setThemeMode('light');
-        console.log('✅ InputText: Initialized Color Palette Manager');
-      }
-    },
-    styles: [`
-      .input-demo-container {
-        padding: 2rem;
-        display: flex;
-        flex-direction: column;
-        gap: 1.5rem;
-        background: var(--palette-surface-ground, #EFF2F4);
-        border-radius: 12px;
-        min-height: 120px;
-        font-family: 'Inter', system-ui, sans-serif;
-      }
+      `,
+      props: { ...args, labelText },
+      ngOnInit: () => {
+        // Initialize color palette when component loads
+        if (typeof document !== 'undefined') {
+          colorPaletteManager.setThemeMode('light');
+          console.log('✅ InputText: Initialized Color Palette Manager');
+        }
+      },
+      styles: [`
+        .input-demo-container {
+          padding: 2rem;
+          display: flex;
+          flex-direction: column;
+          gap: 1.5rem;
+          background: var(--palette-surface-ground, #EFF2F4);
+          border-radius: 12px;
+          min-height: 120px;
+          font-family: 'Inter', system-ui, sans-serif;
+        }
 
-      .input-wrapper {
-        width: 100%;
-        max-width: 400px;
-      }
+        .input-wrapper {
+          width: 100%;
+          max-width: 400px;
+        }
 
-      .input-info {
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-        opacity: 0.7;
-        font-size: 12px;
-        color: var(--palette-text-muted, #666);
-      }
+        .input-info {
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
+          opacity: 0.7;
+          font-size: 12px;
+          color: var(--palette-text-muted, #666);
+        }
 
-      .required-note {
-        color: var(--palette-danger, #DA1F2C) !important;
-        font-weight: 500;
-      }
+        .required-note {
+          color: var(--palette-danger, #DA1F2C) !important;
+          font-weight: 500;
+        }
 
-      .error-note {
-        color: var(--palette-danger, #DA1F2C) !important;
-        font-weight: 500;
-      }
+        .error-note {
+          color: var(--palette-danger, #DA1F2C) !important;
+          font-weight: 500;
+        }
 
-      /* PALETTE-DRIVEN INPUT STYLES */
-      
-      .palette-input.p-inputtext {
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
-        border: 2px solid var(--palette-surface-border, #E2E6EB) !important;
-        border-radius: 8px !important;
-        background: var(--palette-surface, #ffffff) !important;
-        color: var(--palette-text-primary, #3D3D3D) !important;
-        padding: 0.875rem 1rem !important;
-        font-size: 14px !important;
-        font-weight: 400 !important;
-        transition: all 0.2s ease !important;
-        width: 100% !important;
-        box-sizing: border-box !important;
-      }
+        /* PALETTE-DRIVEN INPUT STYLES */
+        
+        .palette-input.p-inputtext {
+          font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+          border: 2px solid var(--palette-surface-border, #E2E6EB) !important;
+          border-radius: 8px !important;
+          background: var(--palette-surface, #ffffff) !important;
+          color: var(--palette-text-primary, #3D3D3D) !important;
+          padding: 0.875rem 1rem !important;
+          font-size: 14px !important;
+          font-weight: 400 !important;
+          transition: all 0.2s ease !important;
+          width: 100% !important;
+          box-sizing: border-box !important;
+        }
 
-      /* Focus State */
-      .palette-input.p-inputtext:focus {
-        border-color: var(--palette-primary, #2474BB) !important;
-        box-shadow: 0 0 0 3px var(--palette-primary)20 !important;
-        outline: none !important;
-        background: var(--palette-surface, #ffffff) !important;
-      }
+        /* Focus State */
+        .palette-input.p-inputtext:focus {
+          border-color: var(--palette-primary, #2474BB) !important;
+          box-shadow: 0 0 0 3px var(--palette-primary)20 !important;
+          outline: none !important;
+          background: var(--palette-surface, #ffffff) !important;
+        }
 
-      /* Hover State */
-      .palette-input.p-inputtext:hover:not(:disabled):not(:focus) {
-        border-color: var(--palette-primary, #2474BB) !important;
-      }
+        /* Hover State */
+        .palette-input.p-inputtext:hover:not(:disabled):not(:focus) {
+          border-color: var(--palette-primary, #2474BB) !important;
+        }
 
-      /* Placeholder */
-      .palette-input.p-inputtext::placeholder {
-        color: var(--palette-text-muted, #A9B3C2) !important;
-        opacity: 1 !important;
-      }
+        /* Placeholder */
+        .palette-input.p-inputtext::placeholder {
+          color: var(--palette-text-muted, #A9B3C2) !important;
+          opacity: 1 !important;
+        }
 
-      /* Disabled State */
-      .palette-input.p-inputtext:disabled {
-        background: var(--palette-surface-100, #F7F8F9) !important;
-        border-color: var(--palette-surface-300, #EFF2F4) !important;
-        color: var(--palette-surface-500, #C6CCD6) !important;
-        cursor: not-allowed !important;
-        opacity: 0.6 !important;
-      }
+        /* Disabled State */
+        .palette-input.p-inputtext:disabled {
+          background: var(--palette-surface-100, #F7F8F9) !important;
+          border-color: var(--palette-surface-300, #EFF2F4) !important;
+          color: var(--palette-surface-500, #C6CCD6) !important;
+          cursor: not-allowed !important;
+          opacity: 0.6 !important;
+        }
 
-      /* Readonly State */
-      .palette-input.p-inputtext:read-only {
-        background: var(--palette-surface-50, #FBFCFC) !important;
-        border-color: var(--palette-surface-300, #EFF2F4) !important;
-        cursor: default !important;
-      }
+        /* Readonly State */
+        .palette-input.p-inputtext:read-only {
+          background: var(--palette-surface-50, #FBFCFC) !important;
+          border-color: var(--palette-surface-300, #EFF2F4) !important;
+          cursor: default !important;
+        }
 
-      /* Invalid State */
-      .palette-input.p-inputtext.p-invalid {
-        border-color: var(--palette-danger, #DA1F2C) !important;
-        background: var(--palette-red-50, #FBE9EA) !important;
-      }
+        /* Invalid State */
+        .palette-input.p-inputtext.p-invalid {
+          border-color: var(--palette-danger, #DA1F2C) !important;
+          background: var(--palette-red-50, #FBE9EA) !important;
+        }
 
-      .palette-input.p-inputtext.p-invalid:focus {
-        border-color: var(--palette-danger, #DA1F2C) !important;
-        box-shadow: 0 0 0 3px var(--palette-danger)20 !important;
-      }
+        .palette-input.p-inputtext.p-invalid:focus {
+          border-color: var(--palette-danger, #DA1F2C) !important;
+          box-shadow: 0 0 0 3px var(--palette-danger)20 !important;
+        }
 
-      /* Size Variants */
-      .palette-input.p-inputtext.p-inputtext-sm {
-        padding: 0.625rem 0.75rem !important;
-        font-size: 13px !important;
-      }
+        /* Size Variants */
+        .palette-input.p-inputtext.p-inputtext-sm {
+          padding: 0.625rem 0.75rem !important;
+          font-size: 13px !important;
+        }
 
-      .palette-input.p-inputtext.p-inputtext-lg {
-        padding: 1.125rem 1.25rem !important;
-        font-size: 16px !important;
-      }
+        .palette-input.p-inputtext.p-inputtext-lg {
+          padding: 1.125rem 1.25rem !important;
+          font-size: 16px !important;
+        }
 
-      /* Filled Variant */
-      .palette-input.p-inputtext[data-variant="filled"] {
-        background: var(--palette-surface-100, #F7F8F9) !important;
-        border: 2px solid transparent !important;
-      }
+        /* Filled Variant */
+        .palette-input.p-inputtext[data-variant="filled"] {
+          background: var(--palette-surface-100, #F7F8F9) !important;
+          border: 2px solid transparent !important;
+        }
 
-      .palette-input.p-inputtext[data-variant="filled"]:focus {
-        background: var(--palette-surface, #ffffff) !important;
-        border-color: var(--palette-primary, #2474BB) !important;
-      }
+        .palette-input.p-inputtext[data-variant="filled"]:focus {
+          background: var(--palette-surface, #ffffff) !important;
+          border-color: var(--palette-primary, #2474BB) !important;
+        }
 
-      .palette-input.p-inputtext[data-variant="filled"]:hover:not(:disabled):not(:focus) {
-        background: var(--palette-surface-50, #FBFCFC) !important;
-      }
+        .palette-input.p-inputtext[data-variant="filled"]:hover:not(:disabled):not(:focus) {
+          background: var(--palette-surface-50, #FBFCFC) !important;
+        }
 
-      /* FLOAT LABEL STYLES */
-      
-      p-floatlabel label {
-        font-family: 'Inter', system-ui, sans-serif !important;
-        color: var(--palette-text-muted, #A9B3C2) !important;
-        font-size: 14px !important;
-        font-weight: 500 !important;
-        transition: all 0.2s ease !important;
-        pointer-events: none !important;
-        transform-origin: top left !important;
-      }
+        /* FLOAT LABEL STYLES */
+        
+        p-floatlabel label {
+          font-family: 'Inter', system-ui, sans-serif !important;
+          color: var(--palette-text-muted, #A9B3C2) !important;
+          font-size: 14px !important;
+          font-weight: 500 !important;
+          transition: all 0.2s ease !important;
+          pointer-events: none !important;
+          transform-origin: top left !important;
+        }
 
-      /* Float label when focused or has value */
-      p-floatlabel label.p-float-label-active {
-        color: var(--palette-primary, #2474BB) !important;
-        font-size: 12px !important;
-        font-weight: 600 !important;
-        transform: translateY(-1.25rem) scale(0.85) !important;
-      }
+        /* Float label when focused or has value */
+        p-floatlabel label.p-float-label-active {
+          color: var(--palette-primary, #2474BB) !important;
+          font-size: 12px !important;
+          font-weight: 600 !important;
+          transform: translateY(-1.25rem) scale(0.85) !important;
+        }
 
-      /* Float label when input is focused */
-      p-floatlabel .palette-input.p-inputtext:focus + label {
-        color: var(--palette-primary, #2474BB) !important;
-      }
+        /* Float label when input is focused */
+        p-floatlabel .palette-input.p-inputtext:focus + label {
+          color: var(--palette-primary, #2474BB) !important;
+        }
 
-      /* Float label for invalid state */
-      p-floatlabel .palette-input.p-inputtext.p-invalid + label,
-      p-floatlabel .palette-input.p-inputtext.p-invalid:focus + label {
-        color: var(--palette-danger, #DA1F2C) !important;
-      }
+        /* Float label for invalid state */
+        p-floatlabel .palette-input.p-inputtext.p-invalid + label,
+        p-floatlabel .palette-input.p-inputtext.p-invalid:focus + label {
+          color: var(--palette-danger, #DA1F2C) !important;
+        }
 
-      /* Required field asterisk */
-      p-floatlabel label:has-text("*") {
-        position: relative;
-      }
+        /* Custom styles for different input types */
+        .palette-input.p-inputtext[type="email"] {
+          text-transform: lowercase;
+        }
 
-      /* Custom styles for different input types */
-      .palette-input.p-inputtext[type="email"] {
-        text-transform: lowercase;
-      }
+        .palette-input.p-inputtext[type="number"] {
+          text-align: right;
+        }
 
-      .palette-input.p-inputtext[type="number"] {
-        text-align: right;
-      }
+        .palette-input.p-inputtext[type="search"] {
+          border-radius: 20px !important;
+        }
 
-      .palette-input.p-inputtext[type="search"] {
-        border-radius: 20px !important;
-      }
-
-      .palette-input.p-inputtext[type="password"] {
-        font-family: text-security-disc !important;
-      }
-
-      /* Webkit autofill override */
-      .palette-input.p-inputtext:-webkit-autofill,
-      .palette-input.p-inputtext:-webkit-autofill:focus,
-      .palette-input.p-inputtext:-webkit-autofill:hover {
-        -webkit-box-shadow: 0 0 0 1000px var(--palette-surface, #ffffff) inset !important;
-        -webkit-text-fill-color: var(--palette-text-primary, #3D3D3D) !important;
-        border-color: var(--palette-primary, #2474BB) !important;
-      }
-    `]
-  }),
+        /* Webkit autofill override */
+        .palette-input.p-inputtext:-webkit-autofill,
+        .palette-input.p-inputtext:-webkit-autofill:focus,
+        .palette-input.p-inputtext:-webkit-autofill:hover {
+          -webkit-box-shadow: 0 0 0 1000px var(--palette-surface, #ffffff) inset !important;
+          -webkit-text-fill-color: var(--palette-text-primary, #3D3D3D) !important;
+          border-color: var(--palette-primary, #2474BB) !important;
+        }
+      `]
+    };
+  },
 };
 
 export default meta;
