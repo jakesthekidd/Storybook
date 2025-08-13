@@ -326,27 +326,28 @@ const meta: Meta<InputTextArgs> = {
           font-family: 'Inter', system-ui, sans-serif !important;
           color: var(--palette-text-muted, #A9B3C2) !important;
           font-size: 14px !important;
-          font-weight: 500 !important;
-          transition: all 0.2s ease !important;
+          font-weight: 400 !important;
+          transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
           pointer-events: none !important;
           transform-origin: top left !important;
           position: absolute !important;
           left: 1rem !important;
           top: 50% !important;
           transform: translateY(-50%) !important;
-          background: var(--palette-surface, #ffffff) !important;
-          padding: 0 0.25rem !important;
+          background: transparent !important;
+          padding: 0 !important;
           z-index: 1 !important;
+          user-select: none !important;
         }
 
-        /* Float label when focused or has value (on-label state) */
+        /* Float label when focused or has value (animated to floating position) */
         p-floatlabel label.p-float-label-active,
         p-floatlabel .palette-input.p-inputtext:focus + label,
         p-floatlabel .palette-input.p-inputtext:not(:placeholder-shown) + label {
           color: var(--palette-primary, #2474BB) !important;
           font-size: 12px !important;
           font-weight: 600 !important;
-          transform: translateY(-1.75rem) translateX(-0.25rem) scale(0.85) !important;
+          transform: translateY(-2.25rem) translateX(-0.25rem) scale(0.85) !important;
           background: var(--palette-surface, #ffffff) !important;
           padding: 0 0.5rem !important;
         }
