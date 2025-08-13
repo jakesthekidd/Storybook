@@ -177,41 +177,29 @@ const meta: Meta<TypographyArgs> = {
     props: {
       ...args,
       fontFamilies: [
-        { 
-          name: 'Inter', 
-          family: "'Inter', system-ui, sans-serif", 
-          category: 'Sans Serif',
-          weights: ['300', '400', '500', '600', '700']
+        {
+          name: 'Roboto',
+          family: "'Roboto', system-ui, sans-serif",
+          category: 'Primary Font',
+          weights: ['100', '300', '400', '500', '700', '900']
         },
-        { 
-          name: 'System UI', 
-          family: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", 
-          category: 'System',
-          weights: ['400', '500', '600', '700']
+        {
+          name: 'Roboto Thin',
+          family: "'Roboto', system-ui, sans-serif",
+          category: 'Light Weight',
+          weights: ['100', '300']
         },
-        { 
-          name: 'Helvetica', 
-          family: "'Helvetica Neue', Helvetica, Arial, sans-serif", 
-          category: 'Sans Serif',
-          weights: ['300', '400', '500', '700']
+        {
+          name: 'Roboto Regular',
+          family: "'Roboto', system-ui, sans-serif",
+          category: 'Standard',
+          weights: ['400', '500']
         },
-        { 
-          name: 'Georgia', 
-          family: "Georgia, 'Times New Roman', serif", 
-          category: 'Serif',
-          weights: ['400', '700']
-        },
-        { 
-          name: 'Monaco', 
-          family: "Monaco, 'Courier New', monospace", 
-          category: 'Monospace',
-          weights: ['400']
-        },
-        { 
-          name: 'Roboto', 
-          family: "'Roboto', sans-serif", 
-          category: 'Sans Serif',
-          weights: ['300', '400', '500', '700', '900']
+        {
+          name: 'Roboto Bold',
+          family: "'Roboto', system-ui, sans-serif",
+          category: 'Heavy Weight',
+          weights: ['700', '900']
         }
       ],
       typographyScale: [
