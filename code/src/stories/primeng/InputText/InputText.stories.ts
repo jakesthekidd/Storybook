@@ -316,7 +316,12 @@ const meta: Meta<InputTextArgs> = {
         }
 
         /* FLOAT LABEL STYLES */
-        
+
+        p-floatlabel {
+          position: relative !important;
+          display: block !important;
+        }
+
         p-floatlabel label {
           font-family: 'Inter', system-ui, sans-serif !important;
           color: var(--palette-text-muted, #A9B3C2) !important;
@@ -325,14 +330,25 @@ const meta: Meta<InputTextArgs> = {
           transition: all 0.2s ease !important;
           pointer-events: none !important;
           transform-origin: top left !important;
+          position: absolute !important;
+          left: 1rem !important;
+          top: 50% !important;
+          transform: translateY(-50%) !important;
+          background: var(--palette-surface, #ffffff) !important;
+          padding: 0 0.25rem !important;
+          z-index: 1 !important;
         }
 
-        /* Float label when focused or has value */
-        p-floatlabel label.p-float-label-active {
+        /* Float label when focused or has value (on-label state) */
+        p-floatlabel label.p-float-label-active,
+        p-floatlabel .palette-input.p-inputtext:focus + label,
+        p-floatlabel .palette-input.p-inputtext:not(:placeholder-shown) + label {
           color: var(--palette-primary, #2474BB) !important;
           font-size: 12px !important;
           font-weight: 600 !important;
-          transform: translateY(-1.25rem) scale(0.85) !important;
+          transform: translateY(-1.75rem) translateX(-0.25rem) scale(0.85) !important;
+          background: var(--palette-surface, #ffffff) !important;
+          padding: 0 0.5rem !important;
         }
 
         /* Float label when input is focused */
