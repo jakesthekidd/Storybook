@@ -21,24 +21,7 @@ const config: StorybookConfig = {
     options: {},
   },
   previewHead: (head) => `
-    <script>
-      // IMMEDIATE ResizeObserver error suppression - Before everything
-      const originalError = console.error;
-      console.error = function(message) {
-        if (String(message).includes('ResizeObserver loop completed with undelivered notifications')) {
-          return; // Silent suppression of exact error
-        }
-        return originalError.apply(this, arguments);
-      };
-
-      // Immediate window error suppression
-      window.onerror = function(msg) {
-        if (String(msg).includes('ResizeObserver loop completed with undelivered notifications')) {
-          return true;
-        }
-        return false;
-      };
-    </script>
+    <script src="./resize-observer-fix.js"></script>
     ${head}
     <!-- Only load PrimeIcons, PrimeNG theme will be token-driven -->
     <link rel="stylesheet" href="https://unpkg.com/primeicons@7.0.0/primeicons.css">
