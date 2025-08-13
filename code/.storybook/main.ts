@@ -23,6 +23,15 @@ const config: StorybookConfig = {
   },
   previewHead: (head) => `
     <script>
+      // IMMEDIATE ResizeObserver elimination - runs before anything else
+      if (typeof window !== 'undefined') {
+        window.ResizeObserver = class { observe(){} unobserve(){} disconnect(){} };
+        const suppress = (msg) => String(msg || '').toLowerCase().includes('resizeobserver');
+        const orig = console.error;
+        console.error = function() { if (!suppress(arguments[0])) orig.apply(this, arguments); };
+      }
+    </script>
+    <script>
       // ULTRA-AGGRESSIVE ResizeObserver Error Elimination
       (function() {
         'use strict';
