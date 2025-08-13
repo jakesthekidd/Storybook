@@ -5,16 +5,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { loadTokens, type ThemeMode } from '../src/theme/loadTokens';
 import { enterpriseDesignSystem } from '../src/theme/enterprise-design-system';
 
-// BACKUP ResizeObserver elimination at preview level
-if (typeof window !== 'undefined') {
-  window.ResizeObserver = class SilentResizeObserver { observe(){} unobserve(){} disconnect(){} };
-  const origError = console.error;
-  console.error = function() {
-    if (String(arguments[0] || '').includes('ResizeObserver')) return;
-    return origError.apply(this, arguments);
-  };
-}
-
 // Store current tokens globally for access across stories
 let currentTokens: any = null;
 let currentCSSVars: Record<string, string> = {};
