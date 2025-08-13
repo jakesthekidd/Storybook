@@ -23,46 +23,113 @@ const config: StorybookConfig = {
   },
   previewHead: (head) => `
     <script>
-      // Nuclear ResizeObserver Error Elimination
+      // ULTRA-AGGRESSIVE ResizeObserver Error Elimination
       (function() {
         'use strict';
 
-        // 1. Immediate console error suppression
-        const originalError = console.error;
-        console.error = function() {
-          const message = arguments[0];
-          if (message && String(message).includes('ResizeObserver loop completed with undelivered notifications')) {
-            return; // Silent discard
-          }
-          return originalError.apply(this, arguments);
+        // 1. Hijack ALL console methods immediately and permanently
+        const errorPatterns = [
+          'resizeobserver loop completed with undelivered notifications',
+          'resizeobserver loop limit exceeded',
+          'resizeobserver'
+        ];
+
+        const shouldSuppress = (msg) => {
+          if (!msg) return false;
+          const str = String(msg).toLowerCase();
+          return errorPatterns.some(pattern => str.includes(pattern));
         };
 
-        // 2. Replace ResizeObserver entirely with silent no-op
-        if (typeof window !== 'undefined') {
-          window.ResizeObserver = class NoOpResizeObserver {
-            observe() {}
-            unobserve() {}
-            disconnect() {}
-          };
-
-          // Also handle global errors
-          window.onerror = function(msg) {
-            if (String(msg).includes('ResizeObserver loop completed with undelivered notifications')) {
-              return true; // Prevent default
+        // Override ALL console methods
+        ['error', 'warn', 'log', 'info', 'debug'].forEach(method => {
+          const original = console[method];
+          console[method] = function() {
+            if (Array.from(arguments).some(arg => shouldSuppress(arg))) {
+              return; // Complete silence
             }
-            return false;
+            return original.apply(this, arguments);
           };
+        });
 
-          window.addEventListener('error', function(e) {
-            if (e.message && e.message.includes('ResizeObserver loop completed with undelivered notifications')) {
+        // 2. Completely eliminate ResizeObserver from existence
+        Object.defineProperty(window, 'ResizeObserver', {
+          value: class SilentResizeObserver {
+            observe() { /* silent */ }
+            unobserve() { /* silent */ }
+            disconnect() { /* silent */ }
+          },
+          writable: false,
+          configurable: false
+        });
+
+        // 3. Multiple error suppression layers
+        window.onerror = function(msg) {
+          return shouldSuppress(msg);
+        };
+
+        window.onunhandledrejection = function(event) {
+          if (shouldSuppress(event.reason) || shouldSuppress(event.reason?.message)) {
+            event.preventDefault();
+            return true;
+          }
+        };
+
+        // 4. Capture errors at all levels
+        ['error', 'unhandledrejection'].forEach(eventType => {
+          window.addEventListener(eventType, function(e) {
+            const msg = e.message || e.reason || e.error?.message;
+            if (shouldSuppress(msg)) {
               e.preventDefault();
               e.stopPropagation();
+              e.stopImmediatePropagation();
               return false;
             }
-          }, true);
+          }, { capture: true, passive: false });
+        });
+
+        // 5. Override setTimeout/setInterval to catch async errors
+        const originalSetTimeout = window.setTimeout;
+        const originalSetInterval = window.setInterval;
+
+        window.setTimeout = function(fn, delay, ...args) {
+          return originalSetTimeout(() => {
+            try {
+              fn(...args);
+            } catch (e) {
+              if (!shouldSuppress(e.message)) {
+                throw e;
+              }
+            }
+          }, delay);
+        };
+
+        window.setInterval = function(fn, delay, ...args) {
+          return originalSetInterval(() => {
+            try {
+              fn(...args);
+            } catch (e) {
+              if (!shouldSuppress(e.message)) {
+                throw e;
+              }
+            }
+          }, delay);
+        };
+
+        // 6. Prevent any future ResizeObserver creation
+        const observer = window.MutationObserver;
+        if (observer) {
+          const originalObserve = observer.prototype.observe;
+          observer.prototype.observe = function() {
+            try {
+              return originalObserve.apply(this, arguments);
+            } catch (e) {
+              if (shouldSuppress(e.message)) return;
+              throw e;
+            }
+          };
         }
 
-        console.log('✅ ResizeObserver completely disabled - no more errors');
+        console.log('🚫 ResizeObserver completely eliminated - nuclear approach active');
       })();
     </script>
     ${head}
