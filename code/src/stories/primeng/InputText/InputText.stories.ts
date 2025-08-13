@@ -348,20 +348,27 @@ const meta: Meta<InputTextArgs> = {
         }
 
         /* Float label when focused or has value (animated to floating position) */
-        p-floatlabel label.p-float-label-active,
         p-floatlabel .palette-input.p-inputtext:focus + label,
-        p-floatlabel .palette-input.p-inputtext:not(:placeholder-shown) + label {
+        p-floatlabel .palette-input.p-inputtext:not(:placeholder-shown) + label,
+        p-floatlabel .palette-input.p-inputtext:valid:not(:placeholder-shown) + label,
+        p-floatlabel label.p-float-label-active {
           color: var(--palette-primary, #2474BB) !important;
           font-size: 12px !important;
           font-weight: 600 !important;
           transform: translateY(-2.25rem) translateX(-0.25rem) scale(0.85) !important;
           background: var(--palette-surface, #ffffff) !important;
           padding: 0 0.5rem !important;
+          border-radius: 2px !important;
         }
 
-        /* Float label when input is focused */
+        /* Float label focus state color */
         p-floatlabel .palette-input.p-inputtext:focus + label {
           color: var(--palette-primary, #2474BB) !important;
+        }
+
+        /* Float label hover state */
+        p-floatlabel:hover label:not(.p-float-label-active) {
+          color: var(--palette-text-primary, #3D3D3D) !important;
         }
 
         /* Float label for invalid state */
