@@ -133,11 +133,12 @@ const meta: Meta<InputTextArgs> = {
           <div class="input-wrapper">
             <div *ngIf="showFloatLabel; else noFloatLabel">
               <p-floatlabel>
-                <input 
-                  pInputText 
+                <input
+                  pInputText
                   [id]="'input-' + type"
                   [(ngModel)]="value"
                   [type]="type"
+                  [placeholder]="' '"
                   [disabled]="disabled"
                   [readonly]="readonly"
                   [required]="required"
@@ -150,7 +151,7 @@ const meta: Meta<InputTextArgs> = {
                   [class.p-inputtext-lg]="size === 'large'"
                   [class.p-invalid]="invalid"
                   [attr.data-variant]="variant"
-                  class="palette-input" />
+                  class="palette-input float-label-input" />
                 <label [for]="'input-' + type">{{labelText}}</label>
               </p-floatlabel>
             </div>
