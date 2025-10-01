@@ -22,67 +22,7 @@ const config: StorybookConfig = {
     options: {},
   },
   previewHead: (head) => `
-    <script>
-      // IMMEDIATE ResizeObserver suppression - runs first
-      (function() {
-        'use strict';
-
-        // Store original console.error
-        const originalError = console.error;
-
-        // Override console.error immediately
-        console.error = function() {
-          const message = String(arguments[0] || '');
-
-          // Exact matches for the ResizeObserver error
-          if (message === 'ResizeObserver loop completed with undelivered notifications.' ||
-              message === 'ResizeObserver loop completed with undelivered notifications' ||
-              message.indexOf('ResizeObserver loop completed') !== -1 ||
-              message.indexOf('ResizeObserver') !== -1) {
-            return; // Completely silent
-          }
-
-          // Call original for all other errors
-          return originalError.apply(this, arguments);
-        };
-
-        // Also override warn just in case
-        const originalWarn = console.warn;
-        console.warn = function() {
-          const message = String(arguments[0] || '');
-          if (message.indexOf('ResizeObserver') !== -1) {
-            return; // Silent
-          }
-          return originalWarn.apply(this, arguments);
-        };
-
-        // Catch any global errors
-        window.addEventListener('error', function(e) {
-          if (e.message && e.message.indexOf('ResizeObserver') !== -1) {
-            e.preventDefault();
-            e.stopImmediatePropagation();
-            return false;
-          }
-        }, true);
-
-        // Handle promises
-        window.addEventListener('unhandledrejection', function(e) {
-          if (e.reason && String(e.reason).indexOf('ResizeObserver') !== -1) {
-            e.preventDefault();
-            return true;
-          }
-        });
-
-        // Nuclear option - override window.onerror completely
-        window.onerror = function(msg) {
-          if (String(msg).indexOf('ResizeObserver') !== -1) {
-            return true;
-          }
-          return false;
-        };
-
-      })();
-    </script>
+    <script src="/resize-observer-fix.js"></script>
     ${head}
     <!-- Only load PrimeIcons, PrimeNG theme will be token-driven -->
     <link rel="stylesheet" href="https://unpkg.com/primeicons@7.0.0/primeicons.css">
