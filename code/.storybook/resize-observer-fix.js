@@ -98,6 +98,9 @@
     return;
   }
 
+  const raf = typeof requestAnimationFrame === 'function' ? requestAnimationFrame : (cb) => setTimeout(cb, 16);
+  const caf = typeof cancelAnimationFrame === 'function' ? cancelAnimationFrame : clearTimeout;
+
   const NativeResizeObserver = window.ResizeObserver;
 
   class PatchedResizeObserver {
@@ -118,7 +121,7 @@
           return;
         }
 
-        this.__frameId = requestAnimationFrame(() => {
+        this.__frameId = raf(() => {
           this.__frameId = 0;
           const delivery = this.__scheduledEntries;
           this.__scheduledEntries = [];
@@ -144,7 +147,7 @@
 
     disconnect() {
       if (this.__frameId) {
-        cancelAnimationFrame(this.__frameId);
+        caf(this.__frameId);
         this.__frameId = 0;
       }
       return this.__observer.disconnect();
