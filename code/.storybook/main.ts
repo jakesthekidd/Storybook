@@ -27,6 +27,10 @@ const config: StorybookConfig = {
     <!-- Only load PrimeIcons, PrimeNG theme will be token-driven -->
     <link rel="stylesheet" href="https://unpkg.com/primeicons@7.0.0/primeicons.css">
   `,
+  managerHead: (head) => `
+    <script src="/resize-observer-fix.js"></script>
+    ${head}
+  `,
   webpackFinal: async (config) => {
     // Ensure CSS files are handled properly
     const cssRule = config.module?.rules?.find((rule: any) =>
