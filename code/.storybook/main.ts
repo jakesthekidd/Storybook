@@ -1,6 +1,13 @@
 // ResizeObserver fix will be loaded via previewHead script
 
+import fs from 'node:fs';
+import path from 'node:path';
 import type { StorybookConfig } from '@storybook/angular';
+
+const resizeObserverPatch = fs.readFileSync(
+  path.resolve(__dirname, 'resize-observer-fix.js'),
+  'utf-8'
+);
 
 const config: StorybookConfig = {
   stories: ['../src/**/*.stories.@(js|jsx|ts|tsx|mdx)'],
@@ -22,13 +29,13 @@ const config: StorybookConfig = {
     options: {},
   },
   previewHead: (head) => `
-    <script src="/resize-observer-fix.js"></script>
+    <script>${resizeObserverPatch}</script>
     ${head}
     <!-- Only load PrimeIcons, PrimeNG theme will be token-driven -->
     <link rel="stylesheet" href="https://unpkg.com/primeicons@7.0.0/primeicons.css">
   `,
   managerHead: (head) => `
-    <script src="/resize-observer-fix.js"></script>
+    <script>${resizeObserverPatch}</script>
     ${head}
   `,
   webpackFinal: async (config) => {
