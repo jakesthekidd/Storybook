@@ -105,7 +105,7 @@
           "builder": "@storybook/angular:start-storybook",
           "options": {
             "configDir": ".storybook",
-            "browserTarget": "code:build",
+            "browserTarget": "code:build:development",
             "compodoc": false,
             "port": 4200,
             "host": "0.0.0.0"
