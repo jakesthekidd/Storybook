@@ -3,6 +3,12 @@
     return;
   }
 
+  if (window.__resizeObserverPatched__) {
+    return;
+  }
+
+  window.__resizeObserverPatched__ = true;
+
   const suppressedMessages = [
     'ResizeObserver loop completed with undelivered notifications',
     'ResizeObserver loop limit exceeded',
@@ -117,6 +123,10 @@
     }
 
     disconnect() {
+      if (this.__frameId) {
+        cancelAnimationFrame(this.__frameId);
+        this.__frameId = 0;
+      }
       return this.__observer.disconnect();
     }
   }
