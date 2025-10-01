@@ -22,7 +22,7 @@
     "@angular/router": "^17.3.0",
     "@builder.io/sdk": "^6.1.2",
     "@storybook/addon-styling": "^2.0.0",
-    "@storybook/addon-themes": "^9.1.2",
+    "@storybook/addon-themes": "^7.6.20",
     "@storybook/addon-toolbars": "^9.0.8",
     "primeflex": "^4.0.0",
     "primeicons": "^7.0.0",
