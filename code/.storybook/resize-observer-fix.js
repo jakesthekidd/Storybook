@@ -4,23 +4,69 @@
   }
 
   const suppressedMessages = [
+    'ResizeObserver loop completed with undelivered notifications',
+    'ResizeObserver loop limit exceeded',
     'ResizeObserver loop completed with undelivered notifications.',
     'ResizeObserver loop completed with undelivered notifications'
   ];
 
+  const isSuppressedMessage = (value) => {
+    if (typeof value !== 'string') {
+      return false;
+    }
+    const normalized = value.trim();
+    return suppressedMessages.some((entry) => normalized.includes(entry));
+  };
+
   const originalConsoleError = typeof console !== 'undefined' && console.error
     ? console.error.bind(console)
+    : null;
+  const originalConsoleWarn = typeof console !== 'undefined' && console.warn
+    ? console.warn.bind(console)
     : null;
 
   if (originalConsoleError) {
     console.error = (...args) => {
-      const message = typeof args[0] === 'string' ? args[0] : '';
-      if (suppressedMessages.some((entry) => message.includes(entry))) {
+      if (args.length > 0 && isSuppressedMessage(args[0])) {
         return;
       }
       originalConsoleError(...args);
     };
   }
+
+  if (originalConsoleWarn) {
+    console.warn = (...args) => {
+      if (args.length > 0 && isSuppressedMessage(args[0])) {
+        return;
+      }
+      originalConsoleWarn(...args);
+    };
+  }
+
+  window.addEventListener('error', (event) => {
+    if (event?.message && isSuppressedMessage(event.message)) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+    }
+  }, true);
+
+  window.addEventListener('unhandledrejection', (event) => {
+    const reasonMessage = typeof event?.reason === 'string' ? event.reason : event?.reason?.message;
+    if (reasonMessage && isSuppressedMessage(reasonMessage)) {
+      event.preventDefault();
+    }
+  });
+
+  const originalWindowOnError = window.onerror;
+  window.onerror = (message, source, lineno, colno, error) => {
+    if (isSuppressedMessage(message) || isSuppressedMessage(error?.message)) {
+      return true;
+    }
+    if (typeof originalWindowOnError === 'function') {
+      return originalWindowOnError(message, source, lineno, colno, error);
+    }
+    return false;
+  };
 
   if (typeof window.ResizeObserver !== 'function') {
     return;
@@ -54,7 +100,7 @@
           try {
             this.__callback(delivery, this);
           } catch (error) {
-            if (originalConsoleError) {
+            if (originalConsoleError && error && !isSuppressedMessage(error.message || error.toString?.())) {
               originalConsoleError(error);
             }
           }
