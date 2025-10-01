@@ -16,11 +16,32 @@
     'ResizeObserver loop completed with undelivered notifications'
   ];
 
+  const extractMessage = (value) => {
+    if (!value) {
+      return '';
+    }
+    if (typeof value === 'string') {
+      return value;
+    }
+    if (value instanceof Error) {
+      return value.message || '';
+    }
+    if (typeof value === 'object') {
+      if (typeof value.message === 'string') {
+        return value.message;
+      }
+      if (Array.isArray(value)) {
+        return value.map(extractMessage).filter(Boolean).join(' ');
+      }
+    }
+    return '';
+  };
+
   const isSuppressedMessage = (value) => {
-    if (typeof value !== 'string') {
+    const normalized = extractMessage(value).trim();
+    if (!normalized) {
       return false;
     }
-    const normalized = value.trim();
     return suppressedMessages.some((entry) => normalized.includes(entry));
   };
 
@@ -33,7 +54,7 @@
 
   if (originalConsoleError) {
     console.error = (...args) => {
-      if (args.length > 0 && isSuppressedMessage(args[0])) {
+      if (args.some(isSuppressedMessage)) {
         return;
       }
       originalConsoleError(...args);
@@ -42,7 +63,7 @@
 
   if (originalConsoleWarn) {
     console.warn = (...args) => {
-      if (args.length > 0 && isSuppressedMessage(args[0])) {
+      if (args.some(isSuppressedMessage)) {
         return;
       }
       originalConsoleWarn(...args);
@@ -50,22 +71,21 @@
   }
 
   window.addEventListener('error', (event) => {
-    if (event?.message && isSuppressedMessage(event.message)) {
+    if (event && (isSuppressedMessage(event.error) || isSuppressedMessage(event.message))) {
       event.preventDefault();
       event.stopImmediatePropagation();
     }
   }, true);
 
   window.addEventListener('unhandledrejection', (event) => {
-    const reasonMessage = typeof event?.reason === 'string' ? event.reason : event?.reason?.message;
-    if (reasonMessage && isSuppressedMessage(reasonMessage)) {
+    if (event && isSuppressedMessage(event.reason)) {
       event.preventDefault();
     }
   });
 
   const originalWindowOnError = window.onerror;
   window.onerror = (message, source, lineno, colno, error) => {
-    if (isSuppressedMessage(message) || isSuppressedMessage(error?.message)) {
+    if (isSuppressedMessage([message, error])) {
       return true;
     }
     if (typeof originalWindowOnError === 'function') {
@@ -106,7 +126,7 @@
           try {
             this.__callback(delivery, this);
           } catch (error) {
-            if (originalConsoleError && error && !isSuppressedMessage(error.message || error.toString?.())) {
+            if (originalConsoleError && error && !isSuppressedMessage(error)) {
               originalConsoleError(error);
             }
           }
