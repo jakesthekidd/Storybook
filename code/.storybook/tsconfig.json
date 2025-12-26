@@ -1,0 +1,17 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "allowJs": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true
+  },
+  "include": [
+    "../src/**/*",
+    "../.storybook/**/*"
+  ],
+  "exclude": [
+    "../src/test.ts",
+    "../src/**/*.spec.ts"
+  ]
+}
